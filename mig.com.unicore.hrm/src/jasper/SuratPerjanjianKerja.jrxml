@@ -1,0 +1,1313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SuratPerjanjianKerja" language="groovy" pageWidth="609" pageHeight="935" columnWidth="589" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="9dc9e23b-f03e-4811-a339-0ca24d11a66d">
+	<property name="ireport.zoom" value="2.0490403660952117"/>
+	<property name="ireport.x" value="415"/>
+	<property name="ireport.y" value="1390"/>
+	<subDataset name="dataset1" uuid="995aadf0-7046-4702-b5b5-4bd3fea79c81"/>
+	<queryString>
+		<![CDATA[select 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="28" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="5f5ecb1e-5cf0-4d8a-a597-906bf7e8950e" x="0" y="0" width="589" height="14"/>
+				<textElement textAlignment="Center">
+					<font isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SURAT PERJANJIAN KERJA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="00e65e08-26de-4aa5-9424-832fcd7ba532" x="0" y="14" width="589" height="14"/>
+				<textElement textAlignment="Center">
+					<font isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Nomor  :    ]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="887" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="479787ad-9c53-4e90-984b-229da5e741fc" x="0" y="0" width="286" height="14"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Yang Bertanda tangan di bawah ini :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b2487fcd-e60a-4aeb-a82c-07ae18ebc755" x="0" y="16" width="286" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[1. Nama           :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bc5cb441-14fa-4c7e-aac9-c43a5f88abf9" x="14" y="26" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Jabatan       :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4fb55f07-bd46-488a-9f62-628e512dd0f6" x="14" y="37" width="250" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Alamat         :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="51" width="264" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Dalam Ha ini bertindak tas nama Direksi ..................................yang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="62" width="264" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[berkedudukan di Jl. KH. Agus Anang No. 02 Ketapang Kuala Panjang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="73" width="264" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Bandar Lampung, Selanjutnya disebut PIHAK PERTAMA.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4fb55f07-bd46-488a-9f62-628e512dd0f6" x="14" y="120" width="250" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Alamat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bc5cb441-14fa-4c7e-aac9-c43a5f88abf9" x="14" y="100" width="274" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Jabatan       :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b2487fcd-e60a-4aeb-a82c-07ae18ebc755" x="0" y="89" width="286" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2. Nama           :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4fb55f07-bd46-488a-9f62-628e512dd0f6" x="14" y="110" width="250" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Pendidikan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4fb55f07-bd46-488a-9f62-628e512dd0f6" x="14" y="130" width="250" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Jenis Kelamin]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4fb55f07-bd46-488a-9f62-628e512dd0f6" x="14" y="141" width="250" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Agama]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4fb55f07-bd46-488a-9f62-628e512dd0f6" x="14" y="154" width="250" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[No.KTP/SIM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4fb55f07-bd46-488a-9f62-628e512dd0f6" x="14" y="166" width="250" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Telp./HP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="183" width="286" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Dalam hal ini bertindak atas nama pribadi selanjutnya di sebut PIHAK KEDUA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="204" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL I]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="214" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PERNYATAAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="227" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="227" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK KEDUA sepakat mengadakan hubungan kerja dengan PIHAK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="238" width="260" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PERTAMA dan bersedia tidak menjalin hungan kerja dengan pihak /]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="249" width="262" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[instansi lain.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="260" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="260" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK PERTAMA dan PIHAK KEDUA menyetujui dan sepakat bahwa dalam]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="271" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[dalam penyelesaian tugas yang diberikan kepada PIHAK KEDUA adalah]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="282" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[merupakan syarat mutlak hubungan kerja.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="327" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK KEDUA bersedia bekerja dibawah tekanan dan memahami jenis]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="327" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="309" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[RUANG LINGKUP PEKERJAAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="298" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL II]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="338" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[perkerjaan sebagai]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="349" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[............................................................................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="360" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="360" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK KEDUA menyatakan bersedia bila sewaktu-waktu bekerja lembur ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="371" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[dengan melampirkan pernyataan dari pihak orang tua / wali.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="396" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[MASA BERLAKU PERJANJIAN KERJA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="385" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL III]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="411" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="411" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Perjanjian kerja ini berlaku untuk jangka waktu :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="422" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[.................................................sd............................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="434" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="434" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK KEDUA bersedia terikat seperti ayat 1 dan bersedia menerima]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="445" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[sangsi pengembalian upah yang diterima seperti pada pasal 6, jika ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="456" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[mengundurkan diri sebelum masa waktu berakhir dengan jumlah sebesar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="467" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[...........................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="466" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 3.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="466" width="260" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Setelah masa waku berakhir jika PIHAK KEDUA dianggap mampu/cakap]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="475" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[dalam kerja dan merasa anyaman, maka kedua belah pihak dapat ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="485" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[membuat perjanjian baru atau memperpanjang masa waktu secara]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="509" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL IV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="520" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[CARA KERJA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="532" width="286" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK PERTAMA atau waki dari Perusahaan, akan memberikan pengarahan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="543" width="286" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[perihal cara kerja sebelum PIHAK KEDUA memulai pekerjaan,hingga PIHAK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="554" width="286" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[KEDUA memulai pekerjaan, hingga PIHAK KEDUA dapat memahami jelas]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="565" width="286" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Pekerjaannya]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="589" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[JAM KERJA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="580" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL V]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="602" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="602" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Berdasarkan peraturan ketenaga kerjaan yang berlalu empat puluh jam]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="613" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[setiap minggu dan atau enam hari kerja efektif setiap minggu mengingat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="624" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[mengingat jenis pekerjaan tidak setiap jam efektip]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="636" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="636" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Jam masuk kerja dan jam peluang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="647" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[....................................................................................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="658" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[....................................................................................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="684" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[UPAH DAN PEMBAYARAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="2" y="674" width="284" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL VI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="30" y="696" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK PERTAMA memberikan upah sebesar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="2" y="696" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="30" y="707" width="256" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Rp. ..........................dan dihitung dari setiap kehadiran PIHAK KEDUA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="2" y="721" width="28" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="30" y="721" width="256" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Sebagai pengganti kelebihan jam kerja/lembur kedua belah PIHAK setuju ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="30" y="732" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[dengan konvensasi lembur sebesar Rp. ...............................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="30" y="743" width="258" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[untuk kelebihan jam kerjanya selama 1 bulan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="1" y="758" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL VII]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="1" y="769" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[LEMBUR KERJA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="2" y="783" width="284" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK KEDUA bersedia bekerja lembur pada hari libur dan atau libur nasional]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="794" width="286" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[jika diminta untuk bekerja oleh PIHAK PERTAMA dengan dua kali upah dari]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="6b0ad0f4-eaf3-4036-884f-d7ec3d34c3f5" x="289" y="0" width="1" height="882"/>
+			</line>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="805" width="286" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[hari biasa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="289" y="0" width="300" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL IX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="288" y="10" width="301" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[BERAKHIRNYA PERJANJIAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="21" width="27" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="21" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Setiap saat hubungan kerja dapat berakhir jika PIHAK KEDUA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="31" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[melanggar tertib, peraturan dan sistem kerja yang berlaku pada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="41" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Perusahaan PIHAK PERTAMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="52" width="27" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="52" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Pelanggaran yang di maskud pada ayat 1 tersebut adalah :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="301" y="62" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="62" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Pada saat perjanjian kerja diadakan tidak memberikan keterangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="72" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[palsu atau dipalsukan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="301" y="83" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="83" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Tidak masuk kerja 3 (tiga) hari tanpa keterangan tertulis atau alasan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="93" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[syah yang dapat dibenarkan oleh undang-undang yang berlaku]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="301" y="104" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="104" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Melakukan tindakan penipuan, pencurian, penggelapan dan atau]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="114" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[tindakan melawan hukum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="301" y="125" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="318" y="125" width="271" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Menyalah gunakan wewenang dan jabatan untuk kepentingan pribadi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="301" y="136" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="136" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Melakukan perusakan dengan sengaja dan atau kecerobohan yang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="147" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[menimbulkan kerugian atau bahaya teman kerja maupun perusahaan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="157" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK PERTAMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="301" y="168" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.6]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="318" y="168" width="271" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Melakukan segala bentuk perjudian di lingkungan perusahaan dan ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="178" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[tindakan asusila di tempat kerja atau tempat kejadian lain yang ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="188" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[mengakibatkanterlibat hukum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="301" y="198" width="16" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.7]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="199" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Mabuk-mabukan atau mengkonsumsi narkoba dan obat-obatan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="209" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[terlarang dilingkungan kerja]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="301" y="219" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.8]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="219" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Melakukan keributan atau keonaran yang mengganggu suasana kerja]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="229" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[di lingkungan kerja]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="301" y="239" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.9]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="239" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Melakukan perkelahian atau penganiayaan, menghina secara kasar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="318" y="249" width="271" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[dan mengancam pengusaha keluarga pengusaha atau teman kerja]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="300" y="260" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.10]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="260" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Membujuk pengusaha atau teman kerja untuk melakukan sesuatu yang ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="270" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[bertentangan dengan hukum dan kesusilaan serta mengajak atau]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="280" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[mengintimidasi teman kerja untuk melawan atasan atau mogok kerja]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="300" y="291" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.11]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="291" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Dengan sengaja atau ceroboh mempropokasi pribadi atau orang ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="300" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[lain (bukan karyawan) membiarkan merusak aset, membahayakan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="310" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[jiawa teman kerja dan perusahaan PIHAK PERTAMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="300" y="321" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.12]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="321" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Membongkar rahasia perusahaan atau mencemarkan nama baik ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="331" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[pimpinan perusahaan dan keluarga yang seharusnya dirahasiakan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="300" y="341" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.13]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="341" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Tidak menunjukan perbaikan atau melakukan pelanggaran lagi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="351" width="272" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[meskipun telah diberikan peringatan terakhir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="301" y="361" width="17" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[2.14]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="318" y="361" width="271" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Tidak cakap melakukan pekerjaan walaupun sudah di coba dibidang ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="318" y="371" width="271" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[tugas yang ada. Melanggar ketentuan yang telah ditetapkan dalam]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="318" y="381" width="271" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[peraturan Perusahaan dan perjanjian kerja yang telah di sepakati.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="399" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Perusahaan mengakhiri hubungan kerja, sebelum waktu masa berakhir perjanjian ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="409" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[dengan alasan tersebut diatas serta alasan lain yang layak, PIHAK KEDUA ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="419" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[bersediadan sanggup menerima atas pribadi maupun keluarga PIHAK KEDUA ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="429" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[tanpa ada tuntukan apapun (tanpa syarat)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="444" width="299" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL X]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="454" width="299" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[THR KEAGAMAAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="465" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK KEDUA diberikan THR kegamaan berdasarkan hari perayaan pada Agama]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="476" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[yang tercantum pada perjanjian ini di hitung berasarkan kehadiran dan hasil rata-]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="485" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[rata perbulan dan atau masa kerja dibawah satu tahun secara proporsional]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="499" width="299" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL XI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="289" y="508" width="300" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[KEADAAN DARURAT (FORCE MAJOR)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="519" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Perjanjian kerja ini batal dengan sendirinya jika karena keadaan atau situasi yang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="529" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[yang memaksa seperti : bencana alam, pembrontakan, perang, huru-hara,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="540" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[kerusuhan, darurat negara atau apapun yang mengakibatkan perjanjian kerja ini]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="551" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[tidak mungkin lagi untuk diwujudkan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="565" width="299" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL XII]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="576" width="299" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[CUTI DAN PELAKSANAANNYA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="589" width="27" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="319" y="589" width="270" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK KEDUA berhak memperoleh masa cuti selama 12 (dua belas)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="319" y="599" width="270" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[hari kerja, apabila masa kerjanya telah mencapai 12 (dua belas) bulan ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="319" y="609" width="270" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[terus menerus]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="292" y="620" width="27" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="318" y="620" width="271" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PIHAK KEDUA mengajukan surat permohonan cuti terlebih dahulu yang ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="319" y="630" width="270" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[yang disetujui oleh atasan kepada pihak pertama selambat-lambatnya 15]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="319" y="640" width="270" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[(lima belas) hari sebelum masa cuti dilaksanakan.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="293" y="659" width="296" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL XIII]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="292" y="669" width="297" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PENYELESAIAN PERSELISIHAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="687" width="271" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Apabila terjadi perselisihan antara kedua belah pihak lebih mengutamakan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="687" width="27" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="317" y="697" width="271" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[musyawarah untuk mencapai mufakat.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="291" y="708" width="27" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Ayat 2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="318" y="708" width="270" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Apabila tidak tercapai seperti ayat 1, maka kedua belah pihak sepakat untuk]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="318" y="718" width="270" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[menyelesaikan permasalahan tersebut dilakukan melalui panitia hukum ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="318" y="728" width="270" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[berkedudukan Pengadilan Tanjung Karang Lampung.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="745" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Demikain Surat Perjanjian ini dibuat, dipahami dalam keadaan sadar kedua belah]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="755" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[pihak dan bersedia menjalankan tugas dan tanggung jawab masing-masing pihak]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="765" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[selanjutnya tidak ada janji-jani / syarat lain. Ditandatangani bermaterai cukup dan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="775" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[dan perjanjian ini bagian tidak terpisahkan dari ketentuan dari peraturan perusahaan.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="794" width="298" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Dibuat di : Bandar Lampung]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="292" y="805" width="296" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Tanggal : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="290" y="828" width="300" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[              Mewakili Perusahaan :                                                        Menyetujui,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="294" y="860" width="296" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[             (                                      )                                         (                                   )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="28" y="521" width="272" height="11"/>
+				<textElement>
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[tertulis]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="3" y="839" width="283" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Biaya pengobatan Karyawan di tanggung oleh BPJS kesehatan dengan ketentuan-]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="0" y="828" width="286" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PENGOBATAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="3" y="850" width="283" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[ketentuan yang telah berlaku, dibebankan sebesar 1% kepada PIHAK KEDUA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="3" y="860" width="283" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[dan BPJS Ketenaga kerjaan 2% dari upah yang tedaftar.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="-3" y="817" width="289" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PASAL VIII]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="927ca84b-9ec2-48e4-b256-cffdb88ee9f1" x="295" y="871" width="296" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[                     PIHAK PERTAMA                                                PIHAK KEDUA]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+</jasperReport>

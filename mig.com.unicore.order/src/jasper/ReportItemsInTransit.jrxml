@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportItemsInTransit" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bc7222fd-95bb-4a1a-8b8c-26cd0fd089bd">
+	<property name="ireport.zoom" value="1.2396694214876032"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="NoPolisi" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select pl.datedoc,sh.documentno as noshipping,am.name as nmkendaraan,pr.documentno as noplreturn,em.name as nmsupir,
+ pl.documentno as nopl,mp.value as kdbarang,mp.name as nmbarang,uomconversiontostr(mp.m_product_id,SUM(pll.qtyentered)) as qty
+from UNS_PL_Return pr
+ left join UNS_PackingList pl on pl.uns_packinglist_id=pr.uns_packinglist_id
+ left join UNS_PackingList_Order po on po.uns_packinglist_id=pl.uns_packinglist_id
+ left join UNS_PackingList_Line pll on pll.uns_packinglist_order_id=po.uns_packinglist_order_id
+ left join m_product mp on mp.m_product_id=pll.m_product_id
+ left join uns_shippingfreight shf on shf.uns_packinglist_id=pl.uns_packinglist_id and shf.freighttype='PLS'
+ left join uns_shipping sh on sh.uns_shipping_id=shf.uns_shipping_id
+ left join uns_armada am on am.uns_armada_id=sh.uns_armada_id
+ left join uns_employee em on em.uns_employee_id=sh.uns_employee_id
+where pr.docstatus in('DR') AND Case When $P{NoPolisi} IS NOT NULL THEN $P{NoPolisi}=am.UNS_Armada_ID ELSE 1=1 END
+and pl.datedoc>= $P{StartDate} and pl.datedoc<=$P{EndDate}
+GROUP BY pl.datedoc,sh.documentno,am.name,pr.documentno,em.name,pl.documentno,mp.value,mp.name,mp.m_product_id
+order by am.name]]>
+	</queryString>
+	<field name="datedoc" class="java.sql.Timestamp"/>
+	<field name="noshipping" class="java.lang.String"/>
+	<field name="nmkendaraan" class="java.lang.String"/>
+	<field name="noplreturn" class="java.lang.String"/>
+	<field name="nmsupir" class="java.lang.String"/>
+	<field name="nopl" class="java.lang.String"/>
+	<field name="kdbarang" class="java.lang.String"/>
+	<field name="nmbarang" class="java.lang.String"/>
+	<field name="qty" class="java.lang.String"/>
+	<group name="PackingListReturn">
+		<groupExpression><![CDATA[$F{noplreturn}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField>
+					<reportElement x="23" y="2" width="78" height="13" uuid="0b070015-8de4-4e08-ba30-cb19799724e8"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmkendaraan}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="NamaKendaraan">
+		<groupExpression><![CDATA[$F{nmkendaraan}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement x="174" y="0" width="100" height="13" uuid="4cc3aab5-8c7f-4a4a-ae06-d6f67c54a241"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{noplreturn}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="27" y="0" width="74" height="13" uuid="5dce85ee-9be5-4fbf-9b12-42e7adbdb8a0"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nopl}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="101" y="0" width="73" height="13" uuid="dda240cf-c7be-433e-a75a-619bd3a3c937"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{datedoc}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="7">
+				<line>
+					<reportElement x="1" y="3" width="238" height="1" uuid="f6e6416b-8bc9-4714-9bf7-3812f7c7d35f"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="53" splitType="Stretch">
+			<staticText>
+				<reportElement x="455" y="0" width="117" height="11" uuid="168cf365-b0f8-4628-808f-6dec5fd17c45"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="21" uuid="04ae994c-8280-47ce-88e0-9afc64f786ae"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Report Items Intransit [Armada]]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="16" width="572" height="14" uuid="0e8e0a65-d6bb-43d6-ba2e-81e19d23389b"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Periode Tanggal "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' s/d '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="22" width="104" height="14" uuid="18637fe3-0264-4051-b394-314a2a8df87b"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Kendaraan ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="178" y="33" width="61" height="15" uuid="2f971f35-7a0a-4330-86cf-5f7c82519622"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No PL Return]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="239" y="33" width="199" height="20" uuid="985143cd-5aeb-4e72-bc92-e0bce8bb7ac5"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="463" y="33" width="109" height="20" uuid="cde02308-9077-4443-941a-d15999c4fca0"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total Qty]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="47" width="571" height="1" uuid="c44f0ea2-9d97-46d1-9331-3815286531a3"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="452" y="16" width="80" height="20" uuid="75f9bc64-9db2-43d5-86c3-19b7c886dd73"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="532" y="16" width="40" height="20" uuid="02a385ca-83cc-420c-ac9d-c04750d5aba3"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="33" width="104" height="14" uuid="3c7825d8-d7e9-47a6-ae5a-15f2c6d3e8b4"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Packing List]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="33" width="78" height="12" uuid="2cbd1a14-bf8f-4bb7-90f3-d16ac90b973a"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Packing LIst]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement x="219" y="0" width="55" height="13" uuid="24deef8e-8bb7-4fd4-aea3-54a5ba3c4d4c"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kdbarang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="274" y="0" width="178" height="13" uuid="c7a2aa8b-adca-49fb-86af-a3a2eab37ae2"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmbarang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="463" y="0" width="109" height="13" uuid="fe2ecf6c-2f2f-4b49-9ee0-6f99a4f79614"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

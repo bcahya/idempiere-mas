@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportBukuSaldoPiutang" language="groovy" pageWidth="595" pageHeight="842" columnWidth="585" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="706199ef-2142-4cb3-a859-836ee1dbc19e">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT sr.name,concat(cb.bpartnersearchkey,'-',cb.bpartnername)  AS NamaCustomer,count(cb.bpartnername) as jmlnota,sum(ci.grandtotal) as ttlnota,sum(invoiceopentodate(ci.c_invoice_id,0,$P{EndDate})) as sisa
+FROM C_Invoice ci
+INNER JOIN c_bpartner_location cb ON ci.c_bpartner_location_id=cb.c_bpartner_location_id
+INNER JOIN c_bpartner bp on ci.c_bpartner_id=bp.c_bpartner_id
+INNER JOIN ad_user ad ON ci.salesrep_id=ad.ad_user_id
+INNER JOIN ad_org org on ci.ad_org_id=org.ad_org_id
+INNER JOIN c_salesregion sr on org.c_salesregion_id=sr.c_salesregion_id
+WHERE ci.dateinvoiced<=$P{EndDate} and ci.docstatus in('CL','CO') AND
+ci.c_doctype_id IN (SELECT c_doctype_id from c_doctype where docbasetype='ARI')
+and (Case When $P{C_SalesRegion_ID} is not null then ci.ad_org_id in(select ad_org_id from ad_org where c_salesregion_id=$P{C_SalesRegion_ID}) else 1=1 end)
+and (Case When $P{C_BPartner_ID}!=0 then ci.c_bpartner_id=$P{C_BPartner_ID} else 1=1 end)
+and ci.ispaid='N'
+group by cb.c_bpartner_location_id,sr.c_salesregion_id
+order by sr.name,cb.bpartnername]]>
+	</queryString>
+	<field name="name" class="java.lang.String"/>
+	<field name="namacustomer" class="java.lang.String"/>
+	<field name="jmlnota" class="java.lang.Long"/>
+	<field name="ttlnota" class="java.math.BigDecimal"/>
+	<field name="sisa" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="37">
+			<staticText>
+				<reportElement uuid="5e5ae45e-0428-4d8d-b63d-65a374a73206" x="40" y="26" width="174" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0ddd37d8-9812-43fb-b53a-bc19e0e42cb0" x="0" y="0" width="81" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Buku Saldo Piutang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="47b053b2-66a9-45df-85bd-e075d5dd7b3b" x="0" y="13" width="81" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Per Tanggal]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="13c75858-e6f7-4164-b1af-dde4a0c89a92" x="81" y="13" width="100" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{EndDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="8f72a625-f54c-42a2-a515-14f316efee34" x="0" y="26" width="40" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e94e41b0-3957-4379-aa34-c4fa59f1170b" x="214" y="26" width="87" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jumlah Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5c608875-5c19-4bc2-b0a3-acba5e44881c" x="301" y="26" width="126" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Value Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="57280497-6629-46cd-b342-bc85beff8eb4" x="427" y="26" width="128" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sisa Invoice]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement uuid="fdf8c450-8ee3-4813-9d8b-5eba11ea2f2b" x="40" y="0" width="174" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namacustomer}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a3954293-9e07-4fcf-8511-91ec608305bb" x="214" y="0" width="87" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jmlnota}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="52c76cef-86ae-45bd-bdef-3b60c1555747" x="301" y="0" width="126" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ttlnota}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="26bbd3ac-9a67-48bc-889b-1e93485c181e" x="427" y="0" width="128" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sisa}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4ea2c662-8ac3-4cd8-bc62-55b2058ea066" x="0" y="0" width="40" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

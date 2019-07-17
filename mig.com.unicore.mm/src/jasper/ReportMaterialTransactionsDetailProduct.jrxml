@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportMaterialTransactionsDetailProduct" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="83191135-207c-4d33-bf5e-27fd1de33cb9">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_User_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_Product_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_Warehouse_ID" class="java.lang.Integer"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\dev\\UntaCore@TMG\\com.unicore.base\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_Product_Category_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT COALESCE(mi.documentno,mt.documentno,pc.documentno,pl.documentno,mm.documentno, pn.documentno) AS DocumentNo, wh.Name AS Warehouse, COALESCE(ads.RealName, ads.name) AS Created, loc.Value AS Locator, p.Name AS Items, p.value AS DocumentProduct, rl.Name AS Type, trx.MovementQty AS Qty, trx.MovementDate AS MovementDate,now() AS DatePrint, COALESCE(uom.UOMSymbol, uom.Name) AS UOM, p.M_Product_ID AS IDPRoduct, loc.M_Locator_ID AS IDLoc, CASE WHEN $P{DateTo}::timestamp IS NOT NULL THEN $P{DateTo}::timestamp ELSE now()::timestamp END AS DateTrx,
+(SELECT COALESCE(SUM(QtyOnHand),0) FROM M_Storage s WHERE s.M_Product_ID = p.M_Product_ID AND s.M_Locator_ID = loc.M_Locator_ID AND QtyOnHand <> 0) AS StockNow
+
+FROM M_Transaction trx
+
+INNER JOIN M_Product p ON p.M_Product_ID = trx.M_Product_ID
+INNER JOIN M_Product_Category mc ON mc.M_Product_Category_ID=p.M_Product_Category_ID
+INNER JOIN C_UOM uom ON uom.C_UOM_ID = p.C_UOM_ID
+INNER JOIN M_Locator loc ON loc.M_Locator_ID = trx.M_Locator_ID
+INNER JOIN M_Warehouse wh ON wh.M_Warehouse_ID = loc.M_Warehouse_ID
+INNER JOIN AD_Reference rf ON rf.Name = 'M_Transaction Movement Type'
+INNER JOIN AD_Ref_List rl ON rl.AD_Reference_ID = rf.AD_Reference_ID AND rl.Value = trx.MovementType
+INNER JOIN AD_Org ao ON ao.AD_Org_ID = wh.AD_Org_ID
+LEFT JOIN AD_User us ON us.AD_User_ID = $P{AD_User_ID}
+INNER JOIN AD_User ads ON ads.AD_User_ID=trx.Createdby
+LEFT JOIN AD_User_OrgAccess uo ON uo.AD_User_ID = us.AD_User_ID
+LEFT JOIN M_InventoryLine mil ON mil.M_InventoryLine_ID=trx.M_InventoryLine_ID
+LEFT JOIN M_Inventory mi ON mi.M_Inventory_ID=mil.M_Inventory_ID
+LEFT JOIN M_InoutLine min ON min.M_InoutLine_ID=trx.M_InoutLine_ID
+LEFT JOIN M_Inout mt ON mt.M_Inout_ID=min.M_Inout_ID
+LEFT JOIN UNS_PL_Confirmproduct pcp ON pcp.UNS_PL_Confirmproduct_ID=trx.UNS_PL_Confirmproduct_ID
+LEFT JOIN UNS_PL_Confirm pc ON pc.UNS_PL_Confirm_ID=pcp.UNS_PL_Confirm_ID
+LEFT JOIN UNS_PackingList pl ON pl.UNS_PackingList_ID=pc.UNS_PackingList_ID
+LEFT JOIN UNS_Production_detail pd ON pd.UNS_Production_detail_ID=trx.UNS_Production_detail_ID
+LEFT JOIN UNS_Production pn ON pn.UNS_Production_ID=pd.UNS_Production_ID
+LEFT JOIN M_MovementLine mml ON mml.M_MovementLine_ID=trx.M_MovementLine_ID
+LEFT JOIN M_Movement mm ON mm.M_Movement_ID=mml.M_Movement_ID
+
+
+WHERE (CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN trx.MovementDate >= $P{DateFrom}::timestamp AND trx.MovementDate <= $P{DateTo}::timestamp
+WHEN $P{DateFrom}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN trx.MovementDate >= $P{DateTo}::timestamp
+WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN trx.MovementDate >= $P{DateFrom}::timestamp ELSE 1=1 END)
+AND
+(CASE WHEN $P{AD_Org_ID} IS NOT NULL THEN ao.AD_Org_ID = $P{AD_Org_ID} WHEN us.UserAgent = 'N' THEN ao.AD_Org_ID = us.AD_Org_ID ELSE 1=1 END)
+AND
+(CASE WHEN $P{M_Product_ID} IS NOT NULL THEN p.M_Product_ID = $P{M_Product_ID} ELSE 1=1 END)
+AND
+(CASE WHEN $P{M_Warehouse_ID} IS NOT NULL THEN wh.M_Warehouse_ID = $P{M_Warehouse_ID} ELSE 1=1 END)
+AND
+(CASE WHEN $P{M_Product_Category_ID} IS NOT NULL THEN mc.M_Product_Category_ID = $P{M_Product_Category_ID} ELSE 1=1 END)
+
+ORDER BY Items, Warehouse, Locator, MovementDate, Type, created]]>
+	</queryString>
+	<field name="documentno" class="java.lang.String"/>
+	<field name="warehouse" class="java.lang.String"/>
+	<field name="created" class="java.lang.String"/>
+	<field name="locator" class="java.lang.String"/>
+	<field name="items" class="java.lang.String"/>
+	<field name="documentproduct" class="java.lang.String"/>
+	<field name="type" class="java.lang.String"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="movementdate" class="java.sql.Timestamp"/>
+	<field name="dateprint" class="java.sql.Timestamp"/>
+	<field name="uom" class="java.lang.String"/>
+	<field name="idproduct" class="java.lang.Integer"/>
+	<field name="idloc" class="java.lang.Integer"/>
+	<field name="datetrx" class="java.sql.Timestamp"/>
+	<field name="stocknow" class="java.math.BigDecimal"/>
+	<variable name="totalQty" class="java.math.BigDecimal" resetType="Group" resetGroup="Locator" calculation="Sum">
+		<variableExpression><![CDATA[$F{qty}]]></variableExpression>
+	</variable>
+	<group name="Product">
+		<groupExpression><![CDATA[$F{idproduct}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement x="0" y="0" width="555" height="20" uuid="c8367457-7bd5-4277-a1ec-47dc141b4761"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["#Search Key :: " + $F{documentproduct} + "  #Product :: " + $F{items}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="warehouse">
+		<groupExpression><![CDATA[$F{warehouse}]]></groupExpression>
+	</group>
+	<group name="Locator" keepTogether="true">
+		<groupExpression><![CDATA[$F{locator}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<staticText>
+					<reportElement x="390" y="0" width="85" height="20" uuid="57f25bba-7224-47b1-9e38-35c3cf19fd2d"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Transaction]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="515" y="0" width="40" height="20" uuid="d126d085-506d-47a4-98cf-479385cf6ba1"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[UOM]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="310" y="0" width="80" height="20" uuid="4e0b38a3-0161-4603-94ff-c415de5d4f21"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Movement Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="475" y="0" width="40" height="20" uuid="6d897ab9-f3eb-4d99-b775-d79f1d89e42c"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Qty]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="253" y="0" width="57" height="20" uuid="10f8e103-1c20-426c-8692-5b0099a54564"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Document No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="184" y="0" width="69" height="20" uuid="b4b33a19-f566-45a6-a225-ff2f09399e7d"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Created By]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="98" y="0" width="86" height="20" uuid="fb992ded-8e8b-4a6d-8187-44ee04344dd3"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Locator]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="0" width="98" height="20" uuid="b54094c4-58f2-4ce2-b6d9-c6324ae8b5e2"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Warehouse]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="49">
+				<subreport>
+					<reportElement x="0" y="0" width="555" height="40" uuid="7c1bfd7f-d7cf-4e56-9d63-888c679a392a"/>
+					<subreportParameter name="DateTrx">
+						<subreportParameterExpression><![CDATA[$F{datetrx}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="M_Product_ID">
+						<subreportParameterExpression><![CDATA[$F{idproduct}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="SubQty">
+						<subreportParameterExpression><![CDATA[$V{totalQty}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="StockNow">
+						<subreportParameterExpression><![CDATA[$F{stocknow}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="M_Locator_ID">
+						<subreportParameterExpression><![CDATA[$F{idloc}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportMaterialTransactionsDetailProduct_Subreport1.jasper"]]></subreportExpression>
+				</subreport>
+				<line>
+					<reportElement x="0" y="44" width="555" height="1" uuid="287576f8-3f67-4f5e-b576-3d86f9d538c7"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="1" width="555" height="24" uuid="39cedcf2-e978-40df-833c-4c8e56ea8623"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORT MATERIAL TRANSACTION (DETAIL BY PRODUCT)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="25" width="555" height="20" uuid="ef208be8-6d9a-4759-b44c-34a71b9c1dfd"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DateFrom} != null && $P{DateTo} != null ? new SimpleDateFormat("dd-MM-yyyy").format($P{DateFrom})
++ " - " + new SimpleDateFormat("dd-MM-yyyy").format($P{DateTo}) :
+
+$P{DateFrom} == null && $P{DateTo} != null ? "Beginning Times Until "
++ new SimpleDateFormat("dd-MM-yyyy").format($P{DateTo}) :
+
+$P{DateFrom} != null && $P{DateTo} == null ?
+new SimpleDateFormat("dd-MM-yyyy").format($P{DateFrom}) + " Until Now"
+: "All Times"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="435" y="45" width="40" height="15" uuid="51bc3311-9936-4201-a496-f5c80ad3b7cb"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Date Print]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="475" y="45" width="10" height="15" uuid="8f502335-a49f-4a7e-a7ff-2f46d113ac52"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="485" y="45" width="70" height="15" uuid="efc648ff-ca25-4da0-9e92-8de5362612dc"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateprint}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="475" y="0" width="80" height="11" uuid="9216fb79-5d8d-4a40-b8d2-df1e9dc151b2"/>
+				<textElement textAlignment="Right" markup="none">
+					<font size="6" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCore ERP]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="390" y="0" width="85" height="20" uuid="c23a5cbf-ee48-478e-b2d2-48b068ee4d74"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{type}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="475" y="0" width="40" height="20" uuid="0d63a7de-d5aa-4483-aee4-7fc7f74066e6"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="515" y="0" width="40" height="20" uuid="edce17d8-28ab-49b8-b41d-db70f77aab18"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{uom}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="253" y="0" width="57" height="20" uuid="3bdd43d7-a9ec-434b-b57d-aeb3b905971b"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{documentno} == null ? "" : $F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy">
+				<reportElement x="310" y="0" width="80" height="20" uuid="564e2e6b-4e37-4a42-92cd-f1c102962c01"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{movementdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="184" y="0" width="69" height="20" uuid="b6fc50ea-acce-4eab-a298-ec58a39efcac"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{created}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="98" y="0" width="86" height="20" uuid="a618fa68-c166-43c2-8173-31ea688d7381"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{locator}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="98" height="20" uuid="18a71f77-7f1c-42de-9c82-053392c1e3fc"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{warehouse}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20">
+			<textField>
+				<reportElement x="435" y="0" width="80" height="20" uuid="c3d1d38a-4bbd-4d8f-8ea0-3f1d7b534de6"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="515" y="0" width="40" height="20" uuid="4cf34f5d-fff5-450b-adf6-c9ea73a5def0"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

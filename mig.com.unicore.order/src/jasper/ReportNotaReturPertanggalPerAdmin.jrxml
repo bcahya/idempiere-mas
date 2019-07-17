@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportNotaReturPertanggalPerAdmin" language="groovy" pageWidth="611" pageHeight="395" columnWidth="581" leftMargin="10" rightMargin="20" topMargin="10" bottomMargin="6" uuid="c153ae6c-2466-4937-be27-377cf31bd240">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT uomconversiontostr(m_product."m_product_id",c_invoiceline."qtyinvoiced") as qty,
+     c_invoice."grandtotal" as Gtot,
+     c_invoice."adddiscountamt" as DisFak,
+     c_invoice."documentno" AS NoFaktur,
+     c_invoice."dateinvoiced" AS TglFaktur,
+     c_bpartner."name" AS NamaSupplier,
+     c_invoiceline."priceactual" AS Pricelist,
+     c_invoiceline."linenetamt" AS jumlah,
+     c_invoiceline."discountamt" AS Discount,
+     m_product."value" AS KodeProduk,
+     m_product."name" AS NmProduk,
+     c_invoicetax."taxamt" AS ppn,
+     ad_user."name" AS NamaSales,
+     c_bpartner_location."name" AS Alamat,
+     ad_org."name" AS org,
+     c_invoice."description" As Catatan,
+     rayon.name as rayon,
+     c_invoice.dateinvoiced +interval '1 days' *(select "c_paymentterm"."netdays" from "c_paymentterm" where c_paymentterm_id=c_invoice."c_paymentterm_id") as TglJtempo,
+     getterbilangrupiah(c_invoice."grandtotal") as terbilang,invoiceopen(c_invoice."c_invoice_id",0) as sisa,
+     u.name as user
+FROM
+     "adempiere"."c_bpartner" c_bpartner
+     left JOIN "adempiere"."c_invoice" c_invoice ON c_bpartner."c_bpartner_id" = c_invoice."c_bpartner_id"
+     left JOIN "adempiere"."c_invoiceline" c_invoiceline ON c_invoice."c_invoice_id" = c_invoiceline."c_invoice_id"
+     left JOIN "adempiere"."c_invoicetax" c_invoicetax ON c_invoice."c_invoice_id" = c_invoicetax."c_invoice_id"
+     left JOIN "adempiere"."m_product" m_product ON c_invoiceline."m_product_id" = m_product."m_product_id"
+     left JOIN "adempiere"."ad_user" ad_user ON c_invoice."salesrep_id" = ad_user."ad_user_id"
+     left join "adempiere"."c_bpartner_location" c_bpartner_location  on c_invoice."c_bpartner_location_id"=c_bpartner_location."c_bpartner_location_id"
+     left JOIN "adempiere"."ad_org" ad_org on c_invoice."ad_org_id" = ad_org."ad_org_id"
+     left join uns_rayon rayon on rayon.uns_rayon_id=c_bpartner_location.uns_rayon_id
+     left join ad_user u on u.ad_user_id = $P{AD_User_ID}
+WHERE (c_invoice.c_doctype_id IN ( SELECT c_doctype.c_doctype_id FROM c_doctype WHERE c_doctype.docbasetype = 'ARC'))
+and c_bpartner."isvendor"='N' and c_invoice.createdby=$P{AD_User_ID}
+and c_invoice."dateinvoiced">=$P{StartDate} and c_invoice."dateinvoiced"<=$P{EndDate}
+and c_invoice."docstatus"='CO'
+order by ad_user."name",c_invoice."documentno"]]>
+	</queryString>
+	<field name="qty" class="java.lang.String"/>
+	<field name="gtot" class="java.math.BigDecimal"/>
+	<field name="disfak" class="java.math.BigDecimal"/>
+	<field name="nofaktur" class="java.lang.String"/>
+	<field name="tglfaktur" class="java.sql.Timestamp"/>
+	<field name="namasupplier" class="java.lang.String"/>
+	<field name="pricelist" class="java.math.BigDecimal"/>
+	<field name="jumlah" class="java.math.BigDecimal"/>
+	<field name="discount" class="java.math.BigDecimal"/>
+	<field name="kodeproduk" class="java.lang.String"/>
+	<field name="nmproduk" class="java.lang.String"/>
+	<field name="ppn" class="java.math.BigDecimal"/>
+	<field name="namasales" class="java.lang.String"/>
+	<field name="alamat" class="java.lang.String"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="catatan" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="tgljtempo" class="java.sql.Timestamp"/>
+	<field name="terbilang" class="java.lang.String"/>
+	<field name="sisa" class="java.math.BigDecimal"/>
+	<field name="user" class="java.lang.String"/>
+	<variable name="Totfaktur" class="java.math.BigDecimal" resetType="Group" resetGroup="Salesman" calculation="Sum">
+		<variableExpression><![CDATA[$F{gtot}]]></variableExpression>
+	</variable>
+	<variable name="Nourut" class="java.lang.Integer" resetType="Group" resetGroup="Salesman" incrementType="Group" incrementGroup="Noretur" calculation="Count">
+		<variableExpression><![CDATA[new Integer("1")]]></variableExpression>
+		<initialValueExpression><![CDATA[new Integer("0")]]></initialValueExpression>
+	</variable>
+	<variable name="Gtot1" class="java.math.BigDecimal" resetType="Group" resetGroup="Salesman" incrementType="Group" incrementGroup="Noretur" calculation="Sum">
+		<variableExpression><![CDATA[$F{gtot}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="Gsisa" class="java.math.BigDecimal" resetType="Group" resetGroup="Salesman" incrementType="Group" incrementGroup="Noretur" calculation="Sum">
+		<variableExpression><![CDATA[$F{sisa}]]></variableExpression>
+	</variable>
+	<group name="Salesman">
+		<groupExpression><![CDATA[$F{namasales}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement uuid="dbbccefd-64ed-42f6-a770-557275b3cf5a" x="0" y="0" width="100" height="11"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{namasales}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<line>
+					<reportElement uuid="dc17542c-dbcb-4f53-a396-9a1fd5541eb0" x="0" y="6" width="194" height="1"/>
+				</line>
+				<textField>
+					<reportElement uuid="28c21606-8f9b-42b8-84c5-0013ba2ad211" x="199" y="2" width="195" height="11"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA['TOTAL '+$F{namasales}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="2aa5c22f-3281-43cc-b4d6-e735f0ba46d9" x="438" y="2" width="63" height="13"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Gtot1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="41cd88b2-bca2-4cac-abb4-ef537fd36364" x="511" y="2" width="63" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Gsisa}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Noretur">
+		<groupExpression><![CDATA[$F{nofaktur}+$F{namasupplier}]]></groupExpression>
+		<groupHeader>
+			<band height="14">
+				<textField pattern="dd/MM/yyyy">
+					<reportElement uuid="0e354010-cbde-4499-82e2-d0522f20279a" x="28" y="0" width="48" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tglfaktur}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="244a8a18-3af9-42d8-bcf8-bb64526b8019" x="76" y="0" width="47" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nofaktur}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="1d1d6242-bd9b-47ea-88cd-820ab8d950ca" x="127" y="0" width="98" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{namasupplier}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="bd10710f-e7ff-46c2-a172-3e1c039389ea" x="228" y="0" width="182" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="63b81d2b-e128-461f-a815-80339b4bdd8e" x="0" y="0" width="28" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Nourut}.intValue()+1]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="a87c505a-6ada-403c-a7f0-d2ddaf1ebcb4" x="448" y="0" width="53" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{gtot}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="ce4ea1b1-d990-41a1-a925-7c8f848d48ec" x="514" y="0" width="60" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{sisa}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="42" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="89c5d3bd-7695-4d59-82ab-0dc6be131afa" x="487" y="0" width="94" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="e33747de-bed1-4330-8a47-fcce8cd72e86" x="0" y="0" width="581" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA['Report Nota Retur Per Tanggal '+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' sampai '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="827724f9-851e-4309-94c0-8f75cc9160e1" x="0" y="27" width="17" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6159dd71-b29a-4c56-ba0d-9043bd3fc3ae" x="29" y="27" width="47" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0fa157e8-3915-4ad9-b0e3-66fa18ad2595" x="76" y="27" width="47" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.Retur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f3a7da75-5b95-4ba4-8b1d-26938793df4a" x="128" y="27" width="47" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Toko]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="091a6d6b-b808-49c1-a783-30114d16582e" x="199" y="27" width="84" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Faktur Yg Dipotong]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2d0e16df-dbd1-46e5-afa5-b07f8c35cd7c" x="288" y="27" width="94" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Rayon]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b2be5f4f-743c-4d88-ae02-acad9ba26552" x="451" y="27" width="53" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Netto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7974dd28-df76-4358-9fe0-72d81c0b242a" x="517" y="27" width="53" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sisa]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="50c0b3a3-61cb-4e69-8078-8b74ea2d7821" x="0" y="40" width="581" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement uuid="060fdc5b-3780-45bc-9a3c-c27ea0177a99" x="0" y="0" width="51" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['- '+$F{kodeproduk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="848f6225-a024-46be-b2bd-22612c8d9d71" x="51" y="0" width="143" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmproduk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="1a5ca9a2-77c0-4db7-a8c5-6980b6b5eb08" x="209" y="0" width="229" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="87">
+			<staticText>
+				<reportElement uuid="1fab9007-6ceb-4542-9895-6badc6842811" x="62" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Yang Menyerahkan,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="197def7f-637a-4ddb-ab25-9f1232615fb0" x="62" y="48" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[(                               )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ecc7b8ab-255e-445b-8d08-5307a49074d3" x="448" y="48" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[(                               )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7be578b6-48b3-416c-8f95-d716b1b4cb31" x="448" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Yang Menerima,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="89deb600-f553-4070-9518-f725fdf19e8d" x="0" y="67" width="375" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Note : Setiap Retur Ini Sudah divalidasi dan bisa di potong ke Nota yang sudah tertera]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="26102b5f-0808-412a-822d-ed741663601a" x="75" y="50" width="76" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{user}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+</jasperReport>

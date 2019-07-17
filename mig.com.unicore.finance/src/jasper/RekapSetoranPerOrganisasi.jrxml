@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RekapSetoranPerOrganisasi" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" uuid="2162bd1d-16b3-43c5-96c1-e07f86bff8d8">
+	<property name="ireport.zoom" value="1.5026296018031553"/>
+	<property name="ireport.x" value="437"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select u.name as user,now() as now,org.name as nm_org,transaksi.tglbayar,sum(transaksi.tunai) as tunai,sum(transaksi.transfer) as transfer,sum(transaksi.discount)as discount,
+sum(transaksi.notakredit) as kredit,sum(transaksi.retur) as Retur,sum(transaksi.giro) as Giro,sum(transaksi.pembulatan) as pembulatan from (
+select bgresult.ad_org_id as org,bgresult.datedoc as tglbayar,blresult."paidamt" as tunai,0 as transfer,0 as discount,0 as notakredit,0 as retur,0 as giro,0 as pembulatan
+from c_invoice invg
+left join c_bpartner cus on cus."c_bpartner_id"=invg."c_bpartner_id"
+left join ad_user usr on usr."ad_user_id"=invg."salesrep_id"
+left join uns_billingline_result blresult on invg."c_invoice_id"=blresult."c_invoice_id"
+left join uns_billing_result bresult on blresult."uns_billing_result_id"=bresult."uns_billing_result_id"
+left join uns_billinggroup_result bgresult on bresult."uns_billinggroup_result_id"=bgresult."uns_billinggroup_result_id"
+where bgresult.docstatus='CO'
+union all
+select bgresult.ad_org_id as org,bgresult.datedoc as tglbayar,0 as tunai,0 as transfer,0 as discount,0 as notakredit,0 as retur,
+COALESCE((SELECT SUM(paidAMt) FROM UNS_CustomerBG_invlist where c_invoice_id=invg."c_invoice_id"),0) as giro,0 as pembulatan
+from c_invoice invg
+left join c_bpartner cus on cus."c_bpartner_id"=invg."c_bpartner_id"
+left join ad_user usr on usr."ad_user_id"=invg."salesrep_id"
+left join uns_billingline_result blresult on invg."c_invoice_id"=blresult."c_invoice_id"
+left join uns_billing_result bresult on blresult."uns_billing_result_id"=bresult."uns_billing_result_id"
+left join uns_billinggroup_result bgresult on bresult."uns_billinggroup_result_id"=bgresult."uns_billinggroup_result_id"
+inner join UNS_CustomerBG_invlist on UNS_CustomerBG_invlist."c_invoice_id"=invg."c_invoice_id"
+where bgresult.docstatus='CO'
+union all
+select bgresult.ad_org_id as org,bgresult.datedoc as tglbayar,0 as tunai,0 as transfer,0 as discount,0 as notakredit,
+(SELECT coalesce(sum(a.grandtotal), 0) from c_invoice a where a.cN_invoice_id=invg.c_invoice_id and invg.ispaid='Y') AS retur,0 as giro,0 as pembulatan
+from c_invoice invg
+left join c_bpartner cus on cus."c_bpartner_id"=invg."c_bpartner_id"
+left join ad_user usr on usr."ad_user_id"=invg."salesrep_id"
+left join uns_billingline_result blresult on invg."c_invoice_id"=blresult."c_invoice_id"
+left join uns_billing_result bresult on blresult."uns_billing_result_id"=bresult."uns_billing_result_id"
+left join uns_billinggroup_result bgresult on bresult."uns_billinggroup_result_id"=bgresult."uns_billinggroup_result_id"
+inner join c_invoice a on a.cN_invoice_id=invg.c_invoice_id
+where bgresult.docstatus='CO'
+) as transaksi
+left join ad_org org on org.ad_org_id=transaksi.org
+left join ad_user u on u.ad_user_id = $P{AD_User_ID}
+where transaksi.tglbayar is not null and transaksi.tglbayar>=$P{StartDate} and transaksi.tglbayar<=$P{EndDate}
+group by u.name,org.name,transaksi.tglbayar
+order by  org.name,transaksi.tglbayar]]>
+	</queryString>
+	<field name="user" class="java.lang.String"/>
+	<field name="now" class="java.sql.Timestamp"/>
+	<field name="nm_org" class="java.lang.String"/>
+	<field name="tglbayar" class="java.sql.Timestamp"/>
+	<field name="tunai" class="java.math.BigDecimal"/>
+	<field name="transfer" class="java.lang.Long"/>
+	<field name="discount" class="java.lang.Long"/>
+	<field name="kredit" class="java.lang.Long"/>
+	<field name="retur" class="java.math.BigDecimal"/>
+	<field name="giro" class="java.math.BigDecimal"/>
+	<field name="pembulatan" class="java.lang.Long"/>
+	<variable name="ttl" class="java.lang.Double" resetType="None">
+		<variableExpression><![CDATA[$F{tunai}+$F{transfer}+$F{discount}+$F{kredit}+$F{retur}+$F{giro}+$F{pembulatan}]]></variableExpression>
+	</variable>
+	<variable name="Ttunai" class="java.math.BigDecimal" resetType="Group" resetGroup="organisasi" calculation="Sum">
+		<variableExpression><![CDATA[$F{tunai}]]></variableExpression>
+	</variable>
+	<variable name="Ttransfer" class="java.math.BigDecimal" resetType="Group" resetGroup="organisasi" calculation="Sum">
+		<variableExpression><![CDATA[$F{transfer}]]></variableExpression>
+	</variable>
+	<variable name="Tgiro" class="java.math.BigDecimal" resetType="Group" resetGroup="organisasi" calculation="Sum">
+		<variableExpression><![CDATA[$F{giro}]]></variableExpression>
+	</variable>
+	<variable name="Tdisc" class="java.math.BigDecimal" resetType="Group" resetGroup="organisasi" calculation="Sum">
+		<variableExpression><![CDATA[$F{discount}]]></variableExpression>
+	</variable>
+	<variable name="Tretur" class="java.math.BigDecimal" resetType="Group" resetGroup="organisasi" calculation="Sum">
+		<variableExpression><![CDATA[$F{retur}]]></variableExpression>
+	</variable>
+	<variable name="Tbulat" class="java.math.BigDecimal" resetType="Group" resetGroup="organisasi" calculation="Sum">
+		<variableExpression><![CDATA[$F{pembulatan}]]></variableExpression>
+	</variable>
+	<variable name="tttl" class="java.math.BigDecimal" resetType="Group" resetGroup="organisasi" calculation="Sum">
+		<variableExpression><![CDATA[$V{ttl}]]></variableExpression>
+	</variable>
+	<variable name="Tkredit" class="java.math.BigDecimal" resetType="Group" resetGroup="organisasi" calculation="Sum">
+		<variableExpression><![CDATA[$F{kredit}]]></variableExpression>
+	</variable>
+	<variable name="Nourut" class="java.lang.Integer" resetType="Group" resetGroup="organisasi" calculation="Count">
+		<variableExpression><![CDATA[new Integer("1")]]></variableExpression>
+	</variable>
+	<group name="organisasi">
+		<groupExpression><![CDATA[$F{nm_org}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement uuid="5174b2c4-c52f-4ed6-8973-1f037a85273c" x="0" y="0" width="157" height="11"/>
+					<textElement>
+						<font size="8" isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nm_org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<textField pattern="#,##0.00">
+					<reportElement uuid="5957699f-94a3-40ba-951d-8487d90b137b" x="184" y="5" width="67" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Ttunai}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="7659fcc3-fd5b-4e37-9b92-7f6246ad1c5f" x="257" y="5" width="67" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Ttransfer}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="c9c7e672-cded-4c4c-a5bb-1ac99852486a" x="324" y="5" width="67" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Tgiro}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="6441dab5-e110-4c63-b3e5-c58d838a7bd6" x="391" y="5" width="67" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Tretur}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="7b35cff4-1a9f-4312-8123-00c24dd8208f" x="458" y="5" width="67" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Tkredit}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="3a5e9038-7bf2-42bf-886b-4b8a35c62035" x="525" y="6" width="72" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Tbulat}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="1bc0855c-9395-40b9-9b74-a16fa8884e53" x="598" y="5" width="66" height="12"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Tdisc}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="78c0fa6a-99e5-4b68-8767-6e0d033f9508" x="664" y="5" width="67" height="12"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{tttl}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement uuid="4a40dd43-6c07-49c5-bf41-cd7346e47f71" x="0" y="2" width="733" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<textField>
+					<reportElement uuid="9b2e200c-e946-445d-8c1d-fd4ec6dd8ceb" x="13" y="5" width="146" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total :"+$F{nm_org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="62" splitType="Stretch">
+			<textField>
+				<reportElement uuid="6d97d536-1896-41e4-bde5-e85efe0c801b" x="632" y="14" width="80" height="20"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="46238d06-3eb4-4e34-a6e1-231df0c82d00" x="712" y="14" width="40" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0e4d3f02-5788-4256-abe5-bed6602386a2" x="0" y="24" width="196" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Periode :'+ new SimpleDateFormat('dd/MM/yyyy').format($P{StartDate})+' s/d '+new SimpleDateFormat('dd/MM/yyyy').format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="bc77dd59-6a71-422e-b67f-a5d173ab763c" x="0" y="0" width="324" height="14"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REKAP SETORAN SALES PER ORGANISASI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b1ff9dab-10d6-4e0f-9320-36b405395079" x="32" y="46" width="63" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="be38a5dd-0a66-4e5c-b5ec-66eb861cc9cb" x="0" y="46" width="22" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7a645dfe-12b4-4d73-bcda-fdeb9c33e27b" x="184" y="46" width="67" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tunai]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cdf384c4-e15d-4669-8f07-b5c3e5a74417" x="257" y="46" width="67" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Transfer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ce6e95e2-72a3-494b-8c1b-0de3b98164fe" x="324" y="46" width="67" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Giro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ce1531b3-3053-4376-a359-cb44aaa3d9b1" x="391" y="46" width="67" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Retur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6035840e-8483-4335-abc5-c8be1dad72dc" x="458" y="46" width="67" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nota Debit / Kredit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2df86341-0e03-4ab1-92a5-a0913113d89c" x="530" y="46" width="67" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Pembulatan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="665c659c-aa0e-47c5-a9d2-f1e4189c2f61" x="597" y="46" width="67" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Diskon]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="841416b4-d655-49b3-900e-0e853459ff5b" x="664" y="46" width="67" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="19a07883-b7fd-48ad-8501-6dce1cbd9c0a" x="0" y="60" width="741" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="fa466dc3-deb5-4339-9c90-9331f6ddde6b" x="0" y="43" width="741" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="7db95c6a-8470-426d-a8be-af329c3840fb" x="32" y="0" width="50" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglbayar}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="ced5657a-3d4e-40dc-8f23-8a0ee8536a0e" x="184" y="0" width="67" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tunai}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="f6da200b-1d6a-44fe-b426-a8c18172634c" x="257" y="0" width="67" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{transfer}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="02ad4cf3-f6f0-4c8e-8b54-95b76f8ee58b" x="324" y="0" width="67" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{giro}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="846f0415-609c-4cd9-958a-b8c3d5a0b745" x="391" y="0" width="67" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{retur}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="aed8ed74-ab64-45a3-87b3-3ee5591cf5e4" x="458" y="0" width="67" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kredit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="02282577-6f55-4342-9a70-9e08b9579c03" x="525" y="0" width="72" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pembulatan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="a26b5e73-83bb-4324-8ce0-4e6d7595c129" x="597" y="0" width="67" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="d29da001-8ccd-41e8-a0c4-e66b4ca5d665" x="664" y="0" width="67" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ttl}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="bd357593-c534-419b-9aa8-8435369dc232" x="0" y="0" width="28" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Nourut}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="30">
+			<staticText>
+				<reportElement uuid="19cda817-4b34-4ee9-a56a-1a5c82c8296d" x="592" y="6" width="71" height="20"/>
+				<textElement/>
+				<text><![CDATA[Tanggal Print]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="f05b39fe-8c6f-463c-8f72-deb0909ad94f" x="59" y="8" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[": " +$F{user}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="eee981be-d354-464b-a9c7-b56b4ebb6e85" x="664" y="6" width="71" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[": " +new SimpleDateFormat("dd/MM/yyyy").format($F{now})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="435f8777-f3be-4aeb-8192-9744875b8b96" x="7" y="8" width="52" height="20"/>
+				<textElement/>
+				<text><![CDATA[User Print]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="2f538b73-e6c2-4441-a8ab-2e5fd60b87d0" x="0" y="3" width="741" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+</jasperReport>

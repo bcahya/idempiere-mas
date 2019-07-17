@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportBiayaExpedisi" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dacd0de2-b563-4481-a66f-4df886fd99ee">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select * from(
+select d.name as nmjob,org.name as nmorg,eh.documentno as nospk,ed.itemdescription as descp,eh.datedoc,concat(cbl.bpartnername,' ',cbl.name) as namebpartner,
+ ssp.documentno as nosip,ssp.datedoc as tglship,am.name as armada,
+ ssp.status,cd.amount,cg.name
+ from UNS_Expedition eh
+ left join UNS_ExpeditionDetail ed on ed.uns_expedition_id=eh.uns_expedition_id
+ left join c_bpartner cb on cb.c_bpartner_id=eh.c_bpartner_id
+ left join c_bpartner_location cbl on cbl.c_bpartner_location_id=eh.c_bpartner_location_id
+ left join ad_org org on org.ad_org_id=eh.ad_org_id
+ left join UNS_ShippingFreight sh on sh.uns_expedition_id=eh.uns_expedition_id and sh.freighttype='EXP'
+ left join UNS_Shipping sp on sp.uns_shipping_id=sh.uns_shipping_id
+ left join UNS_Armada am on am.UNS_Armada_ID=sp.uns_armada_id
+ left join c_doctype d on d.c_doctype_id=eh.c_doctype_id
+ inner join UNS_Shipping ssp on ssp.uns_shipping_reff_id=sp.uns_shipping_id
+ inner join uns_charge_detail cd on cd.uns_shipping_id=ssp.uns_shipping_id
+ inner join c_charge cg on cg.c_charge_id=cd.c_charge_id
+ and cd.chargetype='CS'
+ and eh.docstatus in('CO','CL')
+ and ssp.docstatus in('CO','CL')
+ union all
+select d.name as nmjob,org.name as nmorg,eh.documentno as nospk,ed.itemdescription as descp,eh.datedoc,concat(cbl.bpartnername,' ',cbl.name) as namebpartner,
+ sp.documentno as nosip,sp.datedoc as tglship,am.name as armada,
+ sp.status,cd.amount,cg.name
+ from UNS_Expedition eh
+ left join UNS_ExpeditionDetail ed on ed.uns_expedition_id=eh.uns_expedition_id
+ left join c_bpartner cb on cb.c_bpartner_id=eh.c_bpartner_id
+ left join c_bpartner_location cbl on cbl.c_bpartner_location_id=eh.c_bpartner_location_id
+ left join ad_org org on org.ad_org_id=eh.ad_org_id
+ left join UNS_ShippingFreight sh on sh.uns_expedition_id=eh.uns_expedition_id and sh.freighttype='EXP'
+ left join UNS_Shipping sp on sp.uns_shipping_id=sh.uns_shipping_id
+ left join UNS_Armada am on am.UNS_Armada_ID=sp.uns_armada_id
+ left join c_doctype d on d.c_doctype_id=eh.c_doctype_id
+ left join uns_charge_detail cd on cd.uns_shipping_id=sp.uns_shipping_id
+ left join c_charge cg on cg.c_charge_id=cd.c_charge_id
+ where cd.chargetype='CS'
+ and sp.docstatus in('CO','CL')
+ and eh.docstatus in('CO','CL')) as data
+ where data.tglship between $P{StartDate} and $P{EndDate}
+ order by data.nospk,data.nmjob,data.nmorg]]>
+	</queryString>
+	<field name="nmjob" class="java.lang.String"/>
+	<field name="nmorg" class="java.lang.String"/>
+	<field name="nospk" class="java.lang.String"/>
+	<field name="descp" class="java.lang.String"/>
+	<field name="datedoc" class="java.sql.Timestamp"/>
+	<field name="namebpartner" class="java.lang.String"/>
+	<field name="nosip" class="java.lang.String"/>
+	<field name="tglship" class="java.sql.Timestamp"/>
+	<field name="armada" class="java.lang.String"/>
+	<field name="status" class="java.lang.String"/>
+	<field name="amount" class="java.math.BigDecimal"/>
+	<field name="name" class="java.lang.String"/>
+	<variable name="bberangkat" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{status}=='DV' ? $F{amount} : 0]]></variableExpression>
+	</variable>
+	<variable name="pulang" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{status}=='RS' ? $F{amount} : 0]]></variableExpression>
+	</variable>
+	<group name="organization">
+		<groupExpression><![CDATA[$F{nmorg}]]></groupExpression>
+		<groupHeader>
+			<band height="13">
+				<textField>
+					<reportElement x="0" y="0" width="222" height="13" uuid="7087054f-7f7d-4b8a-8b87-9d95352ef842"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmorg}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="10">
+				<line>
+					<reportElement x="1" y="3" width="475" height="1" uuid="4e298294-fbd0-4b9c-ba94-5ec06cb8285d"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="nmjob">
+		<groupExpression><![CDATA[$F{nmjob}]]></groupExpression>
+		<groupHeader>
+			<band height="14">
+				<textField>
+					<reportElement x="19" y="0" width="100" height="13" uuid="5f433d0b-adb6-4b9e-8363-eb852cb3ca43"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmjob}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="nospk">
+		<groupExpression><![CDATA[$F{nospk}]]></groupExpression>
+		<groupHeader>
+			<band height="14">
+				<textField>
+					<reportElement x="151" y="0" width="71" height="13" uuid="47f34dd0-2ba5-4c7b-9420-596d4cd28b11"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nospk}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="85" y="0" width="66" height="13" uuid="23551157-1a1d-46c3-99e1-e3cc86f8be5a"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{datedoc}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="222" y="0" width="190" height="13" uuid="023fb654-ab84-45bf-95e8-fc800a119a95"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{descp}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="6">
+				<line>
+					<reportElement x="327" y="2" width="475" height="1" uuid="2fc883df-cae9-41f1-9612-9f343bbd3e14"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="80" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="48" width="802" height="32" uuid="2ed648fb-617b-429e-8e58-7b12c2d42c36"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="402" height="21" uuid="0b91e1fd-f049-457f-814e-a4a5f612598b"/>
+				<textElement>
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Laporan Biaya Pengiriman dan Realisasi]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="21" width="402" height="20" uuid="208a77d8-74ce-4487-ae80-17487641fa2f"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode   :  "+ new SimpleDateFormat('dd/MM/yyyy').format($P{StartDate})+' s/d '+new SimpleDateFormat('dd/MM/yyyy').format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="3" y="51" width="100" height="14" uuid="29b3cbda-6de0-4fdd-84f5-5d74d473733b"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Organization]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="63" width="85" height="14" uuid="07a6629e-42b2-460d-9a24-8e76c4ac21ce"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Job Order / Job Spec]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="85" y="63" width="66" height="14" uuid="31e38938-467b-4d9b-bc3f-c4d45516f1af"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Tgl.SPK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="151" y="63" width="66" height="13" uuid="e73a15e0-ecf3-4574-b4d1-ff04b928d739"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[No. SPK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="222" y="63" width="51" height="13" uuid="af19ed4e-80e5-4ee4-a7ad-34b9515179e4"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[No. Sipping]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="222" y="51" width="116" height="13" uuid="ab4ba271-3f8f-44bb-8eb6-8a546a2e5a81"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="273" y="63" width="51" height="13" uuid="4533b4b8-aba2-494b-8108-6fad6527f47c"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Tgl. Shipping]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="63" width="51" height="13" uuid="91fc814e-206f-405f-9933-9c9b437b8904"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Armada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="437" y="63" width="143" height="13" uuid="79b57b92-ab12-49f7-9275-59c5e918a899"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Keterangan Biaya]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="63" width="100" height="13" uuid="f890a685-6692-432b-9aa7-efe2fec837ba"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Biaya Berangkat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="691" y="63" width="100" height="13" uuid="7025df81-2f7e-4f8e-8f29-0191a0a9d745"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Biaya Pulang]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="682" y="28" width="80" height="20" uuid="3125cc21-8860-4a3d-adac-cecbecb92d9d"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="762" y="28" width="40" height="20" uuid="d8cdbb50-2d86-4852-b2b3-669bb36ef14d"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="702" y="1" width="100" height="20" uuid="32c95487-0c58-4432-9f41-ff59d0d6fbab"/>
+				<textElement textAlignment="Right">
+					<font size="10" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="277" y="1" width="61" height="13" uuid="0a4b9a35-bbe4-4e39-aa6a-cad3db40c873"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglship}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="691" y="0" width="100" height="14" uuid="913341fb-08b0-476b-b499-8efdc0b13509"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{pulang}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="580" y="0" width="100" height="14" uuid="b414a398-95d2-47f0-8b4c-6b6d1ea6bc41"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{bberangkat}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="0" width="97" height="13" uuid="13c68dff-6e09-4898-a358-c9feb406e0d5"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{armada}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="437" y="0" width="143" height="13" uuid="9cc9865e-ec71-4ab3-96dc-8e046e0055b1"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="222" y="0" width="51" height="14" uuid="e46c8fc8-5b05-4223-a8a7-0c87faead49a"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nosip}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="11" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="3" width="475" height="1" uuid="11721dc1-b58d-4747-9bb0-f29d865c0cc6"/>
+			</line>
+		</band>
+	</columnFooter>
+</jasperReport>

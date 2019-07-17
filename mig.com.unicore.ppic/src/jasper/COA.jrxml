@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="COA" language="groovy" pageWidth="595" pageHeight="840" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9dbbce99-a919-4f78-8393-3a726929468a">
+	<property name="ireport.zoom" value="0.9090909090909132"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="177"/>
+	<parameter name="UNS_ShipmentSchedule_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UNS_Employee_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[".\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT c.name as perusahaan, c.description as company, bp.name as originalbuyer,
+l.address1, l.city, co.name AS country, e.name as employee, j.name as posision,
+ss.etd as date, cm.containerno, p.name, p.pack, sosv.coa, sosv.productiondate,
+sosv.expiration, sosv.fc, sosv.ph, sosv.dm, sosv.m_attributesetinstance_id,
+sosv.UNS_SOShipment_V_ID, sos.qtyuom, uom.uomsymbol as uom
+FROM UNS_Employee e INNER JOIN C_Job j ON j.C_Job_ID=e.C_Job_ID,
+UNS_SOShipment_V sosv INNER JOIN AD_Client c ON c.AD_Client_ID=sosv.AD_Client_ID
+INNER JOIN UNS_ShipmentSchedule ss ON ss.UNS_ShipmentSchedule_ID=sosv.UNS_ShipmentSchedule_ID
+INNER JOIN UNS_SOShipment sos ON sos.UNS_SOShipment_id = sosv.UNS_SOShipment_ID
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID=sosv.C_BPartnerSR_ID
+INNER JOIN C_Location l ON l.C_Location_ID=sosv.C_Location_ID
+INNER JOIN C_Country co ON co.C_Country_ID=l.C_Country_ID
+INNER JOIN UNS_ContainerManagement cm ON cm.UNS_ContainerManagement_ID=sosv.UNS_ContainerManagement_ID
+INNER JOIN M_Product p ON p.M_Product_ID=sosv.M_Product_ID
+INNER JOIN C_Uom uom ON sos.C_Uom_ID=uom.C_Uom_ID
+WHERE sosv.UNS_ShipmentSchedule_ID=$P{UNS_ShipmentSchedule_ID} AND e.UNS_Employee_ID=$P{UNS_Employee_ID} AND ss.DocStatus='CO']]>
+	</queryString>
+	<field name="perusahaan" class="java.lang.String"/>
+	<field name="company" class="java.lang.String"/>
+	<field name="originalbuyer" class="java.lang.String"/>
+	<field name="address1" class="java.lang.String"/>
+	<field name="city" class="java.lang.String"/>
+	<field name="country" class="java.lang.String"/>
+	<field name="employee" class="java.lang.String"/>
+	<field name="posision" class="java.lang.String"/>
+	<field name="date" class="java.sql.Timestamp"/>
+	<field name="containerno" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="pack" class="java.lang.String"/>
+	<field name="coa" class="java.lang.String"/>
+	<field name="productiondate" class="java.sql.Timestamp"/>
+	<field name="expiration" class="java.sql.Timestamp"/>
+	<field name="fc" class="java.math.BigDecimal"/>
+	<field name="ph" class="java.math.BigDecimal"/>
+	<field name="dm" class="java.math.BigDecimal"/>
+	<field name="m_attributesetinstance_id" class="java.math.BigDecimal"/>
+	<field name="uns_soshipment_v_id" class="java.math.BigDecimal"/>
+	<field name="qtyuom" class="java.math.BigDecimal"/>
+	<field name="uom" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<textField>
+				<reportElement uuid="5f5aa897-658a-4486-847a-5c4336158ca7" x="100" y="9" width="455" height="46"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{perusahaan}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement uuid="c9a49521-a782-4baf-a57c-108f8aa70add" x="0" y="9" width="100" height="70"/>
+				<box leftPadding="12"/>
+				<imageExpression><![CDATA["images/logo_sambugroup.PNG"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement uuid="1c57968c-05ae-498b-806b-e4a08a0a35bc" x="100" y="55" width="455" height="24"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["CERTIFICATE OF ANALYSIS"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="250" splitType="Stretch">
+			<line>
+				<reportElement uuid="3e921ee6-d5d1-46e1-955f-e193ab5a9227" x="0" y="8" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="5.0" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="56fd66e1-839e-46db-b731-399e0fa69d68" x="14" y="20" width="215" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CERTIFICATE OF ANALYSIS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="867a5518-6f2f-4da1-bc91-3a6e09cbc693" x="14" y="55" width="215" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[CERTIFICATE NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2e36acf7-3f0e-4ce6-8011-95b04b0c4224" x="14" y="80" width="215" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[NAME AND ADDRESS OF EXPORTER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="79ba0ed2-5a74-40cb-bbae-fb1784ec4af6" x="14" y="105" width="215" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[NAME OF CONSIGNEE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5e9d9b64-8228-4dd4-9c9c-4c6b6db5cd16" x="14" y="170" width="215" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[CONTAINER NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a3163fc1-07ce-4519-805c-a022f850cecb" x="14" y="195" width="215" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[NAME OF PRODUCT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5639e6ac-4972-4156-88d1-1fdae03a6df4" x="14" y="220" width="215" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PACKING]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="7130c896-d8d7-462d-ae07-a2283fe72d19" x="229" y="55" width="326" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{coa}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0c76e56a-57e3-4b1d-8be3-7b3a61e1661c" x="229" y="80" width="326" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{company}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="5e6cf3ca-cfec-468b-8606-63e08517ce08" x="229" y="105" width="326" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{originalbuyer}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7109e4d6-8cbb-4fe0-9dd5-e405d2dac6c8" x="229" y="125" width="326" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  "+$F{address1}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="1a4fe75c-55f3-4086-b837-291db1be49d7" x="229" y="145" width="326" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  "+$F{city}.toUpperCase()+", "+$F{country}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a5ad73dc-2019-4d04-9530-e2db2bf83a17" x="229" y="170" width="326" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{containerno}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8680590c-e816-415c-b47d-7c685f2748c9" x="229" y="195" width="326" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{name}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="484fffd9-5354-4b4b-9733-0f98dfb3e954" x="229" y="220" width="326" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{pack} == null) ?
+": " + $F{qtyuom}.setScale(0) + " "+ $F{uom}.toUpperCase()
+:
+": "+ $F{qtyuom}.setScale(0) + " "+ $F{uom}.toUpperCase() +
+" X "+ $F{pack}.toUpperCase()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="44" splitType="Stretch">
+			<subreport>
+				<reportElement uuid="af1a7bf5-7434-4179-9e4f-bebb9f2dbc6d" positionType="Float" x="14" y="0" width="541" height="44" isPrintWhenDetailOverflows="true"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="UNS_SOShipment_V_ID">
+					<subreportParameterExpression><![CDATA[$F{uns_soshipment_v_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "COASubreport1.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="50">
+			<subreport>
+				<reportElement uuid="bc111564-cac7-4e63-99e9-bb9bab842f13" positionType="Float" x="14" y="15" width="541" height="35" isPrintWhenDetailOverflows="true"/>
+				<subreportParameter name="UNS_SOShipment_V_ID">
+					<subreportParameterExpression><![CDATA[$F{uns_soshipment_v_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "COASubreport2.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="117" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="5639e6ac-4972-4156-88d1-1fdae03a6df4" x="14" y="10" width="86" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[BY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5639e6ac-4972-4156-88d1-1fdae03a6df4" x="14" y="35" width="86" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5639e6ac-4972-4156-88d1-1fdae03a6df4" x="14" y="60" width="86" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[TITLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5639e6ac-4972-4156-88d1-1fdae03a6df4" x="14" y="85" width="86" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[DATED]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="b072a2e5-5eb1-4fc6-bd21-46e08a1e9b9e" x="100" y="85" width="228" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+(new SimpleDateFormat("dd/MM/yyyy")).format($F{date})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="92463f94-a9cd-4c61-96c5-a1862a90d853" x="100" y="60" width="228" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{posision}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="75170f06-de29-4606-b527-4855fc203581" x="100" y="35" width="228" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{employee}.toUpperCase()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

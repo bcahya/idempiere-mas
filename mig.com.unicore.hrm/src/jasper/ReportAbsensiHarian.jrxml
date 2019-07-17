@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportAbsensiHarian" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="00e69271-ac55-421b-b8d3-24ec2de598a8">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="UNS_Resource_IDHRM" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select data.nama,data.id as id,data.div,count(distinct data.tanggal),sum(data.mbiasa) as biasa,sum(data.mlembur) as lembur from(
+select biasa.nama as nama,biasa.id as id,biasa.div as div,biasa.tanggal as tanggal,biasa.jam as jam,
+(CASE WHEN biasa.jam>='07:00' and biasa.jam<='08:30' Then 1 else 0 end) as mbiasa,0 as mlembur
+from (
+--- masuk pagi 07.30 sd 18:00
+select distinct min(to_char(inout.checktime,'HH24:MM')) as jm,
+em.name as nama,res.uns_resource_id as id,res.name as div,to_char(inout.checktime,'YYYY-mm-dd') tanggal,
+to_char(inout.checktime,'HH24:MI') as jam
+from UNS_CheckInOut inout
+inner join uns_employee em on inout.attendancename=em.attendancename
+inner join UNS_Resource_WorkerLine wl on em.UNS_Employee_ID=wl.labor_id
+inner join UNS_Resource res on wl.UNS_Resource_ID=res.UNS_Resource_ID
+where date(inout.checktime) between $P{StartDate} and $P{EndDate}
+and case when $P{UNS_Resource_IDHRM}='APST' then
+         res.UNS_Resource_ID in(1000089,1000087,1000088,1000091,1000090,1000096,1000089,1000087,1000086)
+         or em.UNS_Employee_ID=1001894
+    when $P{UNS_Resource_IDHRM}='AKTB' then
+         res.UNS_Resource_ID in(1000089,1000087,1000088,1000091,1000090,1000096,1000089,1000087,1000086)
+         or em.UNS_Employee_ID=1001894
+    when $P{UNS_Resource_IDHRM}='DRVPST' then
+	em.UNS_Employee_ID in(1001771,1002076,1001384,1001637,1001904,1001766,1002058,1001869,1002014)
+	--res.UNS_Resource_ID in(1000094)
+    ELSE
+         res.UNS_Resource_ID in(1000089,1000087,1000088,1000091,1000090,1000096,1000089,1000087,1000086)
+         or em.UNS_Employee_ID=1001894
+    END
+group by em.name,inout.checktime,res.name,res.uns_resource_id
+) as biasa
+union all
+--lembur
+select lembur.nama as nama,lembur.id as id,lembur.div as div,lembur.tanggal as tanggal,lembur.jam as jam,
+0 as mbiasa,(CASE WHEN lembur.jam>='18:01' Then 1 else 0 end) as mlembur
+from (
+--- masuk lembur >18:01
+select distinct max(to_char(inout.checktime,'HH24:MM')) as jm,  em.name as nama,res.uns_resource_id as id,res.name as div,to_char(inout.checktime,'YYYY-mm-dd') tanggal,
+to_char(inout.checktime,'HH24:MI') as jam
+from UNS_CheckInOut inout
+inner join uns_employee em on inout.attendancename=em.attendancename
+inner join UNS_Resource_WorkerLine wl on em.UNS_Employee_ID=wl.labor_id
+inner join UNS_Resource res on wl.UNS_Resource_ID=res.UNS_Resource_ID
+where date(inout.checktime) between $P{StartDate} and $P{EndDate}
+and case when $P{UNS_Resource_IDHRM}='APST' then
+         res.UNS_Resource_ID in(1000089,1000087,1000088,1000091,1000090,1000096,1000089,1000087,1000086)
+         or em.UNS_Employee_ID=1001894
+    when $P{UNS_Resource_IDHRM}='AKTB' then
+         res.UNS_Resource_ID in(1000089,1000087,1000088,1000091,1000090,1000096,1000089,1000087,1000086)
+         or em.UNS_Employee_ID=1001894
+    when $P{UNS_Resource_IDHRM}='DRVPST' then
+	em.UNS_Employee_ID in(1001771,1002076,1001384,1001637,1001904,1001766,1002058,1001869,1002014)
+	--res.UNS_Resource_ID in(1000094)
+    ELSE
+         res.UNS_Resource_ID in(1000089,1000087,1000088,1000091,1000090,1000096,1000089,1000087,1000086)
+        or em.UNS_Employee_ID=1001894
+    END
+group by em.name,inout.checktime,res.name,res.uns_resource_id
+) as lembur) data
+group by data.nama,data.div,data.id
+order by data.nama]]>
+	</queryString>
+	<field name="nama" class="java.lang.String"/>
+	<field name="id" class="java.math.BigDecimal"/>
+	<field name="div" class="java.lang.String"/>
+	<field name="count" class="java.lang.Long"/>
+	<field name="biasa" class="java.lang.Long"/>
+	<field name="lembur" class="java.lang.Long"/>
+	<variable name="Umakan" class="java.lang.Number">
+		<variableExpression><![CDATA[($F{count}*7500)+($F{lembur}*5000)]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="68" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="39ffddfb-a3b9-4324-8124-b6a527367751" x="0" y="2" width="555" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Rekapitulasi Absen Supir]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="dda7053b-24d8-4506-8273-c5f6143fe706" x="0" y="22" width="555" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Periode : "+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+" s/d "+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="81639fea-5ec8-44c8-8523-835a1d7ed2ec" x="0" y="42" width="40" height="26"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<pen lineWidth="0.5" lineColor="#000000"/>
+					<topPen lineWidth="0.5" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d83e5bb0-1d82-419b-9228-7426f00a6946" x="40" y="42" width="162" height="26"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[NAMA KARYAWAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d9657a98-18cb-448e-b2d8-67c8b46a90f2" x="202" y="42" width="222" height="26"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[HADIR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f4b40d3d-2baa-4215-8b06-34ee196d2144" x="424" y="42" width="131" height="26"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[TANDA TANGAN]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="28" splitType="Stretch">
+			<textField>
+				<reportElement uuid="b291bdbf-59d3-4dd3-9018-c4e35d511e14" x="40" y="0" width="162" height="28"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Justified" verticalAlignment="Top">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7767f58c-4cd9-4e6a-8f2e-93dfb8a353b0" x="202" y="0" width="222" height="28"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="a370b2ab-0f4d-44f9-9e1e-1e7e27fda891" x="424" y="0" width="131" height="28"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement uuid="464f48a0-893d-4e13-8c10-d8ee7543a446" x="0" y="0" width="40" height="28"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a512d54c-bbea-4e36-9670-a71cf28d04f5" x="40" y="14" width="162" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{div}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="6" splitType="Stretch"/>
+	</pageFooter>
+</jasperReport>

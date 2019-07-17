@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportPenjualanPerRayonPerPasar" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d961521c-6e4c-486c-850e-b014ecd3baa9">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="SalesRep_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() as tglskrg,us.name as nmctk,ad.name as nmsales,ry.name as rayon,ps.name as nmpasar,mp.name as namebrg,
+uomconversiontostr(mp.m_product_id,sum(cl.qtyentered)) as qty,sum(cl.discountamt) as discount,sum(cl.linenetamt) as tfak
+from c_invoice ci
+left join c_invoiceline cl on cl.c_invoice_id=ci.c_invoice_id
+LEFT JOIN m_product mp on mp.m_product_id=cl.m_product_id
+left join c_bpartner_location cbl on cbl.c_bpartner_location_id=ci.c_bpartner_location_id
+LEFT JOIN uns_rayon ry on ry.uns_rayon_id=cbl.uns_rayon_id
+left join ad_user ad on ad.ad_user_id=ci.salesrep_id
+left join uns_pasar ps on ps.uns_pasar_id=cbl.uns_pasar_id
+left join ad_user us on us.ad_user_id=$P{AD_User_ID}
+where ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+and (ci.c_doctype_id IN ( SELECT c_doctype.c_doctype_id FROM c_doctype WHERE c_doctype.docbasetype = 'ARC')) and ci.docstatus in('CO','CL')
+and case when $P{SalesRep_ID}!=0 then ci.SalesRep_ID=$P{SalesRep_ID} else 1=1 end
+group by ad.name,ry.name,us.name,ps.name,mp.name,mp.m_product_id
+order by nmsales]]>
+	</queryString>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="nmctk" class="java.lang.String"/>
+	<field name="nmsales" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="nmpasar" class="java.lang.String"/>
+	<field name="namebrg" class="java.lang.String"/>
+	<field name="qty" class="java.lang.String"/>
+	<field name="discount" class="java.math.BigDecimal"/>
+	<field name="tfak" class="java.math.BigDecimal"/>
+	<group name="nmsales">
+		<groupExpression><![CDATA[$F{nmsales}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField>
+					<reportElement x="0" y="0" width="127" height="15" forecolor="#0000FF" uuid="625cfd7f-0826-4791-ac76-43ca46aa32a7"/>
+					<textElement>
+						<font size="10" isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmsales}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="8">
+				<line>
+					<reportElement x="0" y="0" width="555" height="1" uuid="62ea2da5-d6f9-46cd-b64e-e5ae35866d2f"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="nmrayon">
+		<groupExpression><![CDATA[$F{rayon}]]></groupExpression>
+		<groupHeader>
+			<band height="14">
+				<textField>
+					<reportElement x="24" y="2" width="170" height="12" forecolor="#FF0000" uuid="3bfb56f5-46e4-4d77-9b5c-47cf23df3a9d"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="49" splitType="Stretch">
+			<staticText>
+				<reportElement x="455" y="0" width="100" height="14" uuid="d757876d-5f58-478b-a844-dc9d3c7a0be0"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="14" uuid="c6f0976f-7ec7-4f41-bdce-c463a61f2576"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Report Penjualan Per Salesman Per Rayon & Pasar]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="14" width="555" height="14" uuid="dae4e89f-a67c-4dc4-9836-739e7eebe58e"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode :  "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+" s/d "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="33" width="70" height="11" uuid="f56a563c-8ff6-4d99-b9d6-0fe6c151d82e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Salesman]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="33" width="98" height="11" uuid="e5b7d204-5775-4f58-a41c-a6af9127247c"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Rayon   /   Pasar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="168" y="33" width="202" height="11" uuid="1d1bc9f9-c367-4124-8206-e3eedaf1079a"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="33" width="97" height="11" uuid="3a0c4bce-4e66-49ad-8d7b-538294ab341a"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty Dalam Satuan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="478" y="33" width="77" height="11" uuid="12eafa76-bd5d-4b26-a1a2-d0c8f9d1ebf1"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total Rp.]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="28" width="555" height="1" uuid="6417e1f4-f64e-459f-8114-23344c9b10b5"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="44" width="555" height="1" uuid="24e2a4b6-e081-489d-9232-16413d29faf0"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="45" y="0" width="123" height="13" uuid="2bb44c89-05bc-478f-93ed-9cafd73d46a1"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmpasar}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="168" y="0" width="202" height="13" uuid="fd94ffac-efdb-4fbc-9924-93a337acb4e9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namebrg}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="381" y="0" width="97" height="13" uuid="b4354fbf-27dd-4004-9e3d-a389ddc07b1d"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="478" y="0" width="77" height="13" uuid="de3b3666-e2e4-415e-bb0c-0c4a5c3f5af4"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tfak}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="10"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="17">
+			<textField>
+				<reportElement x="0" y="2" width="100" height="11" uuid="ea3b2133-2d2b-4dd3-b716-ede059565ca0"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Di cetak Oleh : '+$F{nmctk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="455" y="2" width="100" height="11" uuid="2a3811a2-98a7-4ac1-86b1-732e136308dc"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Tanggal Cetak : '+new SimpleDateFormat("dd/MM/yyyy").format($F{tglskrg})]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+</jasperReport>

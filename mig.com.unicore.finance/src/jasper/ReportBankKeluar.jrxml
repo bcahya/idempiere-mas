@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportBankKeluar" language="groovy" pageWidth="612" pageHeight="396" orientation="Landscape" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f9041f1d-c6d6-4785-841e-63a6f0cc8b93">
+	<property name="ireport.zoom" value="0.75"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_BankAccount_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+bs.documentno as docno,
+ba.name as bankaccount,
+bs.statementdate as date,
+bsl.stmtamt as stamt
+
+
+FROM C_BankStatement bs
+INNER JOIN C_BankStatementLine bsl ON bs.C_BankStatement_ID=bsl.C_BankStatement_ID
+INNER JOIN C_BankAccount ba ON ba.C_BankAccount_ID=bs.C_BankAccount_ID
+
+
+WHERE bsl.TransactionType='APT' AND bs.DocStatus in ('CO','CL') AND (CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN bs.statementdate::timestamp>= $P{DateFrom}::timestamp WHEN $P{DateFrom}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN bs.statementdate::timestamp <= $P{DateTo}::timestamp WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN bs.statementdate::timestamp >= $P{DateFrom}::timestamp AND bs.statementdate::timestamp <= $P{DateTo}::timestamp ELSE 1=1 END) AND CASE WHEN $P{C_BankAccount_ID} IS NOT NULL THEN bs.C_BankAccount_ID=$P{C_BankAccount_ID} ELSE 1=1 END
+
+order by bankaccount]]>
+	</queryString>
+	<field name="docno" class="java.lang.String"/>
+	<field name="bankaccount" class="java.lang.String"/>
+	<field name="date" class="java.sql.Timestamp"/>
+	<field name="stamt" class="java.math.BigDecimal"/>
+	<variable name="stamt_2" class="java.math.BigDecimal" resetType="Column" incrementType="Group" incrementGroup="docno" calculation="Sum">
+		<variableExpression><![CDATA[$F{stamt}]]></variableExpression>
+	</variable>
+	<variable name="stamt_1" class="java.math.BigDecimal" resetType="Group" resetGroup="docno" calculation="Sum">
+		<variableExpression><![CDATA[$F{stamt}]]></variableExpression>
+	</variable>
+	<variable name="stamt_3" class="java.math.BigDecimal" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{stamt}]]></variableExpression>
+	</variable>
+	<variable name="stamt_4" class="java.math.BigDecimal" resetType="Group" resetGroup="docno" calculation="Sum">
+		<variableExpression><![CDATA[$F{stamt}]]></variableExpression>
+	</variable>
+	<group name="docno">
+		<groupExpression><![CDATA[$F{bankaccount}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement x="46" y="0" width="356" height="20" uuid="7acc1fba-04c3-40e8-a2c3-0cfbb4f0a209"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{bankaccount}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="docno" pattern="#,##0.00">
+					<reportElement x="402" y="0" width="137" height="20" uuid="3e17bd83-c0e2-4d9e-98fa-abe7315a982d"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{stamt_4}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="34" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="34" uuid="dd665d6a-5af0-42b0-8ded-93dc1ec66f7d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Print Cash/Bank Keluar]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="4" y="15" width="52" height="20" uuid="a5f538b5-e94d-4792-a0f4-201165503e56"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date    :]]></text>
+			</staticText>
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement x="56" y="15" width="496" height="20" uuid="aba53a9d-5e28-4ac8-bc16-a8f074de16aa"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DateFrom} == null && $P{DateTo} == null ? "All Times":
+$P{DateFrom} != null && $P{DateTo} == null ? new SimpleDateFormat("dd-MMMMM-yyyy").format$P{DateFrom} +"- Today":
+$P{DateFrom} != null && $P{DateTo} != null ? new SimpleDateFormat("dd-MMMMM-yyyy").format$P{DateFrom}+ " - " +new SimpleDateFormat("dd-MMMMM-yyyy").format$P{DateTo}:
+$P{DateFrom} == null && $P{DateTo} != null ? "Until " +new SimpleDateFormat("dd-MMMMM-yyyy").format$P{DateTo}: ""]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="46" y="0" width="356" height="20" uuid="a44ad0ef-7115-4b26-afd7-dad5004e00cc"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Bank/Cash Account]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="402" y="0" width="137" height="20" uuid="7239aa8e-b880-496d-97f9-4f62650ff789"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Total Ammont]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement x="402" y="0" width="137" height="20" uuid="7f851f63-6255-4261-b6d1-28710f101559"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{stamt_3}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="46" y="0" width="356" height="20" uuid="9ce94c78-e75a-48ab-84a2-d43f1d90f5af"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportPenjualanCanvas" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="832" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="3ed43b9c-bbb0-49f5-a3f1-d8080e0b12ed">
+	<property name="ireport.zoom" value="1.3995221406292002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="SalesRegion" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select sr.value as depo,coalesce(ry.name,'Not Define') as rayon,coalesce(cb.name,'Not Define') as prinsiple ,org.name as org,u.name as nmsales,cv.documentno as docno,cv.datedoc tgltrs,cv.description,ccus.name as nmcus,mp.name as nmbarang,
+uomconversiontostr(mp.m_product_id,sum(cvp.qtysold)) as qty
+from UNS_Cvs_Rpt cv
+inner join UNS_Cvs_RptCustomer cvc on cv.uns_cvs_rpt_id=cvc.uns_cvs_rpt_id
+inner join uns_cvscustomer ccus on ccus.uns_cvscustomer_id=cvc.uns_cvscustomer_id
+inner join UNS_Cvs_RptProduct  cvp on cvp.uns_cvs_rptcustomer_id=cvc.uns_cvs_rptcustomer_id
+inner join m_product mp on mp.m_product_id=cvp.m_product_id
+left join C_BPartner_Product mc on mp.m_product_id=mc.m_product_id
+left join c_bpartner cb on mc.c_bpartner_id=cb.c_bpartner_id
+inner join ad_org org on org.ad_org_id=cv.ad_org_id
+inner join ad_user u on u.ad_user_id=cv.salesrep_id
+inner join c_salesregion sr on sr.c_salesregion_id=org.c_salesregion_id
+left join UNS_CvsCustomer_Location cl on ccus.uns_cvscustomer_id=cl.uns_cvscustomer_id
+left join UNS_Rayon ry on cl.UNS_Rayon_ID=ry.UNS_Rayon_ID
+where cv.docstatus in('CO','CL') and cv.datedoc between $P{StartDate} and $P{EndDate}
+and case when $P{SalesRegion} is not null then sr.C_Salesregion_ID=$P{SalesRegion} else 1=1 end
+and case when $P{AD_User_ID} is not null then u.ad_user_id=$P{AD_User_ID} else 1=1 end
+group by cb.name,ry.name,sr.value,org.name,u.name,cv.documentno,cv.datedoc,cv.description,ccus.name,mp.name,mp.m_product_id
+order by sr.value,org.name,cv.datedoc,ccus.name]]>
+	</queryString>
+	<field name="depo" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="prinsiple" class="java.lang.String"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="nmsales" class="java.lang.String"/>
+	<field name="docno" class="java.lang.String"/>
+	<field name="tgltrs" class="java.sql.Timestamp"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="nmcus" class="java.lang.String"/>
+	<field name="nmbarang" class="java.lang.String"/>
+	<field name="qty" class="java.lang.String"/>
+	<variable name="nosales" class="java.lang.Integer" incrementType="Group" incrementGroup="Salesman" calculation="Count">
+		<variableExpression><![CDATA[new Integer("0")]]></variableExpression>
+		<initialValueExpression><![CDATA[new Integer("0")]]></initialValueExpression>
+	</variable>
+	<group name="Organization">
+		<groupExpression><![CDATA[$F{org}]]></groupExpression>
+	</group>
+	<group name="Salesman">
+		<groupExpression><![CDATA[$F{nmsales}]]></groupExpression>
+	</group>
+	<group name="tgltrx">
+		<groupExpression><![CDATA[$F{tgltrs}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="41" splitType="Stretch">
+			<textField>
+				<reportElement uuid="9cb165d8-d807-4286-84c5-23197d9e355e" x="0" y="14" width="585" height="16"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Periode Tanggal '+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' sampai '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="92f0fd49-53a1-4c03-935a-824ba4165bdd" x="0" y="0" width="585" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORT PENJUALAN SALES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80be5e6d-f01c-483f-8663-0ad2c4176504" x="119" y="30" width="88" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Organization]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80be5e6d-f01c-483f-8663-0ad2c4176504" x="319" y="30" width="74" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Salesman]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80be5e6d-f01c-483f-8663-0ad2c4176504" x="393" y="30" width="107" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80be5e6d-f01c-483f-8663-0ad2c4176504" x="500" y="30" width="51" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Transaksi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80be5e6d-f01c-483f-8663-0ad2c4176504" x="551" y="30" width="200" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80be5e6d-f01c-483f-8663-0ad2c4176504" x="751" y="30" width="81" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty. Penjualan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80be5e6d-f01c-483f-8663-0ad2c4176504" x="0" y="30" width="27" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Depo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80be5e6d-f01c-483f-8663-0ad2c4176504" x="27" y="30" width="92" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Rayon]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80be5e6d-f01c-483f-8663-0ad2c4176504" x="207" y="30" width="112" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Organization]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement uuid="79d70162-1a35-4250-b868-dff9b01af5f0" x="751" y="0" width="81" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="98022e86-7152-46c4-86f7-6fa7f24570a2" x="393" y="0" width="107" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmcus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="20e395eb-15b4-41d2-8643-cffa80bbe068" x="319" y="0" width="74" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmsales}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ba4c7e71-5902-4b07-9857-f5cf7a6e2611" x="551" y="0" width="200" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmbarang}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="0c20c61f-cb4e-473a-946f-500c049735ce" x="500" y="0" width="51" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgltrs}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7afd5131-b8d4-4a10-9361-4ddda8ff282b" x="119" y="0" width="88" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="52bd5fcd-2adc-465c-b9b7-c056323f5137" x="0" y="0" width="27" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{depo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4afb34bc-1443-4a84-aa19-57d1d6f635b4" x="27" y="0" width="92" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="17d16953-67cd-42a6-90eb-95f430d3ac47" x="207" y="0" width="112" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prinsiple}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

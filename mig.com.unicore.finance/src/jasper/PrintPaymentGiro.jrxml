@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintPaymentGiro" language="groovy" pageWidth="611" pageHeight="395" columnWidth="581" leftMargin="10" rightMargin="20" topMargin="5" bottomMargin="20" uuid="5548d939-66a9-4be5-9a86-8ec2a03876f3">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="15"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() tglskrg,u.name as nmuser,cb.receiptdate as tgltrx,cb.name as nogiro,
+gac.documentno as nodoc,
+case when ci.documentno is null then (select c_invoice.documentno from c_invoice where c_invoice.c_order_id=cbl.c_order_id) else ci.documentno  end as nofaktur,
+case when ci.documentno is null then (select c_bpartner.name from c_bpartner where c_bpartner_id in(select c_invoice.c_bpartner_id from c_invoice  where c_invoice.c_order_id=cbl.c_order_id)) else ci.documentno  end as name,
+case when ci.documentno is null then (select c_invoice.grandtotal from c_invoice where c_invoice.c_order_id=cbl.c_order_id) else ci.grandtotal  end as gttot,
+cbl.paidamt as tgiro
+from UNS_CustomerBG cb
+left join uns_customerbg_invlist cbl on cb.uns_customerbg_id=cbl.uns_customerbg_id
+left join UNS_CustomerBG_Action gac on gac.uns_customerbg_id=cb.uns_customerbg_id
+left join c_bpartner cp on cb.c_bpartner_id=cp.c_bpartner_id
+left join c_invoice ci on ci.c_invoice_id=cbl.c_invoice_id
+left join ad_user u on u.ad_user_id=$P{AD_User_ID}
+where cb.receiptdate>=$P{StartDate} and cb.receiptdate<=$P{EndDate}
+and cb.createdby=$P{AD_User_ID}]]>
+	</queryString>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="nmuser" class="java.lang.String"/>
+	<field name="tgltrx" class="java.sql.Timestamp"/>
+	<field name="nogiro" class="java.lang.String"/>
+	<field name="nodoc" class="java.lang.String"/>
+	<field name="nofaktur" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="gttot" class="java.math.BigDecimal"/>
+	<field name="tgiro" class="java.math.BigDecimal"/>
+	<variable name="nourut" class="java.lang.String" calculation="Count">
+		<variableExpression><![CDATA[$V{COLUMN_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="Tcomplet" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tgiro}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="ttgiro" class="java.lang.Number" resetType="Group" resetGroup="giro" calculation="Sum">
+		<variableExpression><![CDATA[$F{tgiro}]]></variableExpression>
+	</variable>
+	<group name="giro">
+		<groupExpression><![CDATA[$F{nogiro}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField>
+					<reportElement x="0" y="0" width="160" height="14" uuid="53a16483-144e-47d5-811f-b682c4812c1b"/>
+					<textElement>
+						<font isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Kode Giro '+$F{nogiro}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<textField>
+					<reportElement x="241" y="0" width="160" height="14" uuid="6eb2366b-0bec-49e5-a356-bb6cb1d17d9e"/>
+					<textElement>
+						<font isBold="true" isUnderline="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Total Giro '+$F{nogiro}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="0" width="571" height="1" uuid="c1f392bc-99be-49e7-9d42-7a16e2afd4b4"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<textField pattern="#,##0.00">
+					<reportElement x="401" y="3" width="90" height="13" uuid="88b7659e-bdf8-4665-a391-75183627ae32"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{ttgiro}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="571" height="20" uuid="89ee06dc-88dc-4ddd-a6bc-86760cdd1435"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Laporan Payment Giro]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="36" width="275" height="14" uuid="59622aca-3efd-4450-9a54-f84d9ddfa3a7"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Periode Tanggal : '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' s/d '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="471" y="0" width="100" height="20" uuid="6f38a43c-4420-4089-8b25-15218d5f78ed"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="60" width="26" height="11" uuid="31c18536-93c2-4b50-91ce-fc51f0251e9a"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="28" y="60" width="55" height="11" uuid="9ee0e95c-ebe0-4df6-9c0e-d3749d1d47fd"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl Payment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="89" y="60" width="55" height="11" uuid="37cc6369-a6c3-499c-aeb0-5b44a5786c52"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Payment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="147" y="60" width="49" height="11" uuid="3fbc32c9-111b-4ac9-ac02-b7a61d9a0dac"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No Faktur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="60" width="110" height="11" uuid="6aa6063d-6615-4a3d-93dd-a8af1e6d220e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Toko]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="312" y="60" width="62" height="11" uuid="f9befe6f-2888-412f-997c-1eae91dd6423"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="417" y="60" width="62" height="11" uuid="370edb7e-372d-405b-a396-e77c7e7669d6"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Giro]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="74" width="571" height="1" uuid="a6256598-f5ed-4d2c-bba0-2cfde56d15ad"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="28" y="0" width="55" height="11" uuid="67aaaa5c-ba13-4c2f-bcfc-f41613f7f945"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgltrx}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="89" y="0" width="55" height="11" uuid="b15a9cd8-3a66-4e9d-9bc7-ccda678d67c4"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nodoc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="147" y="0" width="49" height="11" uuid="4a19af7c-8148-47ad-9a23-98b928e19c6f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nofaktur}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="310" y="0" width="64" height="11" uuid="f447c1d6-2e79-4478-9798-d1b14b314fff"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{gttot}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="26" height="11" uuid="2bfca23a-8841-4696-8549-4a13738be6dd"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{nourut}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="0" width="99" height="11" uuid="c3615408-a9ca-4efc-9b8e-1ffb6bdb2f02"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="417" y="0" width="74" height="11" uuid="5b26468e-e0dd-4b32-a8d3-eb53735cd684"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgiro}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="4" splitType="Stretch"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="105">
+			<line>
+				<reportElement x="0" y="0" width="571" height="1" uuid="8d646787-fc8f-4bb4-96ab-7d6156a5a37e"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="210" y="1" width="164" height="11" uuid="266aa9c6-eda3-4663-83e7-3ea773c7eb06"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="401" y="0" width="90" height="11" uuid="cd92292f-28fc-457d-8f16-ebe28ffa2ce4"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Tcomplet}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="82" width="172" height="13" uuid="06864200-3354-40a3-9253-3745ad572773"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Print By : '+$F{nmuser}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="417" y="32" width="126" height="11" uuid="665929c9-0a85-4e38-a7d4-1b89ae30bc0a"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Penerima,]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="357" y="16" width="186" height="11" uuid="ab511fc4-b900-445c-999e-5ac1bfbc0f5e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Bandar Lampung, '+
+new SimpleDateFormat("dd/MM/yyyy").format($F{tgltrx})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="417" y="75" width="126" height="11" uuid="aec41041-97d9-4e8b-a8bd-1b437177219b"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[(                                           )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="275" y="75" width="126" height="11" uuid="a5c706e3-7e23-4259-b3f7-0620b6d69af0"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[(                                           )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="275" y="32" width="126" height="11" uuid="5e8ecc8f-d005-46a8-a42a-98f018b6485e"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Disetor oleh,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="134" y="75" width="126" height="11" uuid="3eaadafd-f086-40e9-89ba-8c8ada23b081"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[(                                           )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="134" y="32" width="126" height="11" uuid="16519db5-9622-453f-b35b-f5f3ce278daf"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Diketahui,]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+</jasperReport>

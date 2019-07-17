@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportVoucerExpedition" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0464eeda-f7ef-406b-ae47-c86cc41fa3d5">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select org.name as org,sh.documentno as noshippingplg,sh.datedoc as tglshipping,shawal.documentno as nosip,shawal.datedoc,
+em.name as nmsupirt,am.name as nmarmada,shf.description as keterangan,xp.documentno as noexpedisi,
+cd.description as ketbiaya,cb.name as nmvendor,sh.shippingtype as shtype,
+(case when cd.chargetype='VC' then (select vc.name from uns_voucher_code vc where cd.uns_voucher_code_id=vc.uns_voucher_code_id) else '' end) as nofoucher,
+(case when cd.isfuel='Y' then (select f.name from uns_fuel f where cd.uns_fuel_id=f.uns_fuel_id) else '' end) as nmbbm,cd.liters as liter,cd.amount as biaya,
+cf.documentno as no_chrageconf, cfd.amountconfirmed as biayaconf
+from UNS_Shipping sh
+left join uns_armada am on am.uns_armada_id=sh.uns_armada_id
+left join uns_employee em on em.uns_employee_id=sh.uns_employee_id
+left join UNS_ShippingFreight shf on shf.uns_shipping_id=sh.uns_shipping_REFF_id
+left join UNS_Charge_Detail cd on cd.uns_shipping_id=sh.uns_shipping_id
+left join uns_charge_confirmation cf on cf.uns_charge_confirmation_id=cd.uns_charge_confirmation_id
+left join uns_charge_detail cfd on cfd.uns_charge_confirmation_id=cf.uns_charge_confirmation_id
+left join ad_org org on org.ad_org_id=sh.ad_org_id
+left join uns_expedition xp on xp.uns_expedition_id=shf.uns_expedition_id
+left join uns_shipping as shawal on shawal.uns_shipping_id=sh.uns_shipping_reff_id
+left join c_bpartner cb on cb.c_bpartner_id=cd.c_bpartner_id
+where sh.docstatus in('CL','CO') and sh.status='RS' and cd.chargetype='VC'
+and sh.datedoc between $P{StartDate} and $P{EndDate}
+order by org.ad_org_id,sh.documentno]]>
+	</queryString>
+	<field name="org" class="java.lang.String"/>
+	<field name="noshippingplg" class="java.lang.String"/>
+	<field name="tglshipping" class="java.sql.Timestamp"/>
+	<field name="nosip" class="java.lang.String"/>
+	<field name="datedoc" class="java.sql.Timestamp"/>
+	<field name="nmsupirt" class="java.lang.String"/>
+	<field name="nmarmada" class="java.lang.String"/>
+	<field name="keterangan" class="java.lang.String"/>
+	<field name="noexpedisi" class="java.lang.String"/>
+	<field name="ketbiaya" class="java.lang.String"/>
+	<field name="nmvendor" class="java.lang.String"/>
+	<field name="shtype" class="java.lang.String"/>
+	<field name="nofoucher" class="java.lang.String"/>
+	<field name="nmbbm" class="java.lang.String"/>
+	<field name="liter" class="java.math.BigDecimal"/>
+	<field name="biaya" class="java.math.BigDecimal"/>
+	<field name="no_chrageconf" class="java.lang.String"/>
+	<field name="biayaconf" class="java.math.BigDecimal"/>
+	<group name="org">
+		<groupExpression><![CDATA[$F{org}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement x="0" y="0" width="128" height="11" uuid="6901f204-6fb8-4b0d-826e-a751995bb430"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="noshipping">
+		<groupExpression><![CDATA[$F{noshippingplg}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement x="28" y="0" width="48" height="11" uuid="cd03ec57-9d36-4598-8d0a-3beb62220d22"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nosip}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="76" y="1" width="52" height="11" uuid="b0be7501-080c-4c54-8797-d7d48934aaf0"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tglshipping}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="128" y="0" width="56" height="11" uuid="803abb67-239d-4582-9b1e-96edfbc674cc"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmarmada}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="188" y="0" width="100" height="11" uuid="c4164a34-c44c-49b9-8f38-6dd9be398076"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmsupirt}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="8"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="72" splitType="Stretch">
+			<staticText>
+				<reportElement x="472" y="0" width="100" height="11" uuid="db6c86c8-104e-48f8-9ac5-22ad01d3847c"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="13" uuid="2c0b0915-cdb5-4260-8388-acf34c160b6c"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Report Voucher Expedition]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="11" width="572" height="13" uuid="bae782bf-e52e-486b-8b83-a64fb5bbac0a"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode Tanggal "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' s/d '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="32" width="100" height="11" uuid="e0bbf1fc-85b4-4fbf-a857-06d911be1a33"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Org]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="28" y="43" width="46" height="11" uuid="1f3ff0e6-dc81-4052-908f-b0797c25eb1f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sttelemtent Exp]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="54" width="128" height="11" uuid="f578484e-4a0d-4531-a109-4407de0cd181"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Keterangan Expedition]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="76" y="43" width="46" height="11" uuid="125db2ce-d284-4417-a361-00e5d66d8530"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Shipping]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="122" y="43" width="62" height="11" uuid="516b3c88-6bf8-488d-abca-2022beccf8f8"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Armada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="189" y="43" width="70" height="11" uuid="db44c372-89ee-41ee-8431-ec1d6ed085e8"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Supir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="54" width="128" height="11" uuid="406624d1-1473-4e14-ab4a-59cd86ae04ff"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Keterangan Biaya Expedition]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="258" y="54" width="98" height="11" uuid="fb33a024-90f2-4718-a613-312e86739a77"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Vendor Voucher]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="356" y="54" width="75" height="11" uuid="7c31bd2e-9bff-43ac-82d2-7dc9b277953e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No Voucher]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="54" width="29" height="11" uuid="8a250821-bc07-4c2c-90f5-0c5e569b5c69"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty/Liter]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="460" y="54" width="57" height="11" uuid="035aa6e0-39de-4a5a-95f3-db9840d3c32a"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama BBM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="517" y="54" width="55" height="11" uuid="3643fdd9-b9ff-4b9b-ab4f-3a3487251b6e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jumlah Biaya]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="68" width="572" height="1" uuid="c6ea3e87-ac49-4044-8fd1-0f9b97c8db92"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement x="130" y="0" width="133" height="11" uuid="516d61ef-425e-49f4-838d-e334a6bba1e3"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ketbiaya}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="263" y="0" width="93" height="11" uuid="3892da79-c570-43cb-98f1-56cbbccafc49"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmvendor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="356" y="0" width="75" height="11" uuid="e629a713-6efc-4fc1-9103-66c6481e8c73"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nofoucher}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="524" y="0" width="48" height="11" uuid="ec4347f3-0e08-49f0-bea1-50e223b7b987"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{biaya}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="460" y="0" width="57" height="11" uuid="2d4c45bb-f077-48cd-9aaa-cc002479c80e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmbbm}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="130" height="11" uuid="59aa6893-3adf-459f-9ba8-dd1d1f74e517"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="431" y="0" width="29" height="11" uuid="1786de07-edad-4181-81f3-05fa216d81be"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{liter}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="50"/>
+	</lastPageFooter>
+</jasperReport>

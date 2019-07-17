@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FR_StdMultiFormat_4Cols" pageWidth="842" pageHeight="590" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fda4ee76-fe28-4e78-91ac-1b9f5fd24736">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="UntaCoreKPDJBC@RealTime"/>
+	<style name="style_amt">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{level}==1]]></conditionExpression>
+			<style mode="Opaque" forecolor="#6600FF" backcolor="#FFCC33" fontSize="9">
+				<pen lineColor="#000000"/>
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+				</box>
+				<paragraph rightIndent="5"/>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{level}>=2]]></conditionExpression>
+			<style mode="Opaque" forecolor="#FF9900" backcolor="#CCFFCC" fontSize="8">
+				<pen lineColor="#000000"/>
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+				</box>
+				<paragraph rightIndent="10"/>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{level}==0 && $F{islinesubtotal}.equals("Y")]]></conditionExpression>
+			<style fontSize="10" isBold="true" isItalic="true">
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+				</box>
+			</style>
+		</conditionalStyle>
+	</style>
+	<style name="style_uraian">
+		<paragraph leftIndent="10"/>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{level}==0 && $F{islinesubtotal}.equals("Y")]]></conditionExpression>
+			<style isBold="true" isItalic="true">
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+				</box>
+				<paragraph leftIndent="20"/>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{level}==1]]></conditionExpression>
+			<style mode="Opaque" forecolor="#6600FF" backcolor="#FFCC33" fontSize="9">
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+				</box>
+				<paragraph leftIndent="15"/>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{level}>=2]]></conditionExpression>
+			<style mode="Opaque" forecolor="#FF9900" backcolor="#CCFFCC" fontSize="8">
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted" lineColor="#000000"/>
+				</box>
+				<paragraph leftIndent="20"/>
+			</style>
+		</conditionalStyle>
+	</style>
+	<style name="style_color">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("NRED")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#FF0000"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("NBLU")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#0000FF"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("NPIN")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#FFAFAF"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("NORA")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#FFC800"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("NYEL")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#FFFF00"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("NGRE")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#00FF00"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("NMAG")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#FF00FF"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("NCYA")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#00FFFF"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("LGRA")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#C0C0C0"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("NGRA")]]></conditionExpression>
+			<style mode="Transparent"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("LBLU")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#CBF5EF"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("LGRE")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#D4FFA9"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{backcolor}.equals("LORA")]]></conditionExpression>
+			<style mode="Opaque" backcolor="#FFE361"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="Record_ID" class="java.lang.Integer">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT c.Name AS Perusahaan, rls.FooterTitle, pr.Name AS ReportTitle, period.Name AS Periode, rl.IsLineSubTotal, rl.IsPrintUnderLine, r.levelno::Integer AS level, r.*, rl.backcolor, rp.*, (SELECT count(*) FROM t_report WHERE pa_report_id=$P{Record_ID})::Integer AS totallines
+FROM T_Report r
+INNER JOIN PA_Report pr ON r.PA_Report_ID=pr.PA_Report_ID
+INNER JOIN C_Period period ON pr.C_Period_ID=period.C_Period_ID
+INNER JOIN AD_Client c ON c.AD_Client_ID=pr.AD_Client_ID
+INNER JOIN PA_ReportLineSummary rls ON rls.PA_ReportLineSummary_ID=r.PA_ReportLineSummary_ID
+LEFT OUTER JOIN PA_ReportLine rl ON r.PA_ReportLine_ID=rl.PA_ReportLine_ID
+LEFT OUTER JOIN T_Report_Pattern rp ON rp.PA_ReportLineSummary_ID=rls.PA_ReportLineSummary_ID AND rp.PA_Report_ID=pr.PA_Report_ID
+WHERE pr.PA_Report_ID=$P{Record_ID} ORDER BY rls.SeqNo, r.SeqNo, r.Record_ID, r.levelno, r.Name]]>
+	</queryString>
+	<field name="perusahaan" class="java.lang.String"/>
+	<field name="footertitle" class="java.lang.String"/>
+	<field name="reporttitle" class="java.lang.String"/>
+	<field name="periode" class="java.lang.String"/>
+	<field name="islinesubtotal" class="java.lang.String"/>
+	<field name="isprintunderline" class="java.lang.String"/>
+	<field name="level" class="java.lang.Integer"/>
+	<field name="ad_pinstance_id" class="java.math.BigDecimal"/>
+	<field name="pa_reportline_id" class="java.math.BigDecimal"/>
+	<field name="record_id" class="java.math.BigDecimal"/>
+	<field name="fact_acct_id" class="java.math.BigDecimal"/>
+	<field name="seqno" class="java.math.BigDecimal"/>
+	<field name="levelno" class="java.math.BigDecimal"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="col_0" class="java.math.BigDecimal"/>
+	<field name="col_2" class="java.math.BigDecimal"/>
+	<field name="col_1" class="java.math.BigDecimal"/>
+	<field name="col_3" class="java.math.BigDecimal"/>
+	<field name="col_4" class="java.math.BigDecimal"/>
+	<field name="col_5" class="java.math.BigDecimal"/>
+	<field name="col_6" class="java.math.BigDecimal"/>
+	<field name="col_7" class="java.math.BigDecimal"/>
+	<field name="col_8" class="java.math.BigDecimal"/>
+	<field name="col_9" class="java.math.BigDecimal"/>
+	<field name="col_10" class="java.math.BigDecimal"/>
+	<field name="col_11" class="java.math.BigDecimal"/>
+	<field name="col_12" class="java.math.BigDecimal"/>
+	<field name="col_13" class="java.math.BigDecimal"/>
+	<field name="col_14" class="java.math.BigDecimal"/>
+	<field name="col_15" class="java.math.BigDecimal"/>
+	<field name="col_16" class="java.math.BigDecimal"/>
+	<field name="col_17" class="java.math.BigDecimal"/>
+	<field name="col_18" class="java.math.BigDecimal"/>
+	<field name="col_19" class="java.math.BigDecimal"/>
+	<field name="col_20" class="java.math.BigDecimal"/>
+	<field name="t_report_uu" class="java.lang.String"/>
+	<field name="pa_reportlinesummary_id" class="java.math.BigDecimal"/>
+	<field name="pa_report_id" class="java.math.BigDecimal"/>
+	<field name="header_1" class="java.lang.String"/>
+	<field name="header_2" class="java.lang.String"/>
+	<field name="header_3" class="java.lang.String"/>
+	<field name="header_4" class="java.lang.String"/>
+	<field name="header_5" class="java.lang.String"/>
+	<field name="header_6" class="java.lang.String"/>
+	<field name="header_7" class="java.lang.String"/>
+	<field name="header_8" class="java.lang.String"/>
+	<field name="header_9" class="java.lang.String"/>
+	<field name="header_10" class="java.lang.String"/>
+	<field name="header_0" class="java.lang.String"/>
+	<field name="summary" class="java.lang.String"/>
+	<field name="backcolor" class="java.lang.String"/>
+	<field name="col_0_fp" class="java.lang.String"/>
+	<field name="col_1_fp" class="java.lang.String"/>
+	<field name="col_2_fp" class="java.lang.String"/>
+	<field name="col_3_fp" class="java.lang.String"/>
+	<field name="col_4_fp" class="java.lang.String"/>
+	<field name="col_5_fp" class="java.lang.String"/>
+	<field name="col_6_fp" class="java.lang.String"/>
+	<field name="col_7_fp" class="java.lang.String"/>
+	<field name="col_8_fp" class="java.lang.String"/>
+	<field name="col_9_fp" class="java.lang.String"/>
+	<field name="col_10_fp" class="java.lang.String"/>
+	<field name="col_11_fp" class="java.lang.String"/>
+	<field name="col_12_fp" class="java.lang.String"/>
+	<field name="col_13_fp" class="java.lang.String"/>
+	<field name="col_14_fp" class="java.lang.String"/>
+	<field name="col_15_fp" class="java.lang.String"/>
+	<field name="col_16_fp" class="java.lang.String"/>
+	<field name="col_17_fp" class="java.lang.String"/>
+	<field name="col_18_fp" class="java.lang.String"/>
+	<field name="col_19_fp" class="java.lang.String"/>
+	<field name="col_20_fp" class="java.lang.String"/>
+	<field name="t_report_pattern_uu" class="java.lang.String"/>
+	<field name="totallines" class="java.lang.Integer"/>
+	<variable name="col_0_1" class="java.math.BigDecimal" resetType="Group" resetGroup="LineSummary" calculation="Sum">
+		<variableExpression><![CDATA[$F{col_0}]]></variableExpression>
+	</variable>
+	<variable name="hitung" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$V{hitung} + $V{COLUMN_COUNT}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<group name="LineSummary">
+		<groupExpression><![CDATA[$F{pa_reportlinesummary_id}]]></groupExpression>
+		<groupHeader>
+			<band height="14">
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="0" y="0" width="802" height="14" backcolor="#DCDCFA" uuid="7647c132-9972-4b90-a007-0d95fac3ab18"/>
+					<box leftPadding="3" rightPadding="3">
+						<pen lineWidth="0.25"/>
+						<topPen lineWidth="0.0" lineStyle="Dotted" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dotted" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{summary}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band>
+				<frame>
+					<reportElement x="0" y="-28" width="802" height="28" uuid="baa4b7d7-da6c-42fa-8eee-73972fca9fd6"/>
+					<box>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</frame>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="60" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="16" width="803" height="17" uuid="e83bf8e3-b137-4adf-a065-0f115ab0e91b">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{reporttitle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="803" height="17" uuid="da4aad97-4bf8-4f48-a96c-d35f09b81ac7"/>
+				<textElement textAlignment="Center">
+					<font size="13" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Laporan Keuangan : " + $F{perusahaan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="32" width="803" height="15" uuid="f3e7781c-63fb-4f56-bd93-87afed255b4d"/>
+				<textElement textAlignment="Center">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode: " + $F{periode}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="33" splitType="Stretch">
+			<frame>
+				<reportElement x="0" y="0" width="802" height="33" uuid="eb4aafa6-ae9b-4779-b4b1-b0fa5cca05b0"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</frame>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="382" height="30" backcolor="#DCDCFA" uuid="785a406c-c5ce-4f60-af1d-4cee9de018b0">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DESKRIPSI]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="487" y="0" width="105" height="30" backcolor="#DCDCFA" uuid="7834695c-6327-4be1-a821-d4099b664e7f"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{header_1}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="592" y="0" width="105" height="30" backcolor="#DCDCFA" uuid="5539e460-b9a0-4878-afab-22df50bd609b"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{header_2}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="382" y="0" width="105" height="30" backcolor="#DCDCFA" uuid="e56168d7-c6ae-499c-8dea-b3ce90ab6ec8"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{header_0}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="697" y="0" width="105" height="30" backcolor="#DCDCFA" uuid="1564004b-591e-4746-992e-37c59c809caa"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{header_3}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<frame>
+				<reportElement style="style_color" x="1" y="0" width="802" height="14" uuid="9ea64942-732e-422e-8213-bb38a33ee798"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+			</frame>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement style="style_uraian" x="0" y="0" width="382" height="14" uuid="4c2a7426-6632-41ef-84d1-d5d41d9b4c73"/>
+				<box leftPadding="3" rightPadding="3">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="style_amt" x="382" y="0" width="105" height="14" uuid="ac3b30a0-1210-4bbc-a5b6-f3a33df65ed8">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="3" rightPadding="3">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat($F{col_0_fp} == null? "##,##0.00" :$F{col_0_fp})
+.format($F{col_0}.doubleValue())]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="style_amt" x="487" y="0" width="105" height="14" uuid="ec5fc2d0-91ab-4bb7-82da-11cce76e13e0">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="3" rightPadding="3">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat($F{col_1_fp} == null? "##,##0.00" :$F{col_1_fp})
+.format($F{col_1}.doubleValue())]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="style_amt" x="592" y="0" width="105" height="14" uuid="9615f94d-7d6a-47c7-9467-eeda240e5fba">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="3" rightPadding="3">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[new DecimalFormat($F{col_2_fp} == null? "##,##0.00" :$F{col_2_fp})
+.format($F{col_2}.doubleValue())]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement style="style_amt" x="697" y="0" width="105" height="14" uuid="4193bad4-4570-4156-8ffd-31928537b8a0">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<box leftPadding="3" rightPadding="3">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[new DecimalFormat($F{col_3_fp} == null? "##,##0.00" :$F{col_3_fp})
+.format($F{col_3}.doubleValue())]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="384" y="13" width="102" height="1" uuid="355b6833-1d9f-48ab-8d6a-0865af13cef3">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<printWhenExpression><![CDATA[($F{isprintunderline}.equals("Y") && $F{levelno}.intValue()==0)? true : false;]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="489" y="13" width="102" height="1" uuid="24cc0a2b-f58c-472c-a4ac-4500cf785f2e">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<printWhenExpression><![CDATA[($F{isprintunderline}.equals("Y") && $F{levelno}.intValue()==0)? true : false;]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="594" y="13" width="102" height="1" uuid="4da02c7e-2dd5-4eb3-a3d2-1ff5c0497819">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<printWhenExpression><![CDATA[($F{isprintunderline}.equals("Y") && $F{levelno}.intValue()==0)? true : false;]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="699" y="13" width="102" height="1" uuid="d8ece996-544c-468a-8490-a0db31429b37">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<printWhenExpression><![CDATA[($F{isprintunderline}.equals("Y") && $F{levelno}.intValue()==0)? true : false;]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="1">
+			<frame>
+				<reportElement x="0" y="-28" width="802" height="28" uuid="0f1a91d3-807b-4d5e-903e-05bc874d7413">
+					<printWhenExpression><![CDATA[($V{hitung} - $V{COLUMN_COUNT}) < ($F{totallines}-$V{COLUMN_COUNT})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</frame>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="22">
+			<staticText>
+				<reportElement x="1" y="10" width="123" height="12" uuid="a9933b1c-904d-4de0-92c9-c29e5045dfaa"/>
+				<textElement>
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<text><![CDATA[UntaERP Accounting System]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="771" y="7" width="28" height="15" uuid="c1ab4b92-0553-4a4b-b78e-e3e5c7024cf6"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="382" y="7" width="315" height="15" uuid="58499bb1-fefa-48ca-8f55-74417075654f"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{reporttitle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="738" y="7" width="33" height="15" uuid="ea6f8c60-e2a9-49d6-b955-a2ef1bfb4a2b"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER} + " / "]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

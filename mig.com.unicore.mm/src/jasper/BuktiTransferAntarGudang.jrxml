@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BuktiTransferAntarGudang" language="groovy" pageWidth="612" pageHeight="396" columnWidth="582" leftMargin="10" rightMargin="20" topMargin="10" bottomMargin="5" whenResourceMissingType="Empty" uuid="0235094f-a3f1-4f1c-8f87-0b8530c38846">
+	<property name="ireport.zoom" value="1.2418426461183103"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="M_Movement_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT mm.documentno AS docno, mv.documentno as docconf, org.name AS OrgName, kode.value AS kodebarang, kode.Name AS namaBarang, mw.name AS DestWarehouse, mm.movementdate AS mdate,
+COALESCE(mm.description, mm.description, '-') AS des, ml.value AS Loc, mlt.value AS Locto,
+ROUND(coalesce(mml.UOMmovementqtyL1,'0'),0)
+AS Qty1, cu1.name AS UOMConvL1,
+ROUND(coalesce(mml.UOMmovementqtyL2,'0'),0)
+AS Qty2, cu2.name AS UOMConvL2,
+ROUND(coalesce(mml.UOMmovementqtyL3,'0'),0)
+AS Qty3, cu3.name AS UOMConvL3,
+ROUND(coalesce(mml.UOMmovementqtyL4,'0'),0)
+AS Qty4, cu4.name AS UOMConvL4,
+uns_shipping."driver" as Supir,
+uns_armada."value" as nomobil
+FROM M_Movement mm
+INNER JOIN M_Warehouse mw ON mw.M_Warehouse_ID = mm.DestinationWarehouse_ID
+INNER JOIN ad_org org ON org.AD_Org_ID = mm.AD_Org_ID
+INNER JOIN m_movementline mml ON mml.m_movement_id = mm.m_movement_id
+INNER JOIN M_Locator ml ON ml.M_Locator_ID = mml.M_Locator_ID
+INNER JOIN M_Locator mlt ON mlt.M_Locator_ID = mml.M_Locatorto_ID
+INNER JOIN M_Product kode ON kode.M_Product_ID = mml.M_Product_ID
+LEFT JOIN C_UOM cu1 ON cu1.C_UOM_ID = kode.UOMConversionL1_ID
+LEFT JOIN C_UOM cu2 ON cu2.C_UOM_ID = kode.UOMConversionL2_ID
+LEFT JOIN C_UOM cu3 ON cu3.C_UOM_ID = kode.UOMConversionL3_ID
+LEFT JOIN C_UOM cu4 ON cu4.C_UOM_ID = kode.UOMConversionL4_ID
+LEFT JOIN uns_shippingfreight shf on shf.m_movement_id=mm.m_movement_id
+LEFT JOIN uns_shipping on uns_shipping.uns_shipping_id=shf.uns_shipping_id
+left Join uns_armada on uns_shipping."uns_armada_id"=uns_armada."uns_armada_id"
+left join  M_MovementConfirm mv on mv.m_movement_id=mm.m_movement_id and mv.confirmationtype='CDW'
+WHERE mm.docstatus NOT in('VO','RE') AND mm.m_movement_id = $P{M_Movement_ID}]]>
+	</queryString>
+	<field name="docno" class="java.lang.String"/>
+	<field name="docconf" class="java.lang.String"/>
+	<field name="orgname" class="java.lang.String"/>
+	<field name="kodebarang" class="java.lang.String"/>
+	<field name="namabarang" class="java.lang.String"/>
+	<field name="destwarehouse" class="java.lang.String"/>
+	<field name="mdate" class="java.sql.Timestamp"/>
+	<field name="des" class="java.lang.String"/>
+	<field name="loc" class="java.lang.String"/>
+	<field name="locto" class="java.lang.String"/>
+	<field name="qty1" class="java.math.BigDecimal"/>
+	<field name="uomconvl1" class="java.lang.String"/>
+	<field name="qty2" class="java.math.BigDecimal"/>
+	<field name="uomconvl2" class="java.lang.String"/>
+	<field name="qty3" class="java.math.BigDecimal"/>
+	<field name="uomconvl3" class="java.lang.String"/>
+	<field name="qty4" class="java.math.BigDecimal"/>
+	<field name="uomconvl4" class="java.lang.String"/>
+	<field name="supir" class="java.lang.String"/>
+	<field name="nomobil" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="38" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="f9f72038-c17a-465b-8dc9-b5a04094232f" x="0" y="0" width="572" height="21"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[S U R A T   J A L A N]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="72160d02-49a7-4995-8d09-244f48d0f1f3" x="0" y="21" width="572" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[BUKTI TRANSFER ANTAR GUDANG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8a9ec519-94ef-4f0b-a165-f8f55a038f54" x="472" y="1" width="100" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCore ERP]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="64" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="ba7ef372-85d2-4c03-936e-3bc8f3456152" x="0" y="0" width="79" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nomor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f3a2417a-bbdc-4891-9744-32fc1077edea" x="0" y="14" width="79" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4024f428-82a6-4896-9268-88c663803528" x="0" y="29" width="79" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Transfer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cfa83633-a9a3-4753-9d00-b1b0ef0564d9" x="0" y="44" width="79" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Catatan ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dec37bb2-5e02-448b-8714-097ecf78827a" x="79" y="0" width="13" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e09fdb4d-fdf3-48af-91bc-45e12a404021" x="79" y="14" width="13" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a1aed1c0-b972-4eb9-a5b3-38178b7ac04c" x="79" y="29" width="13" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0227b899-14ea-4155-bb0c-4d98b52fa3f8" x="79" y="44" width="13" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="a80a0b11-a3db-4c3c-9999-600ca03a640f" x="92" y="0" width="83" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{docno}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="db1c8df7-249b-4418-91fd-e59ee843c52c" x="92" y="14" width="189" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{mdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f5a52d37-7322-4a81-8ed4-7dd34bf510f3" x="92" y="44" width="264" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{des}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7a33568c-9455-48be-be52-b071a2ee756b" x="92" y="29" width="114" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{loc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e05f17d3-36b4-4d5d-b70f-7a148a24ba28" x="206" y="29" width="366" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Ke    "+ $F{destwarehouse}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="3a6b182e-c500-4eb4-a4f4-c48260776de1" x="393" y="14" width="67" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Kendaraan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="775c9a63-bca8-4f29-99a8-a747e269c68a" x="460" y="14" width="12" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="06ef6079-068a-431d-aee9-001ad99de400" x="472" y="14" width="100" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nomobil} == null ? "" : $F{nomobil}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="cf5fd303-dae6-46e4-a723-157cc8f2120f" x="354" y="0" width="106" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Konfirmasi]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="14b67328-2ad8-4bf1-a963-0fe2a435f55b" x="460" y="0" width="100" height="14"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{docconf}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="79e7bc11-2e62-495d-8750-511fba96aad8" x="24" y="0" width="83" height="20"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[KODE BARANG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="378a5fe4-fd93-4acf-abec-e4d0d2063f56" x="107" y="0" width="238" height="20"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[NAMA BARANG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2eba84c2-43ee-4858-b9de-194c37cf9bde" x="345" y="0" width="227" height="18"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[JUMLAH]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="0f3eda7d-2326-493c-b57f-0628383979b8" x="0" y="0" width="572" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="dd0b55f9-908d-4c50-b632-7bcef771d74d" x="-2" y="19" width="574" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="69f24587-361c-4c1c-a248-d7395d4595e3" x="1" y="0" width="24" height="20"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[NO]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement uuid="33f5e9c6-04d2-43f3-bdc6-f2af70a8413a" x="107" y="0" width="262" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namabarang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="aa739330-5cc5-4836-a9d5-8cd5a9bf2893" x="24" y="0" width="83" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kodebarang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="3976376a-31b1-4062-911d-0b6aae9c6d43" x="449" y="0" width="23" height="11">
+					<printWhenExpression><![CDATA[$F{uomconvl2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="ddea53b1-b6ba-4fe4-acf4-d3e50889d91c" x="513" y="0" width="21" height="11">
+					<printWhenExpression><![CDATA[$F{uomconvl3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="c5e325c1-4e1f-4521-86e9-a1c84b386237" x="534" y="0" width="38" height="11"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{uomconvl3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="9c907199-3df7-4a61-b5ee-34fd72ea5225" x="472" y="0" width="41" height="11"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{uomconvl2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e1ca5914-871a-4117-bd25-afec377cfe4a" x="404" y="0" width="45" height="11"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{uomconvl1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f6719ed7-f0b3-495e-8ca3-36f89398228b" x="369" y="0" width="35" height="11">
+					<printWhenExpression><![CDATA[$F{uomconvl1} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="38e3530b-0de5-4aff-9d75-bafc8c282f60" x="1" y="0" width="22" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="8" splitType="Stretch">
+			<line>
+				<reportElement uuid="d872ad8e-d3fb-4f4b-9f48-13b1c0b9171f" x="-1" y="0" width="573" height="1"/>
+			</line>
+		</band>
+	</columnFooter>
+	<lastPageFooter>
+		<band height="72">
+			<staticText>
+				<reportElement uuid="9e11080e-88ce-4bcc-a94a-ec0a1d9372b4" x="0" y="0" width="79" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Diserahkan Oleh,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4ad13f11-8648-4f96-9949-3cab72d16144" x="246" y="0" width="79" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Diterima Oleh,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="942c78a9-ee87-411a-b26d-85633033a26f" x="493" y="0" width="79" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Supir,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9cc10285-643d-4bda-954b-7d8ad9230e94" x="0" y="52" width="79" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[(......................)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a3cb87b2-4d55-4de1-acf3-28e5eb90113a" x="246" y="52" width="79" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[(......................)]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="160a3569-9e9e-47bb-8b3b-399d22ddfb30" x="493" y="52" width="79" height="15"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(   "+$F{supir}+"  )"]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+</jasperReport>

@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FormUmumDaftarPenyusutanFiskal" language="groovy" pageWidth="1224" pageHeight="612" orientation="Landscape" columnWidth="1184" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b1ad07c8-5c61-462e-b665-74216d99c475">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="185"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="AD_Client_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="isDepreciated" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="OnlyActDeprStatus" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="A_Asset_Status" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_Year_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT A.value AS Asset,
+LTG.Name AS Grup,
+LO.Name AS Jen,
+Org.Name AS Org,
+AG.Description AS Kel,
+A.AssetActivationDate AS tanggal,
+AD.A_Asset_Cost AS harga,
+AD.A_Current_Period AS per,
+D.DepreciationType AS Metode,
+DF.DepreciationType AS MetodeFis,
+CL.Name AS Client,
+CurrExp.Year AS Tahun,
+DISR.Name AS Kondisi,
+A.Description,
+COALESCE ((COALESCE (AD.A_Accumulated_Depr,0) - COALESCE (FutureExp.SUMExpense,0) - COALESCE(CurrExp.SUMExpense,0)),0) AS PrevYearAccumulated,
+COALESCE ((COALESCE (AD.A_Accumulated_Depr_F,0) - COALESCE (FutureExp.SUMExpense_F,0) - COALESCE(CurrExp.SUMExpense_F,0)),0) AS PrevYearAccumulated_F,
+COALESCE (CurrExp.SUMExpense,0) As CurrYearAccumulated,
+COALESCE (CurrExp.SUMExpense_F, 0) As CurrYearAccumulated_F,
+COALESCE (COALESCE (AD.A_Asset_Cost,0) - COALESCE (AD.A_Accumulated_Depr,0) + COALESCE(FutureExp.SUMExpense,0)) AS Sisa,
+COALESCE (COALESCE (AD.A_Asset_Cost,0) - COALESCE (AD.A_Accumulated_Depr_F,0) + COALESCE(FutureExp.SUMExpense_F,0)) AS SisaF
+
+FROM A_Asset A
+INNER JOIN  A_Asset_Group AG ON AG.A_Asset_Group_ID=A.A_Asset_Group_ID
+INNER JOIN  A_Depreciation_Workfile AD ON AD.A_Asset_ID=A.A_Asset_ID
+INNER JOIN  AD_Org Org ON Org.AD_Org_ID=A.AD_Org_ID
+INNER JOIN  AD_Ref_List LTG ON LTG.value=AG.TaxGroupType
+INNER JOIN AD_Reference ARG ON ARG.AD_Reference_ID=LTG.AD_Reference_ID AND ARG.Name='_UNS_TaxGroupType'
+INNER JOIN  AD_Ref_List LO ON LO.value=AG.ObjectType
+INNER JOIN AD_Reference ARO ON ARO.AD_Reference_ID=LO.AD_Reference_ID AND ARO.Name='_UNS_ObjectType'
+INNER JOIN  A_Asset_Group_Acct AGA ON AGA.A_Asset_Group_ID=A.A_Asset_Group_ID
+INNER JOIN  A_Depreciation D ON D.A_Depreciation_ID=AGA.A_Depreciation_ID
+INNER JOIN  A_Depreciation DF ON DF.A_Depreciation_ID=AGA.A_Depreciation_F_ID
+INNER JOIN  AD_Client CL ON CL.AD_Client_ID=$P{AD_Client_ID}
+LEFT JOIN A_Asset_Disposed DIS ON DIS.A_Asset_ID=A.A_Asset_ID
+LEFT JOIN  AD_Ref_List DISR ON DISR.value=DIS.A_Disposed_Reason
+LEFT JOIN AD_Reference DISAR ON DISAR.AD_Reference_ID=DISR.AD_Reference_ID AND DISR.Name='A_Disposed_Reason'
+LEFT OUTER JOIN (SELECT COALESCE(SUM(Expense),0) As SUMExpense, COALESCE(SUM(Expense_F),0) As SUMExpense_F, A_Asset_ID
+	FROM A_Depreciation_Exp
+	INNER JOIN C_Year y ON y.C_Year_ID=$P{C_Year_ID}
+	WHERE y.FiscalYear > CAST(EXTRACT(YEAR FROM DateAcct) AS VarChar)
+	AND Processed='Y'
+	GROUP BY A_Asset_ID) As FutureExp ON A.A_Asset_ID=FutureExp.A_Asset_ID
+LEFT OUTER JOIN (SELECT COALESCE(SUM(Expense),0) As SUMExpense, COALESCE(SUM(Expense_F),0) As SUMExpense_F, A_Asset_ID, y.fiscalyear As year
+	FROM A_Depreciation_Exp
+	INNER JOIN C_Year y ON y.C_Year_ID=$P{C_Year_ID}
+	WHERE y.FiscalYear = CAST(EXTRACT(YEAR FROM DateAcct) AS VarChar)
+	AND Processed='Y'
+	GROUP BY A_Asset_ID, year) As CurrExp ON A.A_Asset_ID=CurrExp.A_Asset_ID
+
+WHERE  CASE WHEN $P{isDepreciated} IS NOT NULL THEN AG.isDepreciated='Y' ELSE 1=1 END
+    AND CASE WHEN $P{OnlyActDeprStatus} IS NOT NULL THEN A.A_Asset_Status='AC'
+		ELSE (CASE WHEN $P{A_Asset_Status} = 'AC' THEN A.A_Asset_Status='AC'
+			  WHEN $P{A_Asset_Status} = 'DP' THEN A.A_AsseT_Status='DP'
+			  WHEN $P{A_Asset_Status} = 'DI' THEN A.A_Asset_Status='DI'
+			  WHEN $P{A_Asset_Status} = 'PR' THEN A.A_Asset_Status='PR'
+			  WHEN $P{A_Asset_Status} = 'RE' THEN A.A_Asset_Status='RE'
+			  WHEN $P{A_Asset_Status} = 'SO' THEN A.A_Asset_Status='SO'
+			  ELSE 1=1 END)
+		END
+
+ORDER BY Grup, Org, AG.SeqNo, tanggal, Asset]]>
+	</queryString>
+	<field name="asset" class="java.lang.String"/>
+	<field name="grup" class="java.lang.String"/>
+	<field name="jen" class="java.lang.String"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="kel" class="java.lang.String"/>
+	<field name="tanggal" class="java.sql.Timestamp"/>
+	<field name="harga" class="java.math.BigDecimal"/>
+	<field name="per" class="java.math.BigDecimal"/>
+	<field name="metode" class="java.lang.String"/>
+	<field name="metodefis" class="java.lang.String"/>
+	<field name="client" class="java.lang.String"/>
+	<field name="tahun" class="java.lang.String"/>
+	<field name="kondisi" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="prevyearaccumulated" class="java.math.BigDecimal"/>
+	<field name="prevyearaccumulated_f" class="java.math.BigDecimal"/>
+	<field name="curryearaccumulated" class="java.math.BigDecimal"/>
+	<field name="curryearaccumulated_f" class="java.math.BigDecimal"/>
+	<field name="sisa" class="java.math.BigDecimal"/>
+	<field name="sisaf" class="java.math.BigDecimal"/>
+	<variable name="sisa_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Jenis" calculation="Sum">
+		<variableExpression><![CDATA[$F{sisa}]]></variableExpression>
+	</variable>
+	<variable name="sisaf_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Jenis" calculation="Sum">
+		<variableExpression><![CDATA[$F{sisaf}]]></variableExpression>
+	</variable>
+	<variable name="sisa_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Kel" calculation="Sum">
+		<variableExpression><![CDATA[$F{sisa}]]></variableExpression>
+	</variable>
+	<variable name="sisaf_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Kel" calculation="Sum">
+		<variableExpression><![CDATA[$F{sisaf}]]></variableExpression>
+	</variable>
+	<variable name="curryearaccumulated_f_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Kel" calculation="Sum">
+		<variableExpression><![CDATA[$F{curryearaccumulated_f}]]></variableExpression>
+	</variable>
+	<variable name="curryearaccumulated_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Kel" calculation="Sum">
+		<variableExpression><![CDATA[$F{curryearaccumulated}]]></variableExpression>
+	</variable>
+	<variable name="prevyearaccumulated_f_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Kel" calculation="Sum">
+		<variableExpression><![CDATA[$F{prevyearaccumulated_f}]]></variableExpression>
+	</variable>
+	<variable name="prevyearaccumulated_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Kel" calculation="Sum">
+		<variableExpression><![CDATA[$F{prevyearaccumulated}]]></variableExpression>
+	</variable>
+	<variable name="prevyearaccumulated_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Jenis" calculation="Sum">
+		<variableExpression><![CDATA[$F{prevyearaccumulated}]]></variableExpression>
+	</variable>
+	<variable name="prevyearaccumulated_f_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Jenis" calculation="Sum">
+		<variableExpression><![CDATA[$F{prevyearaccumulated_f}]]></variableExpression>
+	</variable>
+	<variable name="curryearaccumulated_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Jenis" calculation="Sum">
+		<variableExpression><![CDATA[$F{curryearaccumulated}]]></variableExpression>
+	</variable>
+	<variable name="curryearaccumulated_f_2" class="java.math.BigDecimal" resetType="Group" resetGroup="Jenis" calculation="Sum">
+		<variableExpression><![CDATA[$F{curryearaccumulated_f}]]></variableExpression>
+	</variable>
+	<group name="Jenis">
+		<groupExpression><![CDATA[$F{grup}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField>
+					<reportElement x="0" y="0" width="1184" height="15" uuid="ffc23b62-c3fa-4d43-9360-0a0756d622d2"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+						<paragraph leftIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{grup}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="36">
+				<staticText>
+					<reportElement x="0" y="0" width="507" height="15" uuid="62f4396b-d02e-4bc0-a35e-b19d6e4f326e"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+						<paragraph leftIndent="2"/>
+					</textElement>
+					<text><![CDATA[Jumlah Penyusutan Seluruh]]></text>
+				</staticText>
+				<textField pattern="#,##0.00">
+					<reportElement x="887" y="0" width="90" height="15" uuid="92130cb6-f4e5-4c84-bf94-1f53000fd383"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sisa_1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="977" y="0" width="90" height="15" uuid="56c344ab-ea36-4f14-ab4b-e1ef09e03e58"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sisaf_1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="507" y="0" width="95" height="15" uuid="afb690f9-5d34-4dc2-aee8-0d6485f68706"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{prevyearaccumulated_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="602" y="0" width="95" height="15" uuid="0ca5165c-e136-46d4-afca-2177168d5710"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{prevyearaccumulated_f_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="697" y="0" width="95" height="15" uuid="6c593fe3-03ed-48da-898e-8cb831bf48fa"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{curryearaccumulated_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="792" y="0" width="95" height="15" uuid="5b7679a8-00ee-4e23-b1e9-9601d12f3243"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{curryearaccumulated_f_2}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Kel">
+		<groupExpression><![CDATA[$F{kel}+" "+$F{jen}+" "+$F{org}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField>
+					<reportElement x="0" y="0" width="1184" height="15" uuid="7249cf03-623b-403b-9842-0c04bb75edf1"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isItalic="true"/>
+						<paragraph leftIndent="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{kel}+" - "+$F{org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="15">
+				<textField>
+					<reportElement x="0" y="0" width="507" height="15" uuid="c65f5ca6-55a7-46de-ae2b-02b6f88b1bcb"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="false" isItalic="false" isUnderline="false"/>
+						<paragraph leftIndent="6"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total "+$F{jen}+" - "+$F{org}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="887" y="0" width="90" height="15" uuid="566d0fa5-616b-452d-a131-e10961fd5437"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sisa_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="977" y="0" width="90" height="15" uuid="90afb99d-c5f0-4a74-90c0-8054a664ddb0"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sisaf_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="792" y="0" width="95" height="15" uuid="4ada7846-0149-478e-acc3-db45ea5729f3"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{curryearaccumulated_f_1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="697" y="0" width="95" height="15" uuid="4ac80490-ee40-4b45-a248-80e192dbe311"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{curryearaccumulated_1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="602" y="0" width="95" height="15" uuid="ede9f781-d830-45ca-a5d6-715498b457ef"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{prevyearaccumulated_f_1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="507" y="0" width="95" height="15" uuid="c9b21e9c-d444-4cda-b2ed-4d3f18b9c933"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<paragraph rightIndent="3"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{prevyearaccumulated_1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="1184" height="29" uuid="55212aa3-cc6a-4009-835b-6bb391b04f1e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Daftar Harta " +$F{client}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="29" width="1184" height="20" uuid="29e1c06a-f459-42ce-bc9e-9c54862416b0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TAHUN : " + $F{tahun}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="49" width="1184" height="20" uuid="13824f6f-d7a5-49c5-8ab5-dcd4fd6d27e3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[DAFTAR PENYUSUTAN DAN AMORTISASI FISKAL]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="46" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="16" width="198" height="30" uuid="6a996d81-05bd-4e0f-afca-a768bc1f1098"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Kelompok/Jenis Harta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="198" y="16" width="65" height="30" uuid="2bd1dc57-a95f-465b-a517-2101837e9f2a"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Tanggal Perolehan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="16" width="130" height="15" uuid="ba36a2ff-ed1d-4c24-aa2f-da670ddab2ba"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Metode Penyusutan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="31" width="65" height="15" uuid="07c72f5f-fe7c-445a-9e92-7159702658c0"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Komersial]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="442" y="31" width="65" height="15" uuid="64a3a884-35ec-49dc-9313-f6bbdd12df11"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Fiskal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="507" y="16" width="190" height="15" uuid="8b092a35-afcf-4fbf-b732-dc5458324475"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Ak. Penyusutan Thn Lalu]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="507" y="31" width="95" height="15" uuid="a8edf245-61ed-47b9-862f-787ea8e6820d"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Komersial]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="602" y="31" width="95" height="15" uuid="caa234d5-af30-4b52-b82a-7c434b818ab3"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Fiskal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="697" y="31" width="95" height="15" uuid="d376a224-22f3-402e-8678-399e1327975d"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Komersial]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="792" y="31" width="95" height="15" uuid="510f807e-c686-41ad-9e21-e457a83aa5d5"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Fiskal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="697" y="16" width="190" height="15" uuid="ed629403-1150-4036-8122-937027591fdb"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Penyusutan Thn Ini]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="887" y="31" width="90" height="15" uuid="96861f5b-8173-4d3b-9947-aea32d8f83e1"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Komersial]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="977" y="31" width="90" height="15" uuid="d7580c45-0a71-457e-bd91-3efbe9e565ee"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Fiskal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="887" y="16" width="180" height="15" uuid="1b8b9ed3-6df2-4600-abd3-2f9992e1c164"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Nilai Sisa Buku]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1067" y="16" width="117" height="30" uuid="9b97198a-eda4-4c16-964d-3c5450454a44"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Kondisi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="263" y="16" width="114" height="30" uuid="1d4e6c7c-4587-435e-9d0e-bdefa548b505"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Harga Perolehan]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="198" height="15" uuid="d5511b87-42a1-435e-9686-926368b46d86"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{asset}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="198" y="0" width="65" height="15" uuid="288dcd89-f1b0-40af-98eb-1f6fd1fb6564"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{tanggal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="377" y="0" width="65" height="15" uuid="9f1e09bc-045c-4b8d-8de0-6a562d39ce98"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{metode}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="263" y="0" width="114" height="15" uuid="2a9fcf1a-bede-4d05-a351-9ff435ec53ed"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{harga}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="442" y="0" width="65" height="15" uuid="89c528c6-dfdd-412a-a5ea-b907166b02fc"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{metodefis}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="887" y="0" width="90" height="15" uuid="6e5a6884-374b-4ca5-93d4-ded14e14d42f"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sisa}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="977" y="0" width="90" height="15" uuid="a5e4d653-b936-46d2-9e19-52736d3fcb0d"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sisaf}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1067" y="0" width="117" height="15" uuid="8ae2e292-21b4-441d-aa7c-4aa3a159706f"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kondisi}==null ? ' ' : $F{kondisi}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="507" y="0" width="95" height="15" uuid="b5b9b39e-2fd5-4d45-ac75-712eafc0fddf"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prevyearaccumulated}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="602" y="0" width="95" height="15" uuid="203491f1-c55a-4945-9e61-1f9c22d05e47"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prevyearaccumulated_f}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="697" y="0" width="95" height="15" uuid="73a947df-5937-4f0a-8b87-fd1238782925"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{curryearaccumulated}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="792" y="0" width="95" height="15" uuid="a43c084c-0767-475b-b2b7-e22bd40b6152"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{curryearaccumulated_f}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

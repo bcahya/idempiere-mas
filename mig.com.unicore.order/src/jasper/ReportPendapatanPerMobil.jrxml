@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportPendapatanPerMobil" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="772" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="20" uuid="896b0731-e62d-4d01-9b02-826daf24a6be">
+	<property name="ireport.zoom" value="0.9982500000000041"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UNS_Armada_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\project\\UntaCore@FLG\\com.unicore.order\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT ss.DocumentNo AS ReturnShipping, sd.DocumentNo AS DeliveryShipping, ss.DateDoc SettlementDate, sd.DateDoc AS DeliveryDate, ar.Name AS VehicleNo, sd.Driver AS Driver, bp.Name AS DeliveryPartner, COALESCE(bps.Name, '') AS ReturnPartner, iv.GrandTotal AS DeliveryInvoice, COALESCE(ivs.GrandTotal,0) AS ReturnInvoice, COALESCE(oris.Name, '') AS ReturnOri, COALESCE(dests.Name, '') AS ReturnDest, ori.Name AS DeliveryOri, dest.Name AS DeliveryDest, (SELECT SUM(AmountConfirmed) FROM UNS_Charge_Detail WHERE UNS_Shipping_ID = sd.UNS_Shipping_ID) AS DeliveryCharge, (SELECT SUM(AmountConfirmed) FROM UNS_Charge_Detail WHERE UNS_Shipping_ID = ss.UNS_Shipping_ID) AS ReturnCharge, ss.UNS_Shipping_ID AS IDShipping, COALESCE(exp.DocumentNo, '') AS DeliveryNoInv, COALESCE(exps.DocumentNo, '') AS ReturnNoInv
+
+FROM UNS_Shipping ss
+
+INNER JOIN AD_Org org ON org.AD_Org_ID = ss.AD_Org_ID
+INNER JOIN UNS_Shipping sd ON sd.UNS_Shipping_ID = ss.UNS_Shipping_Reff_ID AND sd.Status = 'DV' AND sd.DocStatus IN ('CO', 'CL')
+INNER JOIN UNS_ShippingFreight sfs ON sfs.UNS_Shipping_ID = sd.UNS_Shipping_ID
+INNER JOIN UNS_Expedition exp ON exp.UNS_Expedition_ID = sfs.UNS_Expedition_ID AND exp.isFeedBack = 'N' AND exp.DocStatus IN ('CO', 'CL')
+LEFT JOIN UNS_Expedition exps ON exps.Reference_ID = exp.UNS_Expedition_ID AND exps.isFeedBack = 'Y' AND exps.DocStatus IN ('CO', 'CL')
+INNER JOIN UNS_Armada ar ON ar.UNS_Armada_ID = ss.UNS_Armada_ID AND ar.UNS_Armada_ID = sd.UNS_Armada_ID
+INNER JOIN C_Invoice iv ON iv.C_Invoice_ID = exp.C_Invoice_ID
+LEFT JOIN C_Invoice ivs ON ivs.C_Invoice_ID = exps.C_Invoice_ID
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID = exp.C_BPartner_ID
+LEFT JOIN C_BPartner bps ON bps.C_BPartner_ID = exps.C_BPartner_ID
+LEFT JOIN C_City oris ON oris.C_City_ID = ss.Origin_ID
+LEFT JOIN C_City dests ON dests.C_City_ID = ss.Destination_ID
+LEFT JOIN C_City ori ON ori.C_City_ID = sd.Origin_ID
+LEFT JOIN C_City dest ON dest.C_City_ID = sd.Destination_ID
+
+WHERE org.C_SalesRegion_ID = $P{C_SalesRegion_ID} AND ss.Status = 'RS' AND ss.DocStatus IN ('CO', 'CL') AND sd.DateDoc BETWEEN $P{DateFrom} AND $P{DateTo} AND (CASE WHEN $P{UNS_Armada_ID} IS NOT NULL THEN $P{UNS_Armada_ID} = ar.UNS_Armada_ID ELSE 1=1 END)
+
+ORDER BY sd.DateDoc]]>
+	</queryString>
+	<field name="returnshipping" class="java.lang.String"/>
+	<field name="deliveryshipping" class="java.lang.String"/>
+	<field name="settlementdate" class="java.sql.Timestamp"/>
+	<field name="deliverydate" class="java.sql.Timestamp"/>
+	<field name="vehicleno" class="java.lang.String"/>
+	<field name="driver" class="java.lang.String"/>
+	<field name="deliverypartner" class="java.lang.String"/>
+	<field name="returnpartner" class="java.lang.String"/>
+	<field name="deliveryinvoice" class="java.math.BigDecimal"/>
+	<field name="returninvoice" class="java.math.BigDecimal"/>
+	<field name="returnori" class="java.lang.String"/>
+	<field name="returndest" class="java.lang.String"/>
+	<field name="deliveryori" class="java.lang.String"/>
+	<field name="deliverydest" class="java.lang.String"/>
+	<field name="deliverycharge" class="java.math.BigDecimal"/>
+	<field name="returncharge" class="java.math.BigDecimal"/>
+	<field name="idshipping" class="java.lang.Integer"/>
+	<field name="deliverynoinv" class="java.lang.String"/>
+	<field name="returnnoinv" class="java.lang.String"/>
+	<variable name="diff_charge" class="java.math.BigDecimal" resetType="Column">
+		<variableExpression><![CDATA[$F{returncharge}.subtract($F{deliverycharge})]]></variableExpression>
+	</variable>
+	<variable name="pendapatan" class="java.math.BigDecimal" resetType="Column">
+		<variableExpression><![CDATA[$F{deliveryinvoice}.subtract($F{returncharge})]]></variableExpression>
+	</variable>
+	<variable name="total_tagihan" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{deliveryinvoice}.add($F{returninvoice})]]></variableExpression>
+	</variable>
+	<variable name="total_uangjalan" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{deliverycharge}]]></variableExpression>
+	</variable>
+	<variable name="total_realisasi" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$V{diff_charge}]]></variableExpression>
+	</variable>
+	<variable name="total_tuangjalan" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{returncharge}]]></variableExpression>
+	</variable>
+	<variable name="total_pendapatan" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$V{pendapatan}.add($F{returninvoice})]]></variableExpression>
+	</variable>
+	<variable name="num" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$V{num} == null ? 1 : $V{num} + 1]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="49" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="cb88d971-ec6a-4921-8a66-d46a0f5d41b2" x="0" y="0" width="772" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORT PENDAPATAN PER MOBIL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1b43929d-56bf-4efd-bc2d-d53065a9ca96" x="0" y="20" width="772" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EKSPEDISI]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="3725ebb9-9d79-4bd3-9d91-1ded2e20ba27" x="0" y="34" width="772" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Tanggal "+new SimpleDateFormat("dd/MM/yyyy").format($P{DateFrom})+" sampai "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{DateTo})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="30b753fb-624a-4063-aafb-71d2b842e7f7" x="221" y="0" width="90" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[A s a l]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4aecacd4-534c-48c4-997a-cf977f1d3c52" x="46" y="0" width="51" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f105b58b-d160-4174-98f0-c3fd3f34a8d7" x="446" y="0" width="79" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Tagihan OA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="76ee6291-9d60-4c59-9ffc-9e57b5f3f5c9" x="707" y="0" width="65" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Pendapatan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="50c992af-7666-482b-ac50-642b62663b10" x="525" y="0" width="60" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Uang Jalan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ba24b03e-ce22-4b0f-baed-e3d79a2cb997" x="0" y="0" width="46" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Dokumen]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4aecacd4-534c-48c4-997a-cf977f1d3c52" x="97" y="0" width="124" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Pengguna Jasa]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="308692d1-aa97-4e8a-a9b2-936e3756e95c" x="0" y="0" width="772" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="9d334248-7d35-427e-8d5e-ce7b4bea75b3" x="-1" y="1" width="1" height="14"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="a7184061-9128-4803-b070-95b13b2f11e4" x="772" y="1" width="1" height="14"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="308692d1-aa97-4e8a-a9b2-936e3756e95c" x="0" y="14" width="772" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="b097b097-21b4-4e25-a9f9-bb8ce4c0deb0" x="311" y="0" width="90" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[T u j u a n]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b097b097-21b4-4e25-a9f9-bb8ce4c0deb0" x="402" y="0" width="43" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[No. Exp]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="949bd000-2df7-42dd-b09f-ad7cdf26f089" x="586" y="0" width="61" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Realisasi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="247f0082-1767-435c-9a3a-2e04bd3eb0a1" x="647" y="0" width="60" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[T.Uang Jalan]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="59" splitType="Stretch">
+			<textField>
+				<reportElement uuid="21538282-d59f-4ae9-b0a0-e4c5c08503a2" x="0" y="15" width="46" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{deliveryshipping}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ee8e6aa0-3c0b-4698-9fe2-e8f5fd24960b" x="0" y="30" width="46" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{returnshipping}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="2ecfc0ce-a4f1-4f5e-add8-ce984e1860a2" x="46" y="15" width="51" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{deliverydate}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="87d4df1c-f243-4534-97bf-e5310d755057" x="46" y="30" width="51" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{settlementdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="626646b3-a969-4f0f-acc8-10ec7e6c59c3" x="221" y="16" width="90" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{deliveryori}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="497eaa6e-f4c7-42b6-9e1b-926ec71e6be7" x="221" y="30" width="90" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{returnori}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="dc68f045-5802-49be-8a56-a8f3e50dea5c" x="311" y="15" width="90" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{deliverydest}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4d217f20-8064-4c3b-a950-e027471357a7" x="311" y="30" width="90" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{returndest}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="a82b0b3e-4210-461b-bf09-a68059a04253" x="446" y="15" width="79" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{deliveryinvoice}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="9824b42e-4be5-432c-803c-67fc98e02c98" x="446" y="30" width="79" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{returninvoice}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="b17c8621-9aa3-4bf1-b279-90cb62559e90" x="525" y="15" width="61" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{deliverycharge}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="4a36c526-b056-4251-87e2-bc6ca6b86001" x="586" y="16" width="61" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{diff_charge}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="ae8b7d8f-79bd-49c0-845b-b1c56a5cc143" x="0" y="47" width="56" height="12"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Biaya-biaya ::]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement uuid="4a36c526-b056-4251-87e2-bc6ca6b86001" x="647" y="15" width="61" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{returncharge}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="2ecfc0ce-a4f1-4f5e-add8-ce984e1860a2" x="97" y="15" width="124" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{deliverypartner}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="2ecfc0ce-a4f1-4f5e-add8-ce984e1860a2" x="97" y="30" width="124" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{returnpartner}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="4a36c526-b056-4251-87e2-bc6ca6b86001" x="708" y="15" width="64" height="15"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{pendapatan}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="9d334248-7d35-427e-8d5e-ce7b4bea75b3" x="-1" y="1" width="1" height="58"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement uuid="ee8e6aa0-3c0b-4698-9fe2-e8f5fd24960b" x="1" y="1" width="771" height="15"/>
+				<box leftPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{num} + ". " + $F{vehicleno} + " - " + $F{driver}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="dc68f045-5802-49be-8a56-a8f3e50dea5c" x="401" y="15" width="44" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{deliverynoinv}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="dc68f045-5802-49be-8a56-a8f3e50dea5c" x="402" y="30" width="43" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{returnnoinv}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="9d334248-7d35-427e-8d5e-ce7b4bea75b3" x="772" y="0" width="1" height="58"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<subreport>
+				<reportElement uuid="282f15a6-dffe-4c91-bd7e-8b729d16126e" x="55" y="47" width="288" height="12"/>
+				<subreportParameter name="UNS_Shipping_ID">
+					<subreportParameterExpression><![CDATA[$F{idshipping}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportPendapatanPerMobil_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="9824b42e-4be5-432c-803c-67fc98e02c98" x="708" y="32" width="64" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{returninvoice}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="1">
+			<line>
+				<reportElement uuid="308692d1-aa97-4e8a-a9b2-936e3756e95c" x="0" y="0" width="772" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<summary>
+		<band height="21" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement uuid="4a36c526-b056-4251-87e2-bc6ca6b86001" x="446" y="0" width="79" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_tagihan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="4a36c526-b056-4251-87e2-bc6ca6b86001" x="526" y="0" width="60" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_uangjalan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="4a36c526-b056-4251-87e2-bc6ca6b86001" x="587" y="0" width="60" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_realisasi}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="4a36c526-b056-4251-87e2-bc6ca6b86001" x="647" y="0" width="60" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_tuangjalan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="4a36c526-b056-4251-87e2-bc6ca6b86001" x="707" y="0" width="65" height="15"/>
+				<box leftPadding="0" rightPadding="0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_pendapatan}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

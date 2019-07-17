@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RekapAbsenEmployee" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="298f24b0-96e1-47b0-b5f1-60ba41d1d37d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Employee_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UNS_Resource_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="StartDate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EndDate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 	emp.Name AS employee,
+	rsc.Name AS Resource,
+	dp.PresenceDate,
+	CASE WHEN dp.DayType='HB' AND dp.PresenceStatus IN ('FLD','HLD','BLD') THEN 1 END AS HariKerja,
+	CASE WHEN dp.DayType='HL' THEN 1 END AS LiburMinggu,
+	CASE WHEN dp.DayType='HN' THEN 1 END AS LiburNasional,
+	dp.PresenceStatus AS status,
+	emp.UNS_Employee_ID,
+	now (),
+	org.Name AS Org
+
+FROM UNS_DailyPresence dp
+
+
+INNER JOIN UNS_MonthlyPresenceSummary mps ON dp.UNS_MonthlyPresenceSummary_ID=mps.UNS_MonthlyPresenceSummary_ID
+INNER JOIN UNS_Employee emp ON emp.UNS_Employee_ID=mps.UNS_Employee_ID
+INNER JOIN AD_Org org ON org.AD_Org_ID=emp.AD_Org_ID
+INNER JOIN C_Period prd ON prd.C_Period_ID=mps.C_Period_ID
+INNER JOIN UNS_Resource_WorkerLine rwl ON rwl.Labor_ID=emp.UNS_Employee_ID
+INNER JOIN UNS_Resource rsc ON rsc.UNS_Resource_ID=rwl.UNS_Resource_ID
+
+WHERE CASE WHEN $P{UNS_Employee_ID} IS NOT NULL THEN emp.UNS_Employee_ID=$P{UNS_Employee_ID} ELSE 1=1 END AND CASE WHEN $P{UNS_Resource_ID} IS NOT NULL THEN rsc.UNS_Resource_ID=$P{UNS_Resource_ID} ELSE 1=1 END AND dp.PresenceDate BETWEEN $P{StartDate} AND $P{EndDate} AND $P{AD_Org_ID}=org.AD_Org_ID
+
+Order By rsc.Name, UNS_Employee_ID]]>
+	</queryString>
+	<field name="employee" class="java.lang.String"/>
+	<field name="resource" class="java.lang.String"/>
+	<field name="presencedate" class="java.sql.Timestamp"/>
+	<field name="harikerja" class="java.lang.Integer"/>
+	<field name="liburminggu" class="java.lang.Integer"/>
+	<field name="liburnasional" class="java.lang.Integer"/>
+	<field name="status" class="java.lang.String"/>
+	<field name="uns_employee_id" class="java.math.BigDecimal"/>
+	<field name="now" class="java.sql.Timestamp"/>
+	<field name="org" class="java.lang.String"/>
+	<variable name="No" class="java.lang.Integer" resetType="Group" resetGroup="employeeID" incrementType="Group" incrementGroup="employeeID" calculation="Count">
+		<variableExpression><![CDATA[$V{No}== null ? 1 : $V{No}++]]></variableExpression>
+	</variable>
+	<variable name="harikerja_1" class="java.lang.Integer" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{harikerja}]]></variableExpression>
+	</variable>
+	<variable name="liburminggu_1" class="java.lang.Integer" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{liburminggu}]]></variableExpression>
+	</variable>
+	<variable name="liburnasional_1" class="java.lang.Integer" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{liburnasional}]]></variableExpression>
+	</variable>
+	<variable name="TotalHari" class="java.lang.Integer" resetType="Group" resetGroup="employeeID">
+		<variableExpression><![CDATA[$V{harikerja_1}+$V{liburminggu_1}]]></variableExpression>
+	</variable>
+	<group name="employeeID">
+		<groupExpression><![CDATA[$F{uns_employee_id}]]></groupExpression>
+		<groupFooter>
+			<band height="20">
+				<textField>
+					<reportElement x="127" y="0" width="154" height="20" uuid="7a78aaf5-4bee-4de2-98a1-5491b746b418"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{employee}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="28" y="0" width="100" height="20" uuid="30fba36c-98ae-49e7-8381-4cb81bc9f349"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{resource}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="482" y="0" width="72" height="20" uuid="a26a1be2-1bf8-4460-ae38-71d6837464ff"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{TotalHari}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="28" height="20" uuid="0b586360-d035-4c40-9750-81d5b99a658c"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{No}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="280" y="0" width="54" height="20" uuid="11afce4d-2ae8-4371-bc18-485664a3c903"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{harikerja_1}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="333" y="0" width="74" height="20" uuid="90003f8c-985d-45a2-8b84-77e91661180f"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{liburminggu_1}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="405" y="0" width="77" height="20" uuid="1fb76bc7-2e80-45f0-afb7-52662d379201"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{liburnasional_1} == null ? 0 : $V{liburnasional_1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="53" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="554" height="33" uuid="2f60cb61-5b5d-49cb-b738-93c2544a5cca"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Rekap Absen Harian]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="33" width="554" height="20" uuid="09893662-1dbb-4c6f-81f4-dfc731d70b53"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="55" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="89" y="15" width="100" height="20" uuid="2d1aae3a-068b-40fb-b6bd-0ddfd5c173fe"/>
+				<textFieldExpression><![CDATA[$P{StartDate}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="89" y="35" width="100" height="20" uuid="92eccb49-d1c0-4995-97aa-f5eb57d96213"/>
+				<textFieldExpression><![CDATA[$P{EndDate}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH.mm.ss">
+				<reportElement x="451" y="35" width="103" height="20" uuid="1277f92f-1a5b-42f5-afb9-7e791a4c2ef7"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{now}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="15" width="71" height="20" uuid="1d89a8b9-7c30-4192-86cd-b4317141f1bf"/>
+				<text><![CDATA[Start Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="35" width="71" height="20" uuid="d0655ccd-8b51-41fe-9db4-ce97d7430a8a"/>
+				<text><![CDATA[End date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="354" y="35" width="79" height="20" uuid="388698e8-2c23-4e5e-9b35-f91a5caa239d"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Date Printed]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="71" y="15" width="18" height="20" uuid="8731d88f-a61e-424b-97dc-1fd50d235f3f"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="71" y="35" width="18" height="20" uuid="9c9b5391-f890-453e-a51d-1d395171260b"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="433" y="35" width="18" height="20" uuid="26bf4f88-0fba-4e5d-822e-943894c86d21"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="127" y="0" width="153" height="20" uuid="1304f076-cc07-4118-a878-8b1c2934f23d"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Nama Karyawan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="28" y="0" width="100" height="20" uuid="19f717b2-526e-4e3b-9fda-85b4254580ca"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Bagian]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="0" width="54" height="20" uuid="ba2826a5-5863-49fa-9c09-c927453f2a0c"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Hari Kerja]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="0" width="74" height="20" uuid="0baae53d-7c10-4e59-b830-8dc2efbb93e8"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Libur Mingguan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="482" y="0" width="72" height="20" uuid="0b4f7852-5125-4a01-9db0-c2b381a388ae"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="405" y="0" width="78" height="20" uuid="d08bb76b-40af-43f6-b7e2-4eab2023d94e"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Libur Nasional]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="28" height="20" uuid="85692e2f-6afa-4d93-8a05-9a0057dda36c"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[No]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="433" y="34" width="80" height="20" uuid="39dbd94a-fe4c-4ba5-8d69-a0f75ae3bb44"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="513" y="34" width="40" height="20" uuid="b0a0bfc4-e7dd-47f7-8b5f-cc86e53c2048"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="40" splitType="Stretch"/>
+	</summary>
+</jasperReport>

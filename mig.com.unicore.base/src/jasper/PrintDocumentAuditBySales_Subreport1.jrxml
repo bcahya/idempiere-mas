@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintDocumentAuditBySales_Subreport1" language="groovy" pageWidth="482" pageHeight="730" columnWidth="482" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="71bbe06a-32cc-4c7d-9807-dc3817fca977">
+	<property name="ireport.zoom" value="1.2100000000000009"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Audit_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT a.DocumentNo AS Audit, a.DateAcct AS DateAudit, a.Description AS DescAudit, COALESCE(usr.RealName, usr.Name) AS Sales, COALESCE(ry.Name, 'UNDEFINED') AS Rayon, COUNT(DISTINCT(bpl.C_BPartner_ID)) AS TotalPartner, SUM(ad.GrandTotal) AS GrandTotal, SUM(ad.OpenAmt) AS OpenAmt, COUNT(ad.C_Invoice_ID) AS TotalInvoice, CASE WHEN a.Processed = 'N' THEN 'Not Completed Yet' ELSE 'Completed' END AS Status FROM UNS_Audit a
+
+INNER JOIN UNS_AuditPartner ap ON ap.UNS_Audit_ID = a.UNS_Audit_ID
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID = ap.C_BPartner_ID
+INNER JOIN UNS_AuditDocument ad ON ad.UNS_AuditPartner_ID = ap.UNS_AuditPartner_ID
+INNER JOIN C_PaymentTerm pt ON pt.C_PaymentTerm_ID = ap.C_PaymentTerm_ID
+INNER JOIN C_Invoice iv ON iv.C_Invoice_ID = ad.C_Invoice_ID
+INNER JOIN AD_User usr ON usr.AD_User_ID = iv.SalesRep_ID
+INNER JOIN C_BPartner_Location bpl ON bpl.C_BPartner_Location_ID = iv.C_BPartner_Location_ID
+LEFT JOIN UNS_Rayon ry ON ry.UNS_Rayon_ID = bpl.UNS_Rayon_ID
+
+WHERE a.UNS_Audit_ID = $P{UNS_Audit_ID}
+GROUP BY a.UNS_Audit_ID, usr.AD_User_ID, ry.UNS_Rayon_ID
+
+ORDER BY Sales, Rayon]]>
+	</queryString>
+	<field name="audit" class="java.lang.String"/>
+	<field name="dateaudit" class="java.sql.Timestamp"/>
+	<field name="descaudit" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="totalpartner" class="java.lang.Long"/>
+	<field name="grandtotal" class="java.math.BigDecimal"/>
+	<field name="openamt" class="java.math.BigDecimal"/>
+	<field name="totalinvoice" class="java.lang.Long"/>
+	<field name="status" class="java.lang.String"/>
+	<variable name="total_partner" class="java.lang.Integer" resetType="Group" resetGroup="Sales" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalpartner}]]></variableExpression>
+	</variable>
+	<variable name="total_invoice" class="java.lang.Integer" resetType="Group" resetGroup="Sales" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalinvoice}]]></variableExpression>
+	</variable>
+	<variable name="total_total" class="java.math.BigDecimal" resetType="Group" resetGroup="Sales" calculation="Sum">
+		<variableExpression><![CDATA[$F{grandtotal}]]></variableExpression>
+	</variable>
+	<variable name="total_balance" class="java.math.BigDecimal" resetType="Group" resetGroup="Sales" calculation="Sum">
+		<variableExpression><![CDATA[$F{openamt}]]></variableExpression>
+	</variable>
+	<group name="Sales">
+		<groupExpression><![CDATA[$F{sales}]]></groupExpression>
+		<groupHeader>
+			<band height="40">
+				<staticText>
+					<reportElement uuid="6a3aca3b-4413-4163-ad1b-2cc84683bb24" x="0" y="20" width="141" height="20"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Rayon]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="8caca2ce-dd6f-41df-b164-7553479cfe69" x="141" y="20" width="69" height="20"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Partner Count]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="0c904562-bf7c-4b18-98d3-ebaa24970da2" x="279" y="20" width="101" height="20"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Total]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="b7b1ec45-4ca3-4745-b145-7d1298867ecb" x="380" y="20" width="101" height="20"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Balance]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="5b67c607-3608-409a-9d64-085bcafa599b" x="210" y="20" width="69" height="20"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Invoice Count]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="6306b84e-7258-41c8-bbf6-9f95c739084c" x="0" y="0" width="482" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{sales}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="29">
+				<textField pattern="#,##0">
+					<reportElement uuid="9ebcc808-6d7f-48e8-8583-34f3bf9ddcc3" x="141" y="0" width="69" height="20"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{total_partner}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0">
+					<reportElement uuid="c46fc879-f688-491c-a4a0-b5cdbd72f680" x="210" y="0" width="69" height="20"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{total_invoice}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="1d57cc26-6d85-4b9a-a895-65c46535c6e9" x="279" y="0" width="101" height="20"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{total_total}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="a5cd8133-2321-477f-84da-ef7b539c239d" x="380" y="0" width="101" height="20"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{total_balance}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="6a3aca3b-4413-4163-ad1b-2cc84683bb24" x="0" y="0" width="141" height="20"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[TOTAL]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="68" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="97eb0aa7-b33c-40ab-aeb6-80876dd01163" x="410" y="0" width="72" height="20"/>
+				<textElement>
+					<font size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCore ERP]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="188b50e1-ecd6-4d37-82af-ff18c5a01c54" x="0" y="20" width="482" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA["No : " + $F{audit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="188b50e1-ecd6-4d37-82af-ff18c5a01c54" x="0" y="50" width="482" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA["Description : " + $F{descaudit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="188b50e1-ecd6-4d37-82af-ff18c5a01c54" x="0" y="35" width="482" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA["Date : " + new SimpleDateFormat("dd-MM-yyyy").format($F{dateaudit})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="fece888f-e50a-4db8-973b-ec4d89e4811f" x="0" y="65" width="482" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement uuid="e14dc41a-15c0-45d2-aa4c-7eb136dccea9" x="0" y="0" width="482" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Audit Result (" + $F{status} + ")"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="6203eea3-187a-4ab6-99e7-d01e043edf4c" x="0" y="0" width="141" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="aae6b18e-cb73-47ea-a972-0bcbdc7061af" x="141" y="0" width="69" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{totalpartner}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="73a6cba4-368d-4ab8-bb57-35eead12bd74" x="279" y="0" width="101" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{grandtotal}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="53b299e4-8834-46b2-9a87-5804d7bd8372" x="380" y="0" width="101" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{openamt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="5460db9b-8e34-4a36-8add-3c6019b0d945" x="210" y="0" width="69" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{totalinvoice}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

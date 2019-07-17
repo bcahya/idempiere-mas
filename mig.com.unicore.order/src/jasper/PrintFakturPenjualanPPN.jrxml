@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintFakturPenjualanPPN" language="groovy" pageWidth="576" pageHeight="460" columnWidth="536" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ff0a495f-f58a-4e92-ac0a-84185cc61e7e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DocumentNo" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ad_user_name" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+distinct ci.referenceno AS nofk,
+ship.poreference AS nosj,
+cb.name AS customer,
+ci.dateacct AS tglfk,
+mp.name AS namabrg,
+cil.qtyinvoiced AS qty,
+cil.priceactual AS harga,
+cil.linenetamt AS jumlah,
+cbl.name AS lokasi,
+now() AS tglskrg,
+$P{ad_user_name} AS operator,
+getterbilangrupiah(cil.linenetamt - cil.discountamt) AS terbilang,
+cu.name AS satuan
+
+FROM uns_billinggroup ubg
+INNER JOIN uns_billing ub ON ub.uns_billinggroup_id = ubg.uns_billinggroup_id
+INNER JOIN uns_billingline ubl ON ubl.uns_billing_id = ub.uns_billing_id
+INNER JOIN c_invoice ci ON ci.c_invoice_id = ubl.c_invoice_id
+INNER JOIN c_bpartner cb ON cb.c_bpartner_id = ci.c_bpartner_id
+INNER JOIN c_invoiceline cil ON cil.c_invoice_id = ci.c_invoice_id
+LEFT JOIN m_product mp ON mp.m_product_id = cil.m_product_id
+INNER JOIN c_uom cu ON cu.c_uom_id = cil.c_uom_id
+LEFT JOIN c_bpartner_location cbl ON cbl.c_bpartner_id = cb.c_bpartner_id
+INNER JOIN m_inout ship ON ship.c_invoice_id = ci.c_invoice_id
+
+WHERE ci.referenceno is not null
+AND ubg.documentno = $P{DocumentNo}
+AND ubg.docstatus = 'CO'
+
+ORDER BY nofk]]>
+	</queryString>
+	<field name="nofk" class="java.lang.String"/>
+	<field name="nosj" class="java.lang.String"/>
+	<field name="customer" class="java.lang.String"/>
+	<field name="tglfk" class="java.sql.Timestamp"/>
+	<field name="namabrg" class="java.lang.String"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="harga" class="java.math.BigDecimal"/>
+	<field name="jumlah" class="java.math.BigDecimal"/>
+	<field name="lokasi" class="java.lang.String"/>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="operator" class="java.lang.String"/>
+	<field name="terbilang" class="java.lang.String"/>
+	<field name="satuan" class="java.lang.String"/>
+	<variable name="jumlah_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Faktur" calculation="Sum">
+		<variableExpression><![CDATA[$F{jumlah}]]></variableExpression>
+	</variable>
+	<group name="Faktur" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{nosj}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="109" splitType="Stretch">
+			<textField>
+				<reportElement x="108" y="91" width="100" height="15" uuid="7febfbb7-1887-49e3-9701-f2f7bd1f0312"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nosj}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="388" y="91" width="100" height="15" uuid="99bdd2f6-6ead-442d-bf31-bfb2d6d1d573"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nofk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="393" y="20" width="107" height="15" uuid="bbbfee58-ab00-467c-ab8b-c06aec3427f9"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{customer}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="393" y="35" width="131" height="30" uuid="9a0430d2-72d3-4b11-b26d-5c8259bb21e7"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{lokasi}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="26" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="###0">
+				<reportElement x="22" y="0" width="17" height="15" uuid="bc424073-2993-45c2-a393-d950f8f1d0e9"/>
+				<textElement textAlignment="Right">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="42" y="0" width="25" height="15" uuid="786555b1-adef-43f1-ab07-760790250fa9"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{satuan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="76" y="0" width="254" height="15" uuid="d49411a5-07a2-44ff-b17c-a1c0f25f7e0c"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namabrg}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.-">
+				<reportElement x="338" y="0" width="75" height="15" uuid="aa5689ee-431a-42a8-86eb-4878f7ef6b14"/>
+				<textElement textAlignment="Right">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{harga}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.-">
+				<reportElement x="420" y="0" width="79" height="15" uuid="fc458232-45c6-41ce-9fe0-743eba8fac95"/>
+				<textElement textAlignment="Right">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jumlah}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="123">
+			<textField pattern="#,##0.-">
+				<reportElement x="414" y="0" width="90" height="15" uuid="21eeb63e-4773-43cd-81cb-bfda7b32a9fb"/>
+				<textElement textAlignment="Right">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{jumlah_1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="76" y="9" width="286" height="15" uuid="375381e1-9ddf-4d70-9c22-29f567b77f01"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{terbilang}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement x="421" y="19" width="100" height="15" uuid="d4f18b93-1eaa-44bb-9e49-0d67d51d24b4"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglskrg}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+</jasperReport>

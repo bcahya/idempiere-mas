@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintBeritaAcaraTandaTerimaRetur" language="groovy" pageWidth="612" pageHeight="396" orientation="Landscape" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9c245756-402d-4aca-8434-2cdc416354d5">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="181"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="M_InOut_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() as tglskrg,uc.name as ucetak,mi.documentno as docno,au.name as sales,mi.movementdate as tglretur,
+case when mi.c_bpartner_location_id is null then bp.name else bl.bpartnername end as nmcus,
+case when mi.c_bpartner_location_id is null then bp.value else bl.bpartnersearchkey end as kdcus,
+mp.name as namabrg,uomconversiontostr(ml.m_product_id,ml.movementqty) as qty
+from M_InOut mi
+left join m_inoutline ml on ml.m_inout_id=mi.m_inout_id
+left join m_product mp on mp.m_product_id=ml.m_product_id
+left join c_bpartner bp on bp.c_bpartner_id = mi.c_bpartner_id
+left join c_bpartner_location bl on bl.c_bpartner_location_id=mi.c_bpartner_location_id
+left join ad_user au on au.ad_user_id=mi.salesrep_id
+left join ad_user uc on uc.ad_user_id=$P{AD_User_ID}
+where  mi.M_InOut_ID=$P{M_InOut_ID}]]>
+	</queryString>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="ucetak" class="java.lang.String"/>
+	<field name="docno" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="tglretur" class="java.sql.Timestamp"/>
+	<field name="nmcus" class="java.lang.String"/>
+	<field name="kdcus" class="java.lang.String"/>
+	<field name="namabrg" class="java.lang.String"/>
+	<field name="qty" class="java.lang.String"/>
+	<variable name="no" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[new Integer('1')]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="83" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="6b5571c1-23bc-48e5-8ca4-032707d005c0" x="0" y="0" width="572" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Berita Acara Serah Terima Retur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="506fc0c1-e5ac-4578-b816-67afb5ee7c4a" x="0" y="20" width="93" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sudah Terima Retur dari]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="e1258057-1fd3-414b-897a-00ae8791dd24" x="93" y="20" width="100" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[': '+$F{kdcus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0cddf16e-86fe-4b97-a082-db2bb30cd22a" x="98" y="32" width="213" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmcus}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="2b79a9f4-581d-4c97-85b1-42c9d1424217" x="0" y="44" width="93" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Dengan rincian sbb ;]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0efd4644-597c-4019-8075-1c58bfe5fc00" x="0" y="66" width="22" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="433ead5c-b7a9-4c34-bb94-c7a8f815193c" x="34" y="66" width="300" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0bac12b4-7ae7-4012-9fa7-5fbd14d64aa7" x="376" y="66" width="196" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Quantity satuan]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="e677510e-583b-4537-a698-f5038c647a55" x="411" y="20" width="161" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Salesman :'+$F{sales}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="08d712d0-958e-4846-bd7e-986b9bec91e3" x="411" y="32" width="161" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Tgl. Retur : '+new SimpleDateFormat("dd/MM/yyyy").format($F{tglretur})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="b765342f-84dc-4eff-a788-21583c0e94e8" x="0" y="62" width="572" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="a4c66e41-5937-4201-abe8-5c9578126e20" x="0" y="78" width="572" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement uuid="1d43e56d-a11d-41a2-ba83-b65761c0eaed" x="34" y="0" width="214" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namabrg}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b824db9a-8763-4b7a-b1a2-e0da24a98e88" x="376" y="0" width="196" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="03a7ec5c-6d51-49db-9510-7cda42632dcb" x="0" y="0" width="23" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="92" splitType="Stretch">
+			<line>
+				<reportElement uuid="a9d12291-ddf5-48ad-b68a-c22d5b668914" x="0" y="5" width="572" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="e5aa8926-63cb-49bd-9179-2f3bbaa600ea" x="0" y="10" width="44" height="14"/>
+				<textElement>
+					<font size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Catatan :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6d1851d4-850d-4598-897e-95a0eae0a069" x="44" y="10" width="277" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Barang diterima dalam keadaan lengkap dan cukup]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="f2c7580a-a8c5-48c1-a82a-300b6f21fcbb" x="386" y="10" width="186" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA['Bandar Lampung : '+new SimpleDateFormat("dd/MM/yyyy").format($F{tglskrg})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="ad7673d7-4202-4b5c-9b7b-8e3e275bbbf9" x="442" y="24" width="100" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Dibuat Oleh,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0222f375-f8b3-42fc-8c75-aefa2bde5f1d" x="442" y="70" width="120" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[(                                                   )]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="8abf1c0a-7993-4ee0-ba5a-5d72576e3cf6" x="452" y="70" width="90" height="13"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ucetak}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="d555e6c8-9af4-4f18-a57a-ded3bd0856e9" x="296" y="24" width="100" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Diserahkan Oleh Toko,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3c9cefc3-06bd-463d-b9a1-9cd890da81c9" x="292" y="70" width="120" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[(                                                   )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1950f4f5-99af-4f13-9a77-1542ca57fff4" x="155" y="70" width="120" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[(                                                   )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d6e9c673-bc9c-4618-803d-1341da36d6fc" x="155" y="24" width="100" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Diterima Oleh Supir,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cca045f9-a179-4481-82c7-526d14eff3ae" x="8" y="70" width="120" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[(                                                   )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="81034838-a340-456c-9fc2-89b44fc1362c" x="8" y="24" width="100" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Diterima Oleh Gudang,]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportJobSpecExpedition_Subreport1" language="groovy" pageWidth="555" pageHeight="752" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="bc7222fd-95bb-4a1a-8b8c-26cd0fd089bd">
+	<property name="ireport.zoom" value="2.8531167061100042"/>
+	<property name="ireport.x" value="604"/>
+	<property name="ireport.y" value="0"/>
+	<style name="DocStatusInv" mode="Transparent" forecolor="#000000" backcolor="#FF3333" fill="Solid" hAlign="Left" fontSize="8">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{invoicestatus}=="CO" | $F{invoicestatus}=="CL"]]></conditionExpression>
+			<style forecolor="#000000" backcolor="#FFFFFF">
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{invoicestatus}!="CO" | $F{invoicestatus}!="CL"]]></conditionExpression>
+			<style forecolor="#FF0000" backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
+	<style name="DocStatusShipp" mode="Transparent" forecolor="#000000" backcolor="#FF3333" fill="Solid" hAlign="Left" fontSize="8">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{settlementstatus}=="CO" | $F{settlementstatus}=="CL"]]></conditionExpression>
+			<style forecolor="#000000" backcolor="#FFFFFF">
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{settlementstatus}==""]]></conditionExpression>
+			<style forecolor="#33FF00" backcolor="#FFFFFF">
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{settlementstatus}!="CO" && $F{settlementstatus}!="CL"]]></conditionExpression>
+			<style forecolor="#3333FF" backcolor="#FFFFFF"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{shippingstatus}!="CO" && $F{shippingstatus}!="CL"]]></conditionExpression>
+			<style forecolor="#FF0000" backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT Master.* FROM (
+SELECT org.Name AS Org, CONCAT(bpl.BPartnerName, '-', bpl.Name) AS BPartnerName, exp.DocumentNo AS Expedition, expd.ItemDescription AS Description, exp.DateDoc AS DateExpedition, inv.DocumentNo AS Invoice, inv.DateInvoiced AS DateInvoice, inv.GrandTotal AS GrandTotal, sh.DocumentNo AS Shipping, sh.DateDoc AS DateShipping, ar.Name AS VehicleNo, inv.DocStatus AS InvoiceStatus, sh.DocStatus AS ShippingStatus, COALESCE(shs.DocStatus, '') AS SettlementStatus
+
+FROM UNS_Expedition exp
+
+INNER JOIN AD_Org org ON org.AD_Org_ID = exp.AD_Org_ID
+INNER JOIN UNS_ExpeditionDetail expd ON expd.UNS_Expedition_ID = exp.UNS_Expedition_ID
+INNER JOIN C_BPartner_Location bpl ON bpl.C_BPartner_Location_ID = exp.C_BPartner_Location_ID
+INNER JOIN C_Invoice inv ON inv.C_Invoice_ID = exp.C_Invoice_ID
+LEFT JOIN UNS_ShippingFreight sf ON sf.UNS_Expedition_ID = exp.UNS_Expedition_ID
+LEFT JOIN UNS_Shipping sh ON sh.UNS_Shipping_ID = sf.UNS_Shipping_ID
+LEFT JOIN UNS_Armada ar ON ar.UNS_Armada_ID = sh.UNS_Armada_ID
+LEFT JOIN UNS_Shipping shs ON shs.UNS_Shipping_Reff_ID = sh.UNS_Shipping_ID
+
+WHERE (exp.DateDoc BETWEEN $P{StartDate} AND $P{EndDate}) AND exp.isFeedBack = 'N' AND exp.DocStatus IN ('CO', 'CL') AND exp.IsSOTrx = 'Y' AND (CASE WHEN $P{C_BPartner_ID} IS NOT NULL THEN bpl.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END) AND CASE WHEN sh.UNS_Shipping_ID > 0 THEN sh.DocStatus NOT IN ('VO', 'RE') ELSE 1=1 END AND CASE WHEN shs.UNS_Shipping_ID > 0 THEN shs.DocStatus NOT IN ('VO', 'RE') ELSE 1=1 END
+
+UNION ALL
+
+SELECT org.Name AS Org, CONCAT(bpl.BPartnerName, '-', bpl.Name) AS BPartnerName, exp.DocumentNo AS Expedition, expd.ItemDescription AS Description, exp.DateDoc AS DateExpedition, inv.DocumentNo AS Invoice, inv.DateInvoiced AS DateInvoice, inv.GrandTotal AS GrandTotal, sh.DocumentNo AS Shipping, sh.DateDoc AS DateShipping, ar.Name AS VehicleNo, inv.DocStatus AS InvoiceStatus, sh.DocStatus AS ShippingStatus, shs.DocStatus AS SettlementStatus
+
+FROM UNS_Expedition exp
+
+INNER JOIN AD_Org org ON org.AD_Org_ID = exp.AD_Org_ID
+INNER JOIN UNS_ExpeditionDetail expd ON expd.UNS_Expedition_ID = exp.UNS_Expedition_ID
+INNER JOIN C_BPartner_Location bpl ON bpl.C_BPartner_Location_ID = exp.C_BPartner_Location_ID
+INNER JOIN C_Invoice inv ON inv.C_Invoice_ID = exp.C_Invoice_ID
+INNER JOIN UNS_Expedition rfr ON rfr.UNS_Expedition_ID = exp.Reference_ID
+LEFT JOIN UNS_ShippingFreight sf ON sf.UNS_Expedition_ID = rfr.UNS_Expedition_ID
+LEFT JOIN UNS_Shipping sh ON sh.UNS_Shipping_ID = sf.UNS_Shipping_ID
+LEFT JOIN UNS_Armada ar ON ar.UNS_Armada_ID = sh.UNS_Armada_ID
+LEFT JOIN UNS_Shipping shs ON shs.UNS_Shipping_Reff_ID = sh.UNS_Shipping_ID
+
+WHERE (exp.DateDoc BETWEEN $P{StartDate} AND $P{EndDate}) AND exp.isFeedBack = 'Y' AND exp.DocStatus IN ('CO', 'CL') AND (CASE WHEN $P{C_BPartner_ID} IS NOT NULL THEN bpl.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END) AND exp.IsSOTrx = 'Y' AND CASE WHEN sh.UNS_Shipping_ID > 0 THEN sh.DocStatus NOT IN ('VO', 'RE') ELSE 1=1 END AND CASE WHEN shs.UNS_Shipping_ID > 0 THEN shs.DocStatus NOT IN ('VO', 'RE') ELSE 1=1 END) Master
+
+ORDER BY Master.Org, Master.BPartnerName, Master.DateExpedition, Master.Expedition]]>
+	</queryString>
+	<field name="org" class="java.lang.String"/>
+	<field name="bpartnername" class="java.lang.String"/>
+	<field name="expedition" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="dateexpedition" class="java.sql.Timestamp"/>
+	<field name="invoice" class="java.lang.String"/>
+	<field name="dateinvoice" class="java.sql.Timestamp"/>
+	<field name="grandtotal" class="java.math.BigDecimal"/>
+	<field name="shipping" class="java.lang.String"/>
+	<field name="dateshipping" class="java.sql.Timestamp"/>
+	<field name="vehicleno" class="java.lang.String"/>
+	<field name="invoicestatus" class="java.lang.String"/>
+	<field name="shippingstatus" class="java.lang.String"/>
+	<field name="settlementstatus" class="java.lang.String"/>
+	<variable name="Tgrandtotal" class="java.lang.Number" resetType="Group" resetGroup="namebpartner" calculation="Sum">
+		<variableExpression><![CDATA[$F{grandtotal}]]></variableExpression>
+	</variable>
+	<group name="org" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{org}]]></groupExpression>
+		<groupHeader>
+			<band height="11">
+				<textField>
+					<reportElement uuid="800ca6cb-8567-4061-82f1-f518519fca08" x="0" y="0" width="554" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="namebpartner">
+		<groupExpression><![CDATA[$F{bpartnername}]]></groupExpression>
+		<groupHeader>
+			<band height="11">
+				<textField>
+					<reportElement uuid="17feaa82-e8c4-441c-a9fb-d28ad288a631" x="23" y="0" width="531" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{bpartnername}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="13">
+				<line>
+					<reportElement uuid="78d9a9a6-75b0-40b1-bc57-ebd83ef5c271" x="1" y="0" width="553" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<textField>
+					<reportElement uuid="e70f9ccd-d7df-4075-9b75-dbc84aa8488d" x="24" y="1" width="424" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total ---->> "+$F{bpartnername}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="d5f9fd9e-1f60-4bbb-9d17-ae12849d66d3" x="503" y="2" width="51" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Tgrandtotal}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="49" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="04ae994c-8280-47ce-88e0-9afc64f786ae" x="0" y="0" width="555" height="16"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Report Job Spec (Expedition)]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="0e8e0a65-d6bb-43d6-ba2e-81e19d23389b" x="0" y="16" width="555" height="13"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Periode Tanggal "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' s/d '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="18637fe3-0264-4051-b394-314a2a8df87b" x="23" y="33" width="49" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Job Spec]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2f971f35-7a0a-4330-86cf-5f7c82519622" x="72" y="33" width="46" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="985143cd-5aeb-4e72-bc92-e0bce8bb7ac5" x="118" y="33" width="116" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d9fe8e40-df6e-4c4b-8b09-71eae760d02f" x="234" y="33" width="70" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="151dc41c-e170-409a-8dbc-a8a53729a851" x="304" y="33" width="45" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cde02308-9077-4443-941a-d15999c4fca0" x="502" y="33" width="53" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total Invoice]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="c44f0ea2-9d97-46d1-9331-3815286531a3" x="1" y="47" width="554" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement uuid="75f9bc64-9db2-43d5-86c3-19b7c886dd73" x="422" y="16" width="80" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="02a385ca-83cc-420c-ac9d-c04750d5aba3" x="503" y="16" width="40" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="86abb035-bd7d-4e97-9a74-e4f368131603" x="349" y="33" width="45" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Ship]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7079f9ea-3b9b-4db4-b7ef-0947dd5e380e" x="394" y="33" width="54" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Shipping]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="86a9927d-3894-4a6d-a0a0-415c4392cde6" x="448" y="33" width="54" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Armada]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="dca117b6-1aa9-4cc5-92ad-b0408b00b46c" x="72" y="0" width="46" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateexpedition}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="6118cb8d-d896-4923-99a7-69b0fd561058" x="23" y="0" width="49" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{expedition}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f1b59e30-2502-4388-9c8f-c9c31e089505" style="DocStatusInv" x="234" y="0" width="70" height="11"/>
+				<textElement markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{invoice}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="bc9518bb-3854-4aad-b323-5f1a216f49c6" x="304" y="0" width="45" height="11" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateinvoice}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="6640d1dc-7324-4df5-b528-de009f625da0" x="503" y="0" width="52" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{grandtotal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0f871dac-4241-4808-94a9-c9d1532549c3" x="118" y="0" width="116" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0bce08d6-35df-427f-9946-69f9da41af5f" style="DocStatusShipp" x="349" y="0" width="45" height="11" backcolor="#000000"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{shipping} == null ? "" : $F{shipping}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="810b03f8-fb2d-4cef-b8e0-14ab08d1b37e" x="394" y="0" width="54" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateshipping} == null ? "" : $F{dateshipping}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="040b2d57-3bdd-4eb1-9643-67567b8569ac" x="448" y="0" width="55" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vehicleno} == null ? "" : $F{vehicleno}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

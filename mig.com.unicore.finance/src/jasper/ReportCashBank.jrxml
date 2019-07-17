@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportCashBank" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2a62d530-e39f-4b18-b4c1-b2ea5740be70">
+	<property name="ireport.zoom" value="1.771561000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\WORK\\iReport\\iReport\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT cb.name AS Bank, cba.name AS NamaAkun, cba.accountno AS NoAkun, arl.name AS TipeAkun, cba.currentbalance AS Saldo, cc.iso_code AS MataUang, ucb.uns_chequebook_ID, ucb.name AS NameCek
+
+FROM c_bank cb
+
+INNER JOIN c_bankaccount cba ON cba.c_bank_id = cb.c_bank_id
+
+INNER JOIN c_currency cc ON cc.c_currency_id = cba.c_currency_id
+
+INNER JOIN ad_ref_list arl ON arl.value = cba.bankaccounttype
+
+LEFT JOIN uns_chequebook ucb ON ucb.c_bankaccount_id = cba.c_bankaccount_id
+
+WHERE arl.ad_reference_id = 216
+
+ORDER BY cb.name, cba.name, cba.accountno]]>
+	</queryString>
+	<field name="bank" class="java.lang.String"/>
+	<field name="namaakun" class="java.lang.String"/>
+	<field name="noakun" class="java.lang.String"/>
+	<field name="tipeakun" class="java.lang.String"/>
+	<field name="saldo" class="java.math.BigDecimal"/>
+	<field name="matauang" class="java.lang.String"/>
+	<field name="uns_chequebook_id" class="java.math.BigDecimal"/>
+	<field name="namecek" class="java.lang.String"/>
+	<variable name="number" class="java.lang.Integer" resetType="Group" resetGroup="NameCek">
+		<variableExpression><![CDATA[($V{number} == null) ?1: $V{number} + 1]]></variableExpression>
+	</variable>
+	<group name="Bank">
+		<groupExpression><![CDATA[$F{bank}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement uuid="fba99aa4-2128-4ab9-bbcf-1b1c906fb2db" x="64" y="0" width="491" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{bank}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="7e4f6610-6203-417b-b9ec-551342fc2076" x="0" y="0" width="54" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Kas / Bank]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="46de0f6a-8844-466e-b06e-8d076dcb098b" x="54" y="0" width="10" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="7"/>
+		</groupFooter>
+	</group>
+	<group name="Akun">
+		<groupExpression><![CDATA[$F{namaakun}]]></groupExpression>
+		<groupHeader>
+			<band height="60">
+				<staticText>
+					<reportElement uuid="db3a20a2-c0d1-491d-a4fc-0be90b05c4b6" x="0" y="0" width="54" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Nama Akun]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="9a5e2c71-3f12-4b46-97cf-319310a9b81a" x="36" y="20" width="109" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[No Akun]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="b8d27088-2576-46c5-a29e-a61990879b7f" x="54" y="0" width="10" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="cff6b299-7dc1-42fc-935f-27b3185c2816" x="145" y="20" width="79" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Tipe]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="d11cba95-5515-48e6-8eb5-9fa9a4098acf" x="224" y="20" width="85" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Saldo]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="5fe0564d-637b-4f71-aa0d-9d0556c3d419" x="64" y="0" width="491" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{namaakun}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="ec88ea30-3ed4-438b-b8a5-721d08978e2e" x="309" y="20" width="83" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Mata Uang]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="9a5e2c71-3f12-4b46-97cf-319310a9b81a" x="0" y="20" width="36" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[NO]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="8c741921-3876-495d-9732-60a10fe80f16" x="392" y="20" width="163" height="20"/>
+					<box leftPadding="0">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement/>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="6d6712f1-262b-4cbf-b301-0ee396435c1f" x="36" y="40" width="109" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{noakun}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="a3609194-dcfb-44cd-bc9e-75f05655e61b" x="145" y="40" width="79" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tipeakun}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="6243de40-b399-4935-80fa-309f94a12f02" x="224" y="40" width="85" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{saldo}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="783799d0-0a96-4333-9a48-efe9e9e4b2a4" x="309" y="40" width="83" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{matauang}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Akun">
+					<reportElement uuid="3b25937f-363e-446e-9df1-eec43d127a83" x="0" y="40" width="36" height="20"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{number}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="8c741921-3876-495d-9732-60a10fe80f16" x="392" y="40" width="163" height="20"/>
+					<box leftPadding="0">
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement/>
+					<text><![CDATA[]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="7"/>
+		</groupFooter>
+	</group>
+	<group name="NameCek">
+		<groupExpression><![CDATA[$F{namecek}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="135bb627-7c22-4395-a77d-e2213c8a387a" x="0" y="0" width="555" height="32"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LAPORAN DAFTAR KAS / BANK]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="3ba47cbb-e10b-416f-b540-5f8070260f13" x="0" y="32" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<detail>
+		<band splitType="Stretch">
+			<subreport>
+				<reportElement uuid="9b1ab7ec-82fa-4fa5-b5db-f2e25d3843f8" x="0" y="0" width="555" height="0" printWhenGroupChanges="Akun"/>
+				<subreportParameter name="UNS_Chequebook_ID">
+					<subreportParameterExpression><![CDATA[$F{uns_chequebook_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportCashBank_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20">
+			<textField evaluationTime="Report">
+				<reportElement uuid="e484222b-d467-47f0-a0b1-d40b6ad85027" positionType="Float" x="536" y="0" width="19" height="20"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="eba02e8f-4643-4c8f-a102-bc8990458ecf" x="436" y="0" width="101" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+" /  "]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

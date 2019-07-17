@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportPendapatanPerMobil_Subreport1" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="13a92c5c-5386-4cb9-b972-93f54cb9fa47">
+	<property name="ireport.zoom" value="1.7715610000000017"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Shipping_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT cc.Name, SUM(cd.AmountConfirmed) AS AmountConfirmed FROM UNS_Charge_Detail cd
+INNER JOIN C_Charge cc ON cc.C_Charge_ID = cd.C_Charge_ID
+WHERE cd.UNS_Shipping_ID=$P{UNS_Shipping_ID} AND cd.ChargeType = 'CS'
+GROUP BY cc.C_Charge_ID]]>
+	</queryString>
+	<field name="name" class="java.lang.String"/>
+	<field name="amountconfirmed" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement uuid="30cb894d-a928-4698-b58a-cd4dd50667db" x="0" y="0" width="86" height="12"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="5d9afefe-6d10-4e87-b14b-6f3b4cb058df" x="86" y="0" width="61" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{amountconfirmed}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

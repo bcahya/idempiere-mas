@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintBuktiPotongReturCustomer" language="groovy" pageWidth="611" pageHeight="395" columnWidth="581" leftMargin="10" rightMargin="20" topMargin="10" bottomMargin="5" uuid="30ca3989-00ed-4421-bb3b-eabaaf2ba090">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_Payment_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() as tglcetak,bl.bpartnername as namacus,pm.documentno as nopayment,pm.datetrx as tgl_payment,pal.amount as nilai,adu.name as nm_sales,
+pal.invoiceamt as tofaktur,(SELECT documentno from c_invoice a where a.c_invoice_id=(SELECT b.c_invoice_id from c_invoice b where b.c_invoice_id=pal.c_invoice_id)) AS nofak,
+(SELECT dateinvoiced from c_invoice a where a.c_invoice_id=(SELECT b.c_invoice_id from c_invoice b where b.c_invoice_id=pal.c_invoice_id)) AS tglfak,
+invoiceopen(pal."c_invoice_id",0) As Sisa,
+(select a.dateinvoiced +interval '1 days' *(select "c_paymentterm"."netdays" from "c_paymentterm" where c_paymentterm_id=a."c_paymentterm_id") from c_invoice a where a.c_invoice_id=(SELECT b.c_invoice_id from c_invoice b where b.c_invoice_id=pal.c_invoice_id))  as TglJtempo,
+(SELECT coalesce(a.grandtotal, 0) from c_invoice a where a.cn_invoice_id=(SELECT b.c_invoice_id from c_invoice b where b.c_invoice_id=pal.c_invoice_id)) AS retur,
+(SELECT documentno from c_invoice a where a.cn_invoice_id=(SELECT b.c_invoice_id from c_invoice b where b.c_invoice_id=pal.c_invoice_id)) AS noretur,u.name as ucetak
+from c_payment pm
+left join c_bpartner as bp on bp.c_bpartner_id=pm.c_bpartner_id
+left join c_bpartner_location bl on bl.c_bpartner_id=bp.c_bpartner_id
+left join c_paymentallocate pal on pal.c_payment_id=pm.c_payment_id
+inner join c_invoice as inv on inv.cn_invoice_id=pal.c_invoice_id
+left join ad_user adu on inv.salesrep_id=adu.ad_user_id
+left join ad_user u on u.ad_user_id = $P{AD_User_ID}
+where pm.c_payment_id=$P{C_Payment_ID}
+and pm.docstatus='CO']]>
+	</queryString>
+	<field name="tglcetak" class="java.sql.Timestamp"/>
+	<field name="namacus" class="java.lang.String"/>
+	<field name="nopayment" class="java.lang.String"/>
+	<field name="tgl_payment" class="java.sql.Timestamp"/>
+	<field name="nilai" class="java.math.BigDecimal"/>
+	<field name="nm_sales" class="java.lang.String"/>
+	<field name="tofaktur" class="java.math.BigDecimal"/>
+	<field name="nofak" class="java.lang.String"/>
+	<field name="tglfak" class="java.sql.Timestamp"/>
+	<field name="sisa" class="java.math.BigDecimal"/>
+	<field name="tgljtempo" class="java.sql.Timestamp"/>
+	<field name="retur" class="java.math.BigDecimal"/>
+	<field name="noretur" class="java.lang.String"/>
+	<field name="ucetak" class="java.lang.String"/>
+	<group name="nodocument">
+		<groupExpression><![CDATA[$F{nopayment}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="82" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="53" width="581" height="29" uuid="32e25bfc-e86a-4b32-8260-10d14d363b0b"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="435" y="0" width="123" height="16" uuid="f6fcafc1-c96f-4993-b79f-3fa5fc661109"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[IdempiereUntaSoft]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="571" height="20" uuid="c4b12c9c-7f2e-43fc-b19f-a62921084b4b"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Daftar Faktur Potong Retur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="72" height="11" uuid="f44207bf-d892-4ab7-9a2e-b104a4f731b2"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nomor Document ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="31" width="72" height="11" uuid="29aefb95-45a5-417e-8f2c-a055df7d7ffe"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Document]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="72" y="20" width="2" height="11" uuid="81ff9227-2f9e-49be-bea9-794493d93b28"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="72" y="31" width="2" height="11" uuid="43155e79-0383-4593-8898-94526de81134"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="77" y="31" width="100" height="11" uuid="6fe01fd5-f4dc-4456-8ddd-bf5a99c1c524"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgl_payment}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="77" y="20" width="100" height="11" uuid="cc1937df-8c45-4bf6-8deb-2ffe2896072f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nopayment}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="60" width="16" height="12" uuid="ba81ddb7-af3a-49a6-b2a8-d3e3c061cc51"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="60" width="89" height="12" uuid="e7e292f3-0e98-4f17-b3af-bac96a6d394e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="111" y="60" width="57" height="12" uuid="5869840d-86a2-4a89-9c74-bdda17f79c0e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Faktur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="168" y="60" width="57" height="12" uuid="58ec4da9-f8a0-44a0-af4c-cec88a63870d"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Faktur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="227" y="60" width="54" height="12" uuid="09f22fc9-c736-43ce-804b-fa623671ad05"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl.Jt.Tempo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="60" width="57" height="12" uuid="9766d4b9-b77c-49c4-9350-c58c97e9274f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nilai Faktur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="60" width="57" height="12" uuid="91a21861-ac15-42fe-af70-3a1a273ba570"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sisa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="399" y="60" width="57" height="12" uuid="f7a2e180-7ff1-4d38-8d3d-455061a12952"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Discount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="524" y="66" width="57" height="12" uuid="de297e1c-2a85-48f6-9560-428a1b13a3a5"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="463" y="66" width="57" height="12" uuid="e6987e31-3f85-4f61-8f50-453e2d71b18b"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Retur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="463" y="53" width="118" height="13" uuid="0b0786c7-e730-4558-87bb-f07b7b565090"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Retur]]></text>
+			</staticText>
+			<line>
+				<reportElement x="460" y="54" width="1" height="28" uuid="265a02b9-12a8-48df-b8f2-a3cf4d82272e"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="460" y="66" width="121" height="1" uuid="cf209e8e-f065-4c72-bb94-a4d5d7bcaf5e"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement x="20" y="0" width="89" height="13" uuid="a120c454-b712-474d-8e25-36c5d23159dc"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namacus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="111" y="0" width="52" height="13" uuid="7c5c35ca-2e75-4ce2-a6d6-7988de76dc39"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nofak}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="168" y="0" width="57" height="13" uuid="24493bdb-f827-421c-ae24-6a24b4b7fbe8"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglfak}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="227" y="0" width="54" height="13" uuid="763c5535-0234-429a-bcca-3411adad8fe2"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgljtempo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="282" y="0" width="55" height="13" uuid="84b5b318-103a-4a25-bb95-db72304ea2e1"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tofaktur}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="340" y="0" width="57" height="13" uuid="e6e50cdb-53cf-46af-97ef-0b17a5f82ee0"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sisa}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="461" y="0" width="56" height="13" uuid="945b7dfd-aa60-4e0d-b2f5-b971aff9ac02"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{noretur}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="520" y="0" width="56" height="13" uuid="d78efef8-a720-4150-bd20-5980a3c9c6a4"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{retur}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="16" height="13" uuid="7bbcb439-4e09-4a0c-bbc8-84bc45503af8"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="130" splitType="Stretch">
+			<staticText>
+				<reportElement x="15" y="31" width="100" height="12" uuid="9ee03885-ed71-4c5f-af81-c4357f2048ad"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[Dibuat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="43" width="100" height="12" uuid="3345be6e-1aee-4974-b47c-a36e392ae15e"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[Administrasi,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="94" width="113" height="12" uuid="48d7c794-7006-4dca-af09-a6522228960f"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[( ..................................)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="167" y="31" width="100" height="12" uuid="4016b650-1f8b-478a-afb0-187b330c4f42"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[Diterima]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="167" y="43" width="100" height="12" uuid="ca8a43ab-e3c7-4e8b-b60e-02ae5865dfc6"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[Kasir,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="317" y="31" width="100" height="12" uuid="39536e29-d702-4425-b59a-9e25cc0e6525"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[Diperiksa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="453" y="31" width="100" height="12" uuid="2c24b69a-5e56-4844-9008-06104c64204d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[Diperiksa Ulang,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="317" y="43" width="100" height="12" uuid="4a1fee14-e26f-4c90-ab73-dc104495cceb"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[Supevisor,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="94" width="113" height="12" uuid="417ea0ca-f114-4985-8f63-439f4054281b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[( ..................................)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="310" y="94" width="113" height="12" uuid="b04ca9eb-b8f5-4117-a96a-dde381fd572c"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[( ..................................)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="447" y="94" width="113" height="12" uuid="e7acd086-1fd3-4cf4-bf29-79fe4da91de0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<text><![CDATA[( ..................................)]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="5" width="581" height="1" uuid="40ddbe92-217e-4a70-8589-9f9bc1509f3a"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="9" y="110" width="100" height="20" uuid="19475317-a925-47d6-8fd1-2fc11411916b"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['User Print : '+$F{ucetak}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="453" y="110" width="123" height="20" uuid="5117635a-2ddf-4269-a463-8c2bafd0e8e8"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Print Date : '+
+date$F{tglcetak}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PromotionFormatExportToExcel" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="782" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="7bce7f2c-d02b-456b-ae06-d3f1076d6486">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select * from(
+SELECT org.value as organisasi,bl.bpartnername as nm_customer,ci.documentno as noducument,ci.dateinvoiced as TGL_INVOICE,mp.name as NAMA_BARANG,
+uomconversiontostr(mp.m_product_id,il.qtyentered) as qty,
+COALESCE((CASE WHEN il.isProductBonuses ='N' THEN (il.DiscountAmt - COALESCE(calcdiscclaiminv(il.C_InvoiceLine_ID, 'Y'),0)-COALESCE(calcdiscsharedinv(il.C_InvoiceLine_ID, 'Y'),0)) WHEN
+il.isProductBonuses='Y' THEN (il.DiscountAmt) ELSE 0 END),0) AS DiscReguler,
+COALESCE((CASE WHEN il.isProductBonuses ='N' THEN (calcdiscreginvpercent(il.C_invoiceline_ID, 'Y')) ELSE 0 END),0) AS DiscRegulerp,
+COALESCE((CASE WHEN il.isProductBonuses ='N' THEN calcdiscclaiminv(il.C_InvoiceLine_ID, 'Y') WHEN il.isProductBonuses='Y' THEN
+calcdiscbonusesinv(il.C_InvoiceLine_ID, 'Y') ELSE 0 END),0) AS DiscClaim,
+COALESCE((CASE WHEN il.isProductBonuses ='N' THEN calcdiscclaiminvpercent(il.C_invoiceline_ID, 'Y') WHEN ol.isProductBonuses='Y' THEN
+calcdiscbonuses(ol.C_OrderLine_ID, 'Y') ELSE 0 END),0) AS DiscClaimP,
+COALESCE((CASE WHEN il.isProductBonuses ='N' THEN COALESCE(calcdiscsharedinv(il.C_InvoiceLine_ID, 'Y'),0) WHEN
+il.isProductBonuses='Y' THEN (il.DiscountAmt) ELSE 0 END),0) AS DiscBersama,
+COALESCE((CASE WHEN il.isProductBonuses ='N' THEN COALESCE(calcdiscsharedinvpercent(il.C_invoiceline_ID, 'Y'),0) WHEN
+il.isProductBonuses='Y' THEN (ol.DiscountAmt) ELSE 0 END),0) AS DiscBersamap
+FROM c_invoice ci
+INNER JOIN c_invoiceline il on ci.c_invoice_id=il.c_invoice_id
+INNER JOIN c_orderline ol on ol.c_orderline_id=il.c_orderline_id
+INNER JOIN m_product mp on mp.m_product_id=il.m_product_id
+INNER JOIN AD_Org org on org.ad_org_id=ci.ad_org_id
+INNER JOIN c_doctype cd on cd.c_doctype_id=ci.c_doctype_id
+INNER JOIN C_BPartner_Product pp on pp.m_product_id=mp.m_product_id
+INNER JOIN C_BPartner_location bl on bl.C_BPartner_location_ID=ci.c_Bpartner_location_id
+INNER JOIN c_salesregion so on so.c_salesregion_id=org.c_salesregion_id
+WHERE cd.docbasetype='ARI' AND ci.docstatus in('CO','CL')
+AND ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+AND CASE WHEN $P{C_BPartner_ID}!=0 THEN pp.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END
+AND CASE WHEN $P{C_SalesRegion_ID}!=0 THEN so.C_Salesregion_ID=$P{C_SalesRegion_ID} ELSE 1=1 END
+union all
+SELECT org.value as organisasi,bl.bpartnername as nm_customer,ci.documentno as noducument,ci.dateinvoiced as TGL_INVOICE,mp.name as NAMA_BARANG,uomconversiontostr(mp.m_product_id,il.qtyentered) as qty,
+COALESCE((CASE WHEN il.isProductBonuses ='N' THEN (il.DiscountAmt-COALESCE(calcdiscclaiminv(il.C_OrderLine_ID, 'Y'),0)) WHEN
+il.isProductBonuses='Y' THEN (il.DiscountAmt) ELSE 0 END),0) AS DiscReguler,0  as DiscRegulerp,
+COALESCE((CASE WHEN il.isProductBonuses ='N' THEN calcdiscclaiminv(il.C_InvoiceLine_ID, 'Y') WHEN il.isProductBonuses='Y' THEN
+calcdiscbonuses(il.C_InvoiceLine_ID, 'Y') ELSE 0 END),0) AS DiscClaim, 0 as discclaimp,
+COALESCE((CASE WHEN il.isProductBonuses ='N' THEN COALESCE(calcdiscsharedinv(il.C_invoiceLine_ID, 'Y'),0) WHEN
+il.isProductBonuses='Y' THEN (il.DiscountAmt) ELSE 0 END),0) AS DiscBersama,0 as discbersamap
+FROM c_invoice ci
+INNER JOIN c_invoiceline il on ci.c_invoice_id=il.c_invoice_id
+INNER JOIN UNS_Cvs_Rpt cr on cr.c_invoice_id=ci.c_invoice_id
+INNER JOIN m_product mp on mp.m_product_id=il.m_product_id
+INNER JOIN AD_Org org on org.ad_org_id=ci.ad_org_id
+INNER JOIN c_doctype cd on cd.c_doctype_id=ci.c_doctype_id
+INNER JOIN C_BPartner_Product pp on pp.m_product_id=mp.m_product_id
+INNER JOIN C_BPartner_location bl on bl.C_BPartner_location_ID=ci.c_Bpartner_location_id
+INNER JOIN c_salesregion so on so.c_salesregion_id=org.c_salesregion_id
+WHERE cd.docbasetype='ARI' and ci.docstatus in('CO','CL')
+AND ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+AND CASE WHEN $P{C_BPartner_ID}!=0 THEN pp.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END
+AND CASE WHEN $P{C_SalesRegion_ID}!=0 THEN so.C_Salesregion_ID=$P{C_SalesRegion_ID} ELSE 1=1 END
+) as master
+order by master.noducument]]>
+	</queryString>
+	<field name="organisasi" class="java.lang.String"/>
+	<field name="nm_customer" class="java.lang.String"/>
+	<field name="noducument" class="java.lang.String"/>
+	<field name="tgl_invoice" class="java.sql.Timestamp"/>
+	<field name="nama_barang" class="java.lang.String"/>
+	<field name="qty" class="java.lang.String"/>
+	<field name="discreguler" class="java.math.BigDecimal"/>
+	<field name="discregulerp" class="java.math.BigDecimal"/>
+	<field name="discclaim" class="java.math.BigDecimal"/>
+	<field name="discclaimp" class="java.math.BigDecimal"/>
+	<field name="discbersama" class="java.math.BigDecimal"/>
+	<field name="discbersamap" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="12" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="35" height="12" uuid="619eaeaf-2492-4778-aa44-c6c37fcc959c"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Org]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="35" y="0" width="46" height="12" uuid="04ea263e-fb10-4704-bdf6-de0a958fa914"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[No Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="179" y="0" width="42" height="12" uuid="d7ba2b9d-f43d-4c1b-92b4-5b50454bc5aa"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Tgl. Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="221" y="0" width="144" height="12" uuid="a82d9a42-f5e6-4b61-b37b-9d22ceb88850"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="365" y="0" width="72" height="12" uuid="195becdf-b8f2-45a9-8635-79f26586e3e0"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Qty Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="437" y="0" width="65" height="12" uuid="40cf4a6e-2443-4e50-838f-d544da670b35"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Disc. Value Reguler]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="556" y="0" width="59" height="12" uuid="06027f04-ff80-474c-a226-66a11f1d3b8a"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Disc. Value Claim]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="663" y="0" width="53" height="12" uuid="c505c6bd-1de4-4ecf-94f6-7f917d57a328"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Disc. Bersama]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="81" y="0" width="98" height="12" uuid="04ea263e-fb10-4704-bdf6-de0a958fa914"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Nama Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="502" y="0" width="54" height="12" uuid="f71e4215-03a9-4c36-a00e-3d6982d2b4d9"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Disc. Perc. Reguler]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="615" y="0" width="48" height="12" uuid="09661fc1-8c35-42c8-91ed-48459ba0b0dc"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Disc. Perc. Claim]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="716" y="0" width="66" height="12" uuid="0c013594-9496-456e-8c87-0ae2a2770a06"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Disc. Perc. Bersama]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="35" height="12" uuid="656e4905-e81e-4370-8955-92df280cc46f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{organisasi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="35" y="0" width="46" height="12" uuid="5271f93f-ab07-4adf-8179-b06ca2d4c61f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{noducument}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="179" y="0" width="42" height="12" uuid="fc290225-afe6-47ac-8dc6-53785d211272"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgl_invoice}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="221" y="0" width="144" height="12" uuid="be54dd0f-5b5c-4975-99fa-b85754f5eb6c"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_barang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="365" y="0" width="72" height="12" uuid="47864867-dd79-4cf2-b34b-076b043d9c5f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="437" y="0" width="65" height="12" uuid="56fb0384-6f12-4676-b6ad-912c756d9ddd"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discreguler}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="556" y="0" width="59" height="12" uuid="dad2d4ee-3584-4c72-a1bb-18d1ee3401e8"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discclaim}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="663" y="0" width="53" height="12" uuid="cb54724f-7a5d-4727-b6e4-ddd33034e462"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discbersama}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="81" y="0" width="98" height="12" uuid="5271f93f-ab07-4adf-8179-b06ca2d4c61f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nm_customer}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="502" y="0" width="54" height="12" uuid="10071397-05fd-4e52-8042-c590a6831f52"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discregulerp}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="615" y="0" width="48" height="12" uuid="9c2b87cd-db3e-4ab5-a488-d7f8cdd0e902"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discclaimp}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="716" y="0" width="66" height="12" uuid="0dc679c1-2c83-4c0f-a456-3adfb4629097"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discbersamap}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

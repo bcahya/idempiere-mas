@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportSelisihSetoranSales" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d95d24b8-d725-4fce-a0c4-c38d5e28d471">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select data.org as org,data.tglbayar as tglbayar,data.nama_sales as nama_sales,sum(data.bctunai) as bctunai,sum(data.bptunai) as bptunai,sum(data.bcgiro) as bcgiro,sum(data.bpgiro) as bpgiro,
+sum(data.rctunai) as rctunai,sum(data.rptunai) as rptunai,sum(rcgiro) as rcgiro,sum(rpgiro) as rpgiro,sum(actunai) as actunai,sum(aptunai) as aptunai from(
+select bgresult.ad_org_id as org,bgresult.datedoc as tglbayar,usr.realname as nama_sales,
+case when bgresult.docstatus='CO' then blresult.paidamt else 0 end as bctunai,case when bgresult.docstatus<>'CO' then blresult.paidamt else 0 end as bptunai,
+case when bgresult.docstatus='CO' then blresult.paidamtgiro else 0 end as bcgiro,case when bgresult.docstatus<>'CO' then blresult.paidamtgiro else 0 end as bpgiro,
+0 as rctunai,0 as rptunai,0 as rcgiro,0 as rpgiro,0 as actunai,0 as aptunai
+from uns_billinggroup_result bgresult
+left join uns_billing_result bresult on bresult.uns_billinggroup_result_id=bgresult.uns_billinggroup_result_id
+left join uns_billingline_result blresult on blresult.uns_billing_result_id=bresult.uns_billing_result_id
+left join uns_billinggroup bgroup on bgroup.uns_billinggroup_id=bgresult.uns_billinggroup_id
+left join ad_user usr on usr.ad_user_id=bgroup.salesrep_id
+union all
+select bgresult.ad_org_id as org,bgresult.datedoc as tglbayar,usr.realname as nama_sales, 0 as bctunai,0 as bptunai,0 as bcgiro,0 as bpgiro,
+case when prec.docstatus='CO' then prec.paidamt else 0 end as rctunai,case when prec.docstatus<>'CO' then prec.paidamt else 0 end as rptunai,
+case when prec.docstatus='CO' then prec.paidamtgiro else 0 end as rcgiro,case when prec.docstatus<>'CO' then prec.paidamtgiro else 0 end as rpgiro,0 as actunai,0 as aptunai
+from uns_paymentreceipt prec
+left join uns_preceipt_group preg on preg.uns_preceipt_group_id=prec.uns_preceipt_group_id
+left join uns_billinggroup_result bgresult on bgresult.uns_billinggroup_result_id=prec.uns_billinggroup_result_id
+left join uns_billinggroup bgroup on bgroup.uns_billinggroup_id=bgresult.uns_billinggroup_id
+left join ad_user usr on usr.ad_user_id=bgroup.salesrep_id
+union all
+select bgresult.ad_org_id as org,bgresult.datedoc as tglbayar,usr.realname as nama_sales, 0 as bctunai,0 as bptunai,0 as bcgiro,0 as bpgiro,0 as rctunai,0 as rptunai,0 as rcgiro,0 as rpgiro,
+case when prec.docstatus='CO' then prec.paidamt else 0 end as actunai,case when prec.docstatus<>'CO' then prec.paidamt else 0 end as aptunai
+from uns_pr_allocation prec
+left join uns_billinggroup_result bgresult on bgresult.uns_billinggroup_result_id=prec.uns_billinggroup_result_id
+left join uns_billinggroup bgroup on bgroup.uns_billinggroup_id=bgresult.uns_billinggroup_id
+left join ad_user usr on usr.ad_user_id=bgroup.salesrep_id
+) as data
+where data.tglbayar between $P{StartDate} and $P{EndDate}
+group by data.org,data.tglbayar,data.nama_sales
+order by data.nama_sales,data.tglbayar]]>
+	</queryString>
+	<field name="org" class="java.math.BigDecimal"/>
+	<field name="tglbayar" class="java.sql.Timestamp"/>
+	<field name="nama_sales" class="java.lang.String"/>
+	<field name="bctunai" class="java.math.BigDecimal"/>
+	<field name="bptunai" class="java.math.BigDecimal"/>
+	<field name="bcgiro" class="java.math.BigDecimal"/>
+	<field name="bpgiro" class="java.math.BigDecimal"/>
+	<field name="rctunai" class="java.math.BigDecimal"/>
+	<field name="rptunai" class="java.math.BigDecimal"/>
+	<field name="rcgiro" class="java.math.BigDecimal"/>
+	<field name="rpgiro" class="java.math.BigDecimal"/>
+	<field name="actunai" class="java.math.BigDecimal"/>
+	<field name="aptunai" class="java.math.BigDecimal"/>
+	<variable name="no" class="java.lang.Integer" resetType="Group" resetGroup="Salesman" calculation="Count">
+		<variableExpression><![CDATA[new Integer("1")]]></variableExpression>
+	</variable>
+	<variable name="tcsales" class="java.lang.Number" resetType="Group" resetGroup="Salesman" calculation="Sum">
+		<variableExpression><![CDATA[$F{bctunai}]]></variableExpression>
+	</variable>
+	<variable name="tpsales" class="java.lang.Number" resetType="Group" resetGroup="Salesman" calculation="Sum">
+		<variableExpression><![CDATA[$F{bptunai}]]></variableExpression>
+	</variable>
+	<variable name="tckasir" class="java.lang.Number" resetType="Group" resetGroup="Salesman" calculation="Sum">
+		<variableExpression><![CDATA[$F{rctunai}]]></variableExpression>
+	</variable>
+	<variable name="tpkasir" class="java.lang.Number" resetType="Group" resetGroup="Salesman" calculation="Sum">
+		<variableExpression><![CDATA[$F{rptunai}]]></variableExpression>
+	</variable>
+	<variable name="tcpiutang" class="java.lang.Number" resetType="Group" resetGroup="Salesman" calculation="Sum">
+		<variableExpression><![CDATA[$F{actunai}]]></variableExpression>
+	</variable>
+	<variable name="tppiutang" class="java.lang.Number" resetType="Group" resetGroup="Salesman" calculation="Sum">
+		<variableExpression><![CDATA[$F{aptunai}]]></variableExpression>
+	</variable>
+	<group name="Salesman">
+		<groupExpression><![CDATA[$F{nama_sales}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField>
+					<reportElement x="6" y="0" width="139" height="15" uuid="c417db30-0a8a-4517-acdc-a3397b8093ac"/>
+					<textElement>
+						<font size="10" isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nama_sales}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="1" y="14" width="554" height="1" uuid="fba93ce9-9451-4643-bc42-1bb421c4aeba"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="21">
+				<line>
+					<reportElement x="1" y="0" width="554" height="1" uuid="fe841a65-ad17-40d2-a67e-157b5b1c5fe5"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<textField>
+					<reportElement x="2" y="0" width="105" height="21" uuid="972d8c24-82cc-4359-9fdd-d8aac915488b"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total Sales --> :"+$F{nama_sales}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="107" y="1" width="69" height="20" uuid="17612d8c-9aea-485a-b3ba-85e8ca4172c5"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{tcsales}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="178" y="1" width="69" height="20" uuid="ff07f209-6e6f-4a52-8b0c-35e688cab489"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{tpsales}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="249" y="2" width="75" height="19" uuid="e2b629ce-f545-43fd-ba66-221bf864d018"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{tckasir}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="324" y="1" width="71" height="20" uuid="0a68f112-0960-476b-b184-c18b5ba76b0e"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{tpkasir}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="398" y="1" width="74" height="20" uuid="adae60ef-3b34-4e73-9f49-cb9fa9c62aca"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{tcpiutang}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="475" y="1" width="79" height="20" uuid="eef575ec-13d4-49db-9a6e-c9e42a7f2475"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{tppiutang}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="tanggal">
+		<groupExpression><![CDATA[$F{tglbayar}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="74" splitType="Stretch">
+			<rectangle>
+				<reportElement x="1" y="41" width="554" height="30" uuid="a832e274-7204-46c4-ab84-617ad07daa6e"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="106" y="55" width="69" height="11" uuid="e304417d-4931-476d-b8dd-e03996190030"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Complet]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="178" y="55" width="69" height="11" uuid="929f5e91-23f4-4843-b237-ec5458acd120"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Preapare]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="254" y="55" width="69" height="11" uuid="aa047ae5-37d9-4971-b95d-5230fe0dc442"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Complet]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="326" y="55" width="69" height="11" uuid="a859a358-b2fd-4e56-890a-1b68da876e8d"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Preapare]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="403" y="55" width="69" height="11" uuid="613984a2-8c05-4615-828d-d9501ce11f58"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Complet]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="475" y="55" width="69" height="11" uuid="a18169de-e7f7-4626-9918-15dfb3aa58e0"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Preapare]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="106" y="44" width="141" height="11" uuid="e68e78d6-bb5c-4286-a536-a3b146d3d51a"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sales]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="254" y="44" width="141" height="11" uuid="f1366791-f36c-47dc-b8a5-a9b0610556e4"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Kasir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="403" y="44" width="141" height="11" uuid="c2a55a3d-e591-4c14-83e5-1dc4cc8b893d"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Piutang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="6" y="45" width="100" height="11" uuid="7d05aff8-e326-420e-a027-f740708f98c7"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Sales]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="6" y="55" width="100" height="11" uuid="53badef5-63c4-4bc3-a152-d1c8113d36c6"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="0" width="100" height="13" uuid="b724dea1-a452-4203-85ac-01eff6d13be3"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="0" width="554" height="13" uuid="f98da863-6c42-4381-ae45-69566a9ce264"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status Pelunasan Tunai Sales,  Kasir dan Piutang]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="1" y="13" width="554" height="13" uuid="71d0e2d5-b226-41c2-8326-1abcb7830829"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Periode :'+ new SimpleDateFormat('dd/MM/yyyy').format($P{StartDate})+' s/d '+new SimpleDateFormat('dd/MM/yyyy').format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="106" y="55" width="449" height="1" uuid="c9eef93f-03cc-4de9-970d-9198899d6a59"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="106" y="41" width="1" height="30" uuid="a6d2a2f3-df63-4322-b546-6b83386ddaf9"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="175" y="57" width="1" height="14" uuid="9b0aca0e-f584-410e-b2f8-97ea7335cfd4"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="323" y="57" width="1" height="14" uuid="dfde6886-d67e-4c9e-8d23-0d3e83252a03"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="475" y="56" width="1" height="14" uuid="ab63707e-f87d-4524-b00e-9807121e3bc3"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="249" y="41" width="1" height="30" uuid="51ebcbfc-32f6-4a75-8260-59d211958e5c"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="398" y="41" width="1" height="30" uuid="a0bf3f7c-b5d6-42ad-b4b8-91745dcd71d6"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="6" y="55" width="33" height="11" uuid="2474c574-b448-4605-a33a-1cfae0eac6ce"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="39" y="0" width="62" height="11" uuid="7c7d34b1-f73c-476b-b568-209b5acabd91"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglbayar}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="101" y="0" width="74" height="11" uuid="a5d405ba-7678-4246-90d1-baf5494d5e8a"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{bctunai}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="178" y="0" width="69" height="11" uuid="0fc85c22-cd2b-4468-92c7-cc7bbcdd2acd"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{bptunai}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="249" y="0" width="74" height="11" uuid="e13ec550-05a7-4b86-a75e-eb3f86dca204"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rctunai}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="322" y="0" width="76" height="11" uuid="74042f0c-76cc-4353-b1c8-125104ad309c"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rptunai}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="398" y="0" width="72" height="11" uuid="79de01a9-29af-47d2-8dbc-38755ec9326a"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{actunai}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="470" y="0" width="84" height="11" uuid="ae5ecd4c-f4df-47da-90a9-7855d182bb06"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{aptunai}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="29" height="11" uuid="c5143064-c77b-4ef6-8e0b-fa10caa3e81f"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{no}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="13" splitType="Stretch"/>
+	</summary>
+</jasperReport>

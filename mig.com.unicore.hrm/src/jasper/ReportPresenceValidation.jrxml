@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportPresenceValidation" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dee75da0-309d-44b1-8aed-77c69db1f132">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DocStatus" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_Period_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UNS_Employee_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT  emp.Name AS Employee,
+	emp.AttendanceName AS attname,
+	val.DocumentNo AS DocNo,
+	val.UNS_MonthlyPresenceVal_ID,
+	val.DocStatus,
+	val.StartDate,
+	val.EndDate,
+	days.PresenceDate,
+	(CASE WHEN days.Day='1' THEN 'Sunday' WHEN days.Day='2' THEN 'Monday' WHEN days.day='3' THEN 'Tuesday'
+	WHEN days.day='4' THEN 'Wednesday' WHEN days.day='5' THEN 'Thursday' WHEN days.day='6' THEN 'Friday' WHEN
+	days.day='7' THEN 'Saturday' END),
+	days.PermissionType AS tipeizin,
+	days.TimeInRules,
+	days.TimeOutRules,
+	days.FSTimeIn,
+	days.FSTimeOut,
+	days.belatedduration AS belated,
+	days.Description AS daysDesc,
+	org.Name AS Organisasi,
+	prd.Name AS Periode,
+	bpt.Name AS Bpartner
+
+FROM UNS_MonthlyPresenceVal val
+
+INNER JOIN UNS_DailyPresence days ON days.UNS_MonthlyPresenceVal_ID=val.UNS_MonthlyPresenceVal_ID
+INNER JOIN UNS_MonthlyPresenceSummary mon ON mon.UNS_MonthlyPresenceSummary_ID=days.UNS_MonthlyPresenceSummary_ID
+INNER JOIN UNS_Employee emp ON emp.UNS_Employee_ID=mon.UNS_Employee_ID
+INNER JOIN AD_Org org ON org.AD_Org_ID=val.AD_Org_ID
+INNER JOIN C_Period prd ON prd.C_Period_ID=mon.C_Period_ID
+INNER JOIN C_BPartner bpt ON bpt.C_BPartner_ID=val.C_BPartner_ID
+
+WHERE (CASE WHEN $P{DocStatus} IS NOT NULL THEN val.DocStatus=$P{DocStatus} ELSE 1=1 END) AND (CASE WHEN $P{AD_Org_ID} IS NOT NULL THEN org.AD_Org_ID=$P{AD_Org_ID} ELSE 1=1 END) AND (CASE WHEN $P{C_Period_ID}IS NOT NULL THEN prd.C_Period_ID=$P{C_Period_ID} ELSE 1=1 END) AND (CASE WHEN $P{UNS_Employee_ID} IS NOT NULL THEN emp.UNS_Employee_ID=$P{UNS_Employee_ID} ELSE 1=1 END)
+
+ORDER BY organisasi,periode,bpartner,employee]]>
+	</queryString>
+	<field name="employee" class="java.lang.String"/>
+	<field name="attname" class="java.lang.String"/>
+	<field name="docno" class="java.lang.String"/>
+	<field name="uns_monthlypresenceval_id" class="java.math.BigDecimal"/>
+	<field name="docstatus" class="java.lang.String"/>
+	<field name="startdate" class="java.sql.Timestamp"/>
+	<field name="enddate" class="java.sql.Timestamp"/>
+	<field name="presencedate" class="java.sql.Timestamp"/>
+	<field name="case" class="java.lang.String"/>
+	<field name="tipeizin" class="java.lang.String"/>
+	<field name="timeinrules" class="java.sql.Timestamp"/>
+	<field name="timeoutrules" class="java.sql.Timestamp"/>
+	<field name="fstimein" class="java.sql.Timestamp"/>
+	<field name="fstimeout" class="java.sql.Timestamp"/>
+	<field name="belated" class="java.math.BigDecimal"/>
+	<field name="daysdesc" class="java.lang.String"/>
+	<field name="organisasi" class="java.lang.String"/>
+	<field name="periode" class="java.lang.String"/>
+	<field name="bpartner" class="java.lang.String"/>
+	<variable name="No" class="java.lang.Integer" resetType="Group" resetGroup="validation_id">
+		<variableExpression><![CDATA[$V{No} == null ? 1 : $V{No} + 1]]></variableExpression>
+	</variable>
+	<group name="validation_id" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{uns_monthlypresenceval_id}]]></groupExpression>
+		<groupHeader>
+			<band height="157">
+				<textField>
+					<reportElement x="91" y="106" width="158" height="20" uuid="1d58341b-cdcc-4a54-ab67-710896163a0c"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textFieldExpression><![CDATA[$F{docno}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="91" y="87" width="158" height="20" uuid="0f1e4f19-1b2f-40f7-a594-4911d7f56f72"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textFieldExpression><![CDATA[$F{periode}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="91" y="67" width="158" height="20" uuid="54bdac3a-731e-414d-8c2e-665cd54ce005"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textFieldExpression><![CDATA[$F{organisasi}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="652" y="87" width="150" height="20" uuid="f4952bc2-61f3-42e0-847c-4be66210b798"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textFieldExpression><![CDATA[$F{docstatus}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="652" y="68" width="150" height="20" uuid="ac610694-e974-48d2-b2e1-8134c19fce2d"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textFieldExpression><![CDATA[$F{bpartner}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="652" y="107" width="150" height="20" uuid="12569a00-8368-4feb-876b-41482503501a"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textFieldExpression><![CDATA[$F{startdate}+" - "+$F{enddate}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="67" width="83" height="20" uuid="bbae4a20-d97f-42c4-a91d-1b0750f1e74b"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[Organization]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="86" width="83" height="20" uuid="75f31cf8-fa04-485e-ad2f-4bc9443ebf0f"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[Periode]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="106" width="83" height="20" uuid="84bd206b-d6f3-4f20-9580-682863c3f401"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[Document No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="83" y="87" width="8" height="20" uuid="688f5f3b-db35-4cd2-b8b6-088c1bf6b784"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="83" y="106" width="8" height="20" uuid="c45db082-3264-4e5c-810d-ab4225361feb"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="83" y="67" width="8" height="20" uuid="62348260-46da-412a-9fcb-e81b1479361f"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="644" y="107" width="8" height="20" uuid="c9fba83c-1c86-4910-b22d-3d67a84984ea"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="561" y="107" width="83" height="20" uuid="55d163ae-9514-4902-9928-7f814bc87684"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="644" y="88" width="8" height="20" uuid="20303fd3-b298-4201-aeb2-bdaf1bc930f1"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="561" y="87" width="83" height="20" uuid="b53b87e9-7c2a-4ba6-9e76-b6f0897f4c3f"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[Status]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="644" y="68" width="8" height="20" uuid="3c642621-e4b3-4483-b9f0-b27d93fc4b0a"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="561" y="68" width="83" height="20" uuid="5530e1c9-30f4-4d76-823d-3be10af3a61a"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<text><![CDATA[Business Partner]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="28" y="141" width="125" height="16" uuid="05030cd1-fea6-44d0-896d-3b455e2a162e"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Employee]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="153" y="141" width="81" height="16" uuid="a6e00923-8d0f-40f9-95f9-fd543392409d"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Presence Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="234" y="141" width="70" height="16" uuid="af12bc73-7fa4-4729-ac43-a29a94acb71d"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Days]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="373" y="141" width="73" height="16" uuid="94a02efc-1edb-4d2b-97f1-5495f75ff5fb"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Time In Rules]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="516" y="141" width="67" height="16" uuid="8475584b-3b4e-4ec2-9d3b-557cbaa8d72d"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Time Out Rules]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="304" y="141" width="69" height="16" uuid="f01810f4-34ea-4976-a254-9006a9163ae3"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[FS Time In]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="446" y="141" width="70" height="16" uuid="62ac1665-fa1d-413f-be95-1cc68615c1ed"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[FS Time Out]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="583" y="141" width="83" height="16" uuid="78699b8f-e669-471d-91a5-2046af8e6458"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Permission Type]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="666" y="141" width="136" height="16" uuid="1ea0737f-d8ef-4860-bcf5-ffc76845c91e"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="141" width="28" height="16" uuid="99e3f708-69d4-4f78-b39a-f91a81e04651"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="12" width="802" height="37" uuid="4f44baf8-3fa5-4f4e-9527-cc2523e46d9f"/>
+					<box>
+						<bottomPen lineWidth="1.0" lineStyle="Double"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="16" isBold="true" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[Report Presence Validaton]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="37">
+				<line>
+					<reportElement x="0" y="3" width="802" height="1" uuid="d50ef1f1-03ef-4056-9930-13aeeda35b3d"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="20">
+			<textField isBlankWhenNull="true">
+				<reportElement x="28" y="0" width="125" height="20" uuid="919c9520-385e-42d3-b3d0-c6258b049d65"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{employee}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="153" y="0" width="81" height="20" uuid="63c8692b-8e9e-4c5f-a0e3-fbc7fc831128"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{presencedate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="234" y="0" width="70" height="20" uuid="4c1bccbe-f135-4425-a7f6-75388d1e92bc"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{case}]]></textFieldExpression>
+			</textField>
+			<textField pattern="h.mm.ss a" isBlankWhenNull="true">
+				<reportElement x="373" y="0" width="73" height="20" uuid="7fa4b479-202a-465f-9e6d-b1f81940df26"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{timeinrules}]]></textFieldExpression>
+			</textField>
+			<textField pattern="h.mm.ss a" isBlankWhenNull="true">
+				<reportElement x="516" y="0" width="67" height="20" uuid="d8981f76-fa37-4c59-b3bb-6b275afcefe3"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{timeoutrules}]]></textFieldExpression>
+			</textField>
+			<textField pattern="h.mm.ss a" isBlankWhenNull="true">
+				<reportElement x="304" y="0" width="69" height="20" uuid="050c677e-a556-4f02-91eb-189c1c87913c"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fstimein}]]></textFieldExpression>
+			</textField>
+			<textField pattern="h.mm.ss a" isBlankWhenNull="true">
+				<reportElement x="446" y="0" width="70" height="20" uuid="a8a50181-bca8-45c0-a443-76e7300e6231"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fstimeout}]]></textFieldExpression>
+			</textField>
+			<textField pattern="h.mm.ss a" isBlankWhenNull="true">
+				<reportElement x="583" y="0" width="83" height="20" uuid="5612b595-5c53-4e0e-8e08-17d60b2a03e6"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tipeizin}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="666" y="0" width="136" height="20" uuid="f50cd76e-450b-4ec3-9324-e010c31292a9"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{daysdesc}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="0" y="0" width="28" height="20" uuid="1563d421-eb6f-48bb-966a-2a95a06ca61f"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{No}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="680" y="34" width="80" height="20" uuid="2cf083bd-1862-4b68-bc84-726d519ebb02"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="760" y="34" width="40" height="20" uuid="e04f037b-9a84-496b-8a3f-e0fc33d24931"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

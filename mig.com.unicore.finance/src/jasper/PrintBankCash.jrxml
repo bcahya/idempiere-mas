@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintBankCash" language="groovy" pageWidth="612" pageHeight="396" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="34f5ba20-279a-483a-abcf-77457045aa83">
+	<property name="ireport.zoom" value="1.2100000000000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_BankStatement_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="TransactionType" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+     c_bankstatement."documentno" AS documentno,
+     c_bankstatement."statementdate" AS tanggal,
+     c_bankstatementline."amount" AS jmlh,
+     c_bankstatementline."description" AS keterangan,
+     c_bankstatement."description" AS catatan,
+     c_bankstatementline."transactiontype" AS tipe,
+(select array_to_string(array_agg(concat (value, '.', name)), ' & ') from c_elementvalue where c_elementvalue_id in (case when (c_bankstatementline.c_payment_id is null OR c_bankstatementline.c_payment_id = 0) then (select account_id  from fact_acct where ad_table_id = (SELECT AD_Table_ID FRom AD_Table WHERE TableName = 'C_BankStatement')  AND line_id = c_bankstatementline.c_bankstatementline_id AND case when c_bankstatementline.transactiontype = 'APT' then (amtacctdr Is Not null AND amtacctdr <> 0)
+else (amtacctcr Is Not null AND amtacctcr <> 0) end) else (select account_id  from fact_acct where ad_table_id = (SELECT AD_Table_ID FRom AD_Table WHERE TableName = 'C_Payment')  AND record_id = c_bankstatementline.C_payment_id AND case when c_bankstatementline.transactiontype = 'APT' then (amtacctdr Is Not null AND amtacctdr <> 0)
+else (amtacctcr Is Not null AND amtacctcr <> 0) end) END )) AS accountname,
+getterbilangrupiah((select coalesce (sum (a.amount), 0) from c_bankstatementline a where c_bankstatement_id=c_bankstatement.c_bankstatement_id)) AS terbilang,
+c_bankaccount."name" AS bank,
+now() AS tglskrg,u.name as user
+FROM
+     "adempiere"."c_bankstatement" c_bankstatement
+INNER JOIN "adempiere"."c_bankstatementline" c_bankstatementline ON c_bankstatement."c_bankstatement_id" = c_bankstatementline."c_bankstatement_id"
+INNER JOIN "adempiere"."c_bankaccount" c_bankaccount ON c_bankstatement."c_bankaccount_id" = c_bankaccount."c_bankaccount_id"
+left join ad_user u on u.ad_user_id = $P{AD_User_ID}
+WHERE
+     C_BankStatement."c_bankstatement_id"=$P{C_BankStatement_ID} AND
+c_bankstatementline."transactiontype"=$P{TransactionType} and
+c_bankstatement."docstatus" in ('CO', 'CL')]]>
+	</queryString>
+	<field name="documentno" class="java.lang.String"/>
+	<field name="tanggal" class="java.sql.Timestamp"/>
+	<field name="jmlh" class="java.math.BigDecimal"/>
+	<field name="keterangan" class="java.lang.String"/>
+	<field name="catatan" class="java.lang.String"/>
+	<field name="tipe" class="java.lang.String"/>
+	<field name="accountname" class="java.lang.String"/>
+	<field name="terbilang" class="java.lang.String"/>
+	<field name="bank" class="java.lang.String"/>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="user" class="java.lang.String"/>
+	<variable name="masuk/keluar" class="java.lang.String">
+		<variableExpression><![CDATA[$P{TransactionType}== 'ART' ? "MASUK" : "KELUAR"]]></variableExpression>
+		<initialValueExpression><![CDATA[$P{TransactionType}== 'ART' ? "MASUK" : "KELUAR"]]></initialValueExpression>
+	</variable>
+	<variable name="jmlh_1" class="java.math.BigDecimal" resetType="Page" calculation="Sum">
+		<variableExpression><![CDATA[$F{jmlh}]]></variableExpression>
+	</variable>
+	<group name="1">
+		<groupExpression><![CDATA[$F{documentno}]]></groupExpression>
+		<groupFooter>
+			<band height="127">
+				<staticText>
+					<reportElement uuid="c1e7d78f-fc7f-4f4c-8e48-e61581b21921" x="269" y="27" width="100" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma"/>
+					</textElement>
+					<text><![CDATA[ACCOUNTING]]></text>
+				</staticText>
+				<rectangle>
+					<reportElement uuid="7248abd5-3ba9-4401-bdc9-7e5b39fe09b9" x="369" y="47" width="100" height="52" forecolor="#333333"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement uuid="a24af011-4ac7-4f8c-a726-40669be12e60" x="169" y="27" width="100" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma"/>
+					</textElement>
+					<text><![CDATA[Mengetahui]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="eac18c60-5a12-41db-a85c-6bf6e2794b4b" x="7" y="1" width="447" height="18"/>
+					<textElement>
+						<font fontName="Tahoma"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{terbilang}]]></textFieldExpression>
+				</textField>
+				<rectangle>
+					<reportElement uuid="7d22f385-1704-476c-b2c2-39098b85fa3b" x="0" y="1" width="572" height="15"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement uuid="6e638beb-eb72-4be4-b5cc-5b9fd77965d3" x="169" y="27" width="100" height="20"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement uuid="fbe2d5cc-c794-4ec7-a68e-2dbd9f596682" x="469" y="27" width="104" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma"/>
+					</textElement>
+					<text><![CDATA[PENERIMA]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="e57333ae-4eed-4ae8-853c-f8feb04822c4" x="369" y="27" width="100" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma"/>
+					</textElement>
+					<text><![CDATA[KASIR]]></text>
+				</staticText>
+				<rectangle>
+					<reportElement uuid="b0f69b15-f12b-45e7-b4b5-46d2609c3156" x="469" y="47" width="104" height="52" forecolor="#333333"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement uuid="dca0f23c-4944-46dc-85bf-30b850b8a157" x="469" y="27" width="104" height="20"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<textField>
+					<reportElement uuid="45837bae-1335-422b-be65-b5f28329fa0b" x="1" y="47" width="168" height="52"/>
+					<textElement>
+						<font fontName="Tahoma"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{catatan} == null ? " " : $F{catatan}]]></textFieldExpression>
+				</textField>
+				<rectangle>
+					<reportElement uuid="c71ecf70-654f-4c73-ae09-7c4559551275" x="1" y="27" width="168" height="72"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#000000"/>
+					</graphicElement>
+				</rectangle>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement uuid="a18ebf75-92cf-461b-ba46-e281394a6da4" x="463" y="1" width="100" height="15"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{jmlh_1}]]></textFieldExpression>
+				</textField>
+				<rectangle>
+					<reportElement uuid="0c35ced9-6cf9-49a4-bfaf-e125bede200f" x="269" y="47" width="100" height="52" forecolor="#333333"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement uuid="eaf0f656-d55a-4b39-a9ef-a214da7b0746" x="269" y="27" width="100" height="20"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement uuid="a4969921-019d-4e8a-8193-732ea7043d68" x="169" y="47" width="100" height="52" forecolor="#333333"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement uuid="a17b6562-9da4-4b59-9b36-b44b731eb0db" x="7" y="27" width="94" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma"/>
+					</textElement>
+					<text><![CDATA[Catatan :]]></text>
+				</staticText>
+				<rectangle>
+					<reportElement uuid="7b0c471b-0daa-473c-9137-7db1865204e0" x="369" y="27" width="100" height="20"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<textField>
+					<reportElement uuid="344436ea-49da-400e-895d-60d7cfd3d77c" x="7" y="1" width="447" height="15"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{terbilang}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="efba553f-209e-4930-94a8-0a7d8cd31202" x="169" y="27" width="100" height="20" forecolor="#333333"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Mengetahui]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="4d6cdb7a-4f84-4a3e-8efd-69d95ad47d3f" x="269" y="27" width="100" height="20" forecolor="#333333"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[ACCOUNTING]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="e9b1037d-d21b-4202-ac8b-4ae13685ba38" x="369" y="27" width="100" height="20" forecolor="#333333"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[KASIR]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="c1df045f-85a8-448e-9124-019d20cd57d3" x="469" y="27" width="104" height="20" forecolor="#333333"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[PENERIMA]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="403f845c-8fdc-41b8-a402-1bcbb0a57e6d" x="430" y="107" width="71" height="20"/>
+					<textElement/>
+					<text><![CDATA[Tanggal Print]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="8f632036-cda6-4432-971d-d5877c333f61" x="501" y="107" width="71" height="20"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[": " +new SimpleDateFormat("dd/MM/yyyy").format($F{tglskrg})]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="403f792d-4f25-44f4-be0d-1462990966c9" x="0" y="107" width="52" height="20"/>
+					<textElement/>
+					<text><![CDATA[User Print]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="d2221b54-97f7-41a5-8624-769630ed30a4" x="52" y="107" width="100" height="20"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[": " +$F{user}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="82" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="49a1e450-4f59-439f-b027-f9a3b84d5501" x="0" y="41" width="100" height="20"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[No Bukti]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="68049e55-1c9d-45c8-a31d-13a2184f4346" x="0" y="60" width="100" height="20"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="b381fa7f-e73a-4a2a-b519-64dfa19a166c" x="99" y="41" width="100" height="20"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " +$F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="350b6209-0b7f-4364-9c3e-5b8d203f09c1" x="99" y="60" width="100" height="20"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + new SimpleDateFormat("dd-MMM-yyyy").format($F{tanggal})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="673013fd-e077-4372-ae6f-f4deb1bb9efc" x="1" y="14" width="571" height="21"/>
+				<textElement textAlignment="Center" verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{bank}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="cb538391-87e6-48a6-abec-b8a954d0524b" x="1" y="0" width="571" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA['BUKTI BANK / KAS '+$V{masuk/keluar}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="21" splitType="Stretch">
+			<rectangle>
+				<reportElement uuid="d8deee8d-eec1-4b10-a88a-082d5ae5f9b4" x="0" y="1" width="572" height="18"/>
+				<graphicElement>
+					<pen lineColor="#999999"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="bf5a1ebb-a799-462d-8565-25adb71af3fa" x="0" y="1" width="199" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[AKUN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="22fd88f5-060d-46da-9ae2-21ebbbcc3a97" x="454" y="1" width="118" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[JUMLAH (Rp.)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6586bbfd-79d2-4acd-9a28-b9636ae0962c" x="199" y="1" width="256" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[KETERANGAN]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<textField>
+				<reportElement uuid="68b1b19f-8cff-43c7-95ab-0aef26a81c0d" x="210" y="-1" width="245" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{keterangan} == null ? " " : $F{keterangan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="a118f751-af2a-4f4f-a7c3-f5ded8985d94" x="463" y="-1" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jmlh}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="24fa1c38-aa8f-4237-bda0-119e9ec3e8c5" x="7" y="-1" width="192" height="15"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accountname}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

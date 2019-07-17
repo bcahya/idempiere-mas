@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportPemakaianBahanBakuSummary_Subreport2" language="groovy" pageWidth="504" pageHeight="36" orientation="Landscape" columnWidth="504" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="4933814a-b2f0-4d35-b052-8225919ebcc8">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="primary_id" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+pr.name as produk2,
+uomconversiontostr(pr.M_Product_ID, pd.movementqty) as mqtya
+
+FROM uns_production_detail pd
+INNER JOIN m_product pr on pr.m_product_id=pd.m_product_id
+
+WHERE pd.isendproduct='Y' and pd.isprimary='Y' and pd.uns_production_detail_id=$P{primary_id}]]>
+	</queryString>
+	<field name="produk2" class="java.lang.String"/>
+	<field name="mqtya" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="19" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="0" width="190" height="19" uuid="76b83b13-a6f2-4543-9b87-f1dbdffcc417"/>
+				<box leftPadding="3" rightPadding="0">
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{produk2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.0">
+				<reportElement x="190" y="0" width="60" height="19" uuid="d7c7df72-aea6-4e13-8615-82bdb0ecde0b"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{mqtya}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

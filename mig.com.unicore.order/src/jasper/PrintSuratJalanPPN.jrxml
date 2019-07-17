@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintSuratJalanPPN" language="groovy" pageWidth="576" pageHeight="460" columnWidth="536" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c2ae4ba2-0538-4336-817c-ea53bd99b7ee">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DocumentNo" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+distinct bp.name AS customer,
+ship.poreference AS nosj,
+ship.movementdate AS tgl,
+plc.description AS ket,
+bpl.name AS alamat,
+pdk.name AS produk,
+sline.qtyentered AS qty,
+uom.name AS uom,
+us.name AS operator,
+now() AS tglskrg,
+po.attname AS namatoko,
+po.attaddress AS lokasitoko
+
+FROM
+uns_pl_confirm plc
+INNER JOIN uns_packinglist pl ON plc.uns_packinglist_id = pl.uns_packinglist_id
+INNER JOIN uns_packinglist_order plo ON plo.uns_packinglist_id = pl.uns_packinglist_id
+INNER JOIN m_inout ship ON ship.m_inout_id = plo.m_inout_id
+INNER JOIN c_bpartner bp ON bp.c_bpartner_id = ship.c_bpartner_id
+INNER JOIN c_bpartner_location bpl ON bpl.c_bpartner_id = bp.c_bpartner_id
+INNER JOIN m_inoutline sline ON sline.m_inout_id = ship.m_inout_id
+INNER JOIN m_product pdk ON pdk.m_product_id = sline.m_product_id
+INNER JOIN c_uom uom ON uom.c_uom_id = sline.c_uom_id
+INNER JOIN ad_user us ON us.ad_user_id = plc.updatedby
+INNER JOIN c_order so ON so.c_order_id = ship.c_order_id
+INNER JOIN uns_preorder po ON po.c_order_id = so.c_order_id
+
+WHERE
+ship.poreference is not null  AND
+plc.documentno = $P{DocumentNo}
+
+ORDER BY nosj]]>
+	</queryString>
+	<field name="customer" class="java.lang.String"/>
+	<field name="nosj" class="java.lang.String"/>
+	<field name="tgl" class="java.sql.Timestamp"/>
+	<field name="ket" class="java.lang.String"/>
+	<field name="alamat" class="java.lang.String"/>
+	<field name="produk" class="java.lang.String"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="uom" class="java.lang.String"/>
+	<field name="operator" class="java.lang.String"/>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="namatoko" class="java.lang.String"/>
+	<field name="lokasitoko" class="java.lang.String"/>
+	<variable name="Alamat" class="java.lang.String">
+		<variableExpression><![CDATA[$F{lokasitoko} == null ? $F{customer} +" "+ $F{alamat} : $F{lokasitoko}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="64" splitType="Stretch">
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement x="400" y="39" width="100" height="15" uuid="df56e919-9f39-43c4-a32a-195130989ac7"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgl}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="84" splitType="Stretch">
+			<textField>
+				<reportElement x="332" y="16" width="197" height="30" uuid="c4bcf902-44ae-4fc5-ab56-1ebd09616311"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{lokasitoko} == null ? $F{customer} +"\n"+ $F{alamat} : $F{namatoko} +"\n"+$F{lokasitoko}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="154" y="64" width="100" height="20" uuid="78cef4ab-63ae-42cc-a5ef-a6807d69a1de"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nosj}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="385" y="46" width="144" height="20" uuid="932cf551-512d-4a4d-ab6d-3cfc85699f6a"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{lokasitoko} == null ? " " : "sip : " +$F{customer}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="43" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField pattern="###0">
+				<reportElement x="14" y="0" width="36" height="15" uuid="6dbd8c42-9c14-46b9-a0d9-7fd1be6d79d4"/>
+				<textElement textAlignment="Right">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="55" y="0" width="46" height="15" uuid="b68c2322-a7d0-49e3-860a-22da36493f8f"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{uom}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="129" y="0" width="353" height="15" uuid="42fbca05-2f7f-4dd0-8281-3b98e875be69"/>
+				<textElement>
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{produk}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

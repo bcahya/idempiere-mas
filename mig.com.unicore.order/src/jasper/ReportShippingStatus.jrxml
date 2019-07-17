@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportShippingStatus" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3983027b-566d-443c-9328-4f4f322fbf27">
+	<property name="ireport.zoom" value="1.948717100000002"/>
+	<property name="ireport.x" value="154"/>
+	<property name="ireport.y" value="0"/>
+	<style name="style1">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{indikator} == 1]]></conditionExpression>
+			<style forecolor="#3300FF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DocumentNo" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ReportType" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT org.Value AS Org, sh.DateDoc AS DateShipping, sh.DocumentNo AS NoShipDoc, COALESCE(shs.DocumentNo, '') AS NoShipSettl, ar.Name AS Armada, emp.Name AS Employee, (CASE WHEN shs.UNS_Shipping_ID > 0 AND shs.DocStatus NOT IN ('CO', 'CL') THEN 1 ELSE 0 END) AS Indikator, (CASE WHEN sh.UseCity = 'N' THEN ry.Name ELSE ori.Name || ' - ' || dest.Name END) AS Desc FROM UNS_Shipping sh
+
+INNER JOIN AD_Org org ON org.AD_Org_ID = sh.AD_Org_ID
+INNER JOIN UNS_Armada ar ON ar.UNS_Armada_ID = sh.UNS_Armada_ID
+INNER JOIN UNS_Employee emp ON emp.UNS_Employee_ID = sh.UNS_Employee_ID
+LEFT JOIN UNS_Shipping shs ON shs.UNS_Shipping_Reff_ID = sh.UNS_Shipping_ID
+LEFT JOIN C_City ori ON ori.C_City_ID = sh.Origin_ID
+LEFT JOIN C_City dest ON dest.C_City_ID = sh.Destination_ID
+LEFT JOIN UNS_Rayon ry ON ry.UNS_Rayon_ID = sh.UNS_Rayon_ID
+
+WHERE sh.Status = 'DV' AND sh.DocStatus IN ('CO', 'CL') AND (CASE WHEN shs.UNS_Shipping_ID > 0 THEN shs.Status = 'RS' ELSE 1=1 END) AND sh.DateDoc BETWEEN $P{DateFrom} AND $P{DateTo} AND (CASE WHEN $P{DocumentNo} <> '' THEN sh.DocumentNo = $P{DocumentNo} ELSE 1=1 END) AND (CASE WHEN $P{ReportType} = 'US' THEN (shs.UNS_Shipping_ID > 0 AND shs.DocStatus NOT IN ('VO', 'RE', 'CO', 'CL') OR shs.UNS_Shipping_ID IS NULL) WHEN $P{ReportType} IS NULL THEN (shs.UNS_Shipping_ID > 0 AND shs.DocStatus NOT IN ('VO', 'RE') OR shs.UNS_Shipping_ID IS NULL) ELSE 1=1 END) AND (CASE WHEN $P{C_SalesRegion_ID} IS NOT NULL THEN org.C_SalesRegion_ID = $P{C_SalesRegion_ID} ELSE 1=1 END)
+
+ORDER BY DateShipping, NoShipDoc]]>
+	</queryString>
+	<field name="org" class="java.lang.String"/>
+	<field name="dateshipping" class="java.sql.Timestamp"/>
+	<field name="noshipdoc" class="java.lang.String"/>
+	<field name="noshipsettl" class="java.lang.String"/>
+	<field name="armada" class="java.lang.String"/>
+	<field name="employee" class="java.lang.String"/>
+	<field name="indikator" class="java.lang.Integer"/>
+	<field name="desc" class="java.lang.String"/>
+	<variable name="no" class="java.lang.Integer">
+		<variableExpression><![CDATA[$V{no} == null ? 1 : $V{no} + 1]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="a1770e5a-1c53-4751-bae9-64b541b94f8e" x="0" y="0" width="555" height="20"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status Shipping]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="1140a241-98d7-439b-b322-aa2c2c286f3f" x="67" y="0" width="60" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fa8530b9-ecfa-4cbc-bc96-74a09e556e64" x="127" y="0" width="45" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Shipping]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c1f70776-6602-4695-9b54-7efed9094c0e" x="172" y="0" width="45" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Settlement]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e0081fc1-c7f5-4005-8470-791ce81492dd" x="217" y="0" width="55" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Armada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="52f0fe3e-c7e6-4d47-88dc-fb6d24e85940" x="272" y="0" width="111" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Driver]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="90573f51-253d-4426-9059-a880887a3664" x="0" y="0" width="22" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="52f0fe3e-c7e6-4d47-88dc-fb6d24e85940" x="383" y="0" width="172" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fa8530b9-ecfa-4cbc-bc96-74a09e556e64" x="22" y="0" width="45" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Org]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="fb1b54eb-f9d0-43ed-a5f2-16a7292dd242" x="67" y="0" width="60" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateshipping}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0132d5d7-3d9b-4d6e-91fd-ecf6299de1c7" x="127" y="0" width="45" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{noshipdoc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="1ea25f39-f847-40e3-96e8-f58afa6409c3" style="style1" x="172" y="0" width="45" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{noshipsettl}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="dd6c9d72-d142-48a5-b319-78f2b52097ee" x="217" y="0" width="55" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{armada}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7674adcb-b21a-454c-a0e2-7a9f0ba738d9" x="272" y="0" width="111" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{employee}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="de546135-e88a-4e17-a8e8-48c44d394347" x="0" y="0" width="22" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7674adcb-b21a-454c-a0e2-7a9f0ba738d9" x="383" y="0" width="172" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{desc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0132d5d7-3d9b-4d6e-91fd-ecf6299de1c7" x="22" y="0" width="45" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

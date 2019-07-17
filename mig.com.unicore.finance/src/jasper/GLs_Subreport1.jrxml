@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GLFactDetail" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="170cad0d-5586-44a5-8bc2-333359801ea2">
+	<property name="ireport.zoom" value="1.1000000000000005"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="AD_Org_ID" class="java.lang.Integer"/>
+	<parameter name="Account_ID" class="java.lang.Integer"/>
+	<parameter name="InitialBalance" class="java.math.BigDecimal"/>
+	<parameter name="DateFrom" class="java.sql.Timestamp"/>
+	<parameter name="DateTo" class="java.sql.Timestamp"/>
+	<parameter name="M_Product_ID" class="java.lang.Integer"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<parameter name="M_AttributeValue_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_Attribute_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT o.Value As OrgKey, f.DateAcct, t.Name As TableName, f.Description, f.AmtAcctDr, f.AmtAcctCr, COALESCE(p.Value, '') As ProductName
+FROM Fact_Acct f
+INNER JOIN AD_Org o ON o.AD_Org_ID=f.AD_Org_ID
+LEFT OUTER JOIN AD_Table t ON t.AD_Table_ID=f.AD_Table_ID
+LEFT OUTER JOIN M_Product p ON p.M_Product_ID=f.M_Product_ID
+WHERE f.AD_Org_ID=$P{AD_Org_ID} AND f.Account_ID=$P{Account_ID} AND
+	DateAcct BETWEEN $P{DateFrom} AND $P{DateTo} AND
+	CASE WHEN $P{M_Product_ID} IS NOT NULL AND $P{M_Product_ID}<>0 THEN
+	    f.M_Product_ID = $P{M_Product_ID}  ELSE 1=1 END
+	AND
+	CASE WHEN $P{M_Attribute_ID} IS NOT NULL AND $P{M_Attribute_ID}<>0 THEN
+	   EXISTS (SELECT 1 FROM M_AttributeInstance mai INNER JOIN M_Product pp ON
+ 	   mai.M_AttributeSetInstance_ID=pp.M_AttributeSetInstance_ID
+	   AND pp.M_Product_ID=f.M_Product_ID
+	   WHERE mai.M_Attribute_ID=$P{M_Attribute_ID})
+	ELSE 1=1 END
+	AND
+	CASE WHEN $P{M_AttributeValue_ID} IS NOT NULL AND $P{M_AttributeValue_ID}<>0 THEN
+	EXISTS (SELECT 1 FROM M_AttributeInstance mai INNER JOIN M_Product pp ON
+ 	mai.M_AttributeSetInstance_ID=pp.M_AttributeSetInstance_ID AND pp.M_Product_ID=f.M_Product_ID
+	WHERE mai.M_AttributeValue_ID=$P{M_AttributeValue_ID})
+	ELSE 1=1 END
+	AND
+	CASE WHEN $P{C_BPartner_ID} IS NOT NULL AND $P{C_BPartner_ID}<>0 THEN
+	    f.C_BPartner_ID = $P{C_BPartner_ID}  ELSE 1=1 END
+ORDER BY f.DateAcct]]>
+	</queryString>
+	<field name="orgkey" class="java.lang.String"/>
+	<field name="dateacct" class="java.sql.Timestamp"/>
+	<field name="tablename" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="amtacctdr" class="java.math.BigDecimal"/>
+	<field name="amtacctcr" class="java.math.BigDecimal"/>
+	<field name="productname" class="java.lang.String"/>
+	<variable name="Balance" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{Balance}.add($F{amtacctdr}).subtract($F{amtacctcr})]]></variableExpression>
+		<initialValueExpression><![CDATA[$P{InitialBalance}]]></initialValueExpression>
+	</variable>
+	<variable name="SumDr" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{amtacctdr}]]></variableExpression>
+	</variable>
+	<variable name="SumCr" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{amtacctcr}]]></variableExpression>
+	</variable>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="57" height="12" uuid="58a6f2bc-c3d3-492d-85d5-c9de15596329"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{orgkey}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="58" y="0" width="81" height="12" uuid="50ee6b37-0b9a-4b64-b35b-1c91b5148347"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateacct}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="0" width="115" height="12" uuid="c2f424fd-6e91-4b5c-91d4-9348abe8477e"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tablename}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="256" y="0" width="257" height="12" uuid="efadb9de-f841-4da9-8574-76a5be418693"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description} + ($F{productname}.isEmpty()?"":"::") + $F{productname}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="514" y="0" width="93" height="12" uuid="a399efac-9503-44e2-b5f7-ecc64bf7d6df"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{amtacctdr}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="608" y="0" width="93" height="12" uuid="d4516801-4cbc-4221-bb97-8da65df46804"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{amtacctcr}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="702" y="0" width="100" height="12" uuid="693ea4ef-c819-43b7-8a55-fc4721fa7c05"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Balance}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="12">
+			<textField pattern="">
+				<reportElement x="513" y="0" width="93" height="12" isPrintWhenDetailOverflows="true" forecolor="#000099" uuid="32fcfcda-df63-4b27-bea7-3450577910f6"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("#,##0;(#,##0)").format($V{SumDr})]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="607" y="0" width="93" height="12" forecolor="#000099" uuid="82b2a461-64d0-4475-996a-1afacd0be043"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("#,##0;(#,##0)").format($V{SumCr})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="515" y="0" width="90" height="1" isPrintWhenDetailOverflows="true" uuid="49fd4de0-fe0e-4ecc-95c7-a34a82cfc8c4"/>
+			</line>
+			<line>
+				<reportElement x="609" y="0" width="90" height="1" uuid="964b7d58-b7f7-4cf6-8aa8-9d672b6bbc5b"/>
+			</line>
+		</band>
+	</lastPageFooter>
+</jasperReport>

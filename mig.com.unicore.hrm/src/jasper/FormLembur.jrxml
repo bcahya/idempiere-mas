@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FormLembur" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="39f81753-f352-479d-b0c4-0c468a667e74">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="19"/>
+	<queryString>
+		<![CDATA[select 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="51" splitType="Stretch">
+			<staticText>
+				<reportElement x="375" y="1" width="427" height="50" uuid="6db4f459-0be1-4024-ae78-182145094ce1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Calibri" size="20"/>
+				</textElement>
+				<text><![CDATA[SURAT PERINTAH LEMBUR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="73" y="0" width="243" height="31" forecolor="#FF3300" uuid="a9f5616f-4763-4e5d-9dd6-5a55d86a54bc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Britannic Bold" size="16"/>
+				</textElement>
+				<text><![CDATA[PT. SUTOPO LESTARI JAYA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="73" y="31" width="243" height="20" forecolor="#FF3300" uuid="0810b08d-144a-4cf5-898b-6cba2fc7cc9f"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[PERKEBUNAN DAN PABRIK KELAPA SAWIT]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="1" width="65" height="50" uuid="65d58d5c-9cd3-45ed-9d0e-23274f1ec77e"/>
+				<imageExpression><![CDATA["images/Sutopo.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="50">
+			<staticText>
+				<reportElement x="0" y="10" width="142" height="20" uuid="5d9ed5ae-6e1e-42b3-98bf-5e1be0392ce9"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[TANGGAL SPL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="142" height="20" uuid="b7411f2c-1d77-426d-a5ff-9a1b52856268"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[DEPARTEMENT / DIVISI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="10" width="142" height="20" uuid="ab6e0234-4692-4542-9055-16e346123f06"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Lembur Pada Waktu ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="30" width="142" height="20" uuid="cf19b2b6-4a77-4646-a98e-b28a572fd0ac"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Lembur Pada Hari / Tgl]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="517" y="10" width="11" height="20" uuid="c209deb9-5e92-4c03-93d4-af29095f3543"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="517" y="30" width="11" height="20" uuid="b7af0832-ce25-462a-bab4-d86ecbef393c"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="142" y="10" width="11" height="20" uuid="76b5760c-1f1b-409d-bc73-4ae4599211c6"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="142" y="30" width="11" height="20" uuid="265987d4-89b9-465c-aada-d532487a7e24"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="540" y="15" width="11" height="11" uuid="622eb4d4-fdc1-42cd-beb8-70f270ab41b3"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="551" y="10" width="66" height="20" uuid="dcac5ef6-2e38-4290-8922-26be63ee1c02"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Hari Kerja]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="678" y="10" width="66" height="20" uuid="17612eb2-ccbf-4fdf-9950-1b1d26727abd"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Hari Libur]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="667" y="15" width="11" height="11" uuid="49edee72-94c6-467a-8795-44f07b07b276"/>
+			</rectangle>
+			<line>
+				<reportElement x="3" y="0" width="799" height="1" uuid="75d3ecb7-2c1c-4c6a-94bd-8ebf9598937b"/>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="127">
+			<staticText>
+				<reportElement x="0" y="6" width="142" height="20" uuid="28bd1da9-11dc-4f95-b73e-3fc35ffaa927"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Uraian Tugas Lembur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="142" y="6" width="11" height="20" uuid="d64b2802-8c2a-4652-9e29-391233232727"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="174" y="102" width="11" height="20" uuid="233a3fa0-f6e2-4db4-9784-d1a2f2f01b8a"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="102" width="174" height="20" uuid="7a0a0d13-ea50-4184-a4c4-c503daf0b6ad"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Memberikan Tugas Lembur Kepada]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="0" width="802" height="1" uuid="88a159f9-5603-4b6e-94ee-0863edd3f141"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="163">
+			<line>
+				<reportElement x="0" y="0" width="801" height="1" uuid="5503397e-64ba-4097-920f-717c87c5d996"/>
+			</line>
+			<line>
+				<reportElement x="540" y="22" width="262" height="1" uuid="285b07d7-1090-48a0-aa44-841bffd587e2"/>
+			</line>
+			<line>
+				<reportElement x="0" y="43" width="802" height="1" uuid="ae2eb035-3864-4af8-bdb6-dbd587f7a72b"/>
+			</line>
+			<line>
+				<reportElement x="0" y="63" width="802" height="1" uuid="d2b65602-0bfd-497d-977e-8491816449ad"/>
+			</line>
+			<line>
+				<reportElement x="0" y="106" width="802" height="1" uuid="a771453c-1249-4ebb-930d-403e3fbc3e87"/>
+			</line>
+			<line>
+				<reportElement x="0" y="85" width="802" height="1" uuid="86d4d5fe-905f-4002-ab78-d988422dce71"/>
+			</line>
+			<line>
+				<reportElement x="0" y="126" width="802" height="1" uuid="8dc092dc-d2a2-4696-ba28-6b77d4844783"/>
+			</line>
+			<line>
+				<reportElement x="0" y="1" width="1" height="147" uuid="09e3165a-3a80-413b-b3d2-731641eb2dfa"/>
+			</line>
+			<line>
+				<reportElement x="28" y="0" width="1" height="147" uuid="47e30200-02c5-41f4-a759-2326f5c4a5b1"/>
+			</line>
+			<line>
+				<reportElement x="141" y="0" width="1" height="147" uuid="19f6c265-9e52-4814-9297-307b8cb0fff9"/>
+			</line>
+			<line>
+				<reportElement x="364" y="2" width="1" height="145" uuid="2d8c161a-6d5f-4d03-8cb0-9cbce22383cf"/>
+			</line>
+			<line>
+				<reportElement x="540" y="1" width="1" height="146" uuid="5783ea9f-d3e6-425a-9ba4-41a5a8ed820d"/>
+			</line>
+			<line>
+				<reportElement x="672" y="22" width="1" height="125" uuid="2820f6ea-7818-4504-b7fd-30c34eb8b799"/>
+			</line>
+			<line>
+				<reportElement x="0" y="147" width="802" height="1" uuid="d2270feb-e029-4d52-b031-425912ce8666"/>
+			</line>
+			<line>
+				<reportElement x="801" y="0" width="1" height="147" uuid="8dd76585-7eaf-4cc2-85f5-478c1c0d29fc"/>
+			</line>
+			<staticText>
+				<reportElement x="541" y="0" width="262" height="22" uuid="f0bfe5ce-f786-421a-b1f3-429cc9015161"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Jam Lembur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="541" y="22" width="132" height="21" uuid="db6e5e8c-a3cd-4ee9-bd5d-e6cabb1082fe"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Mulai]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="673" y="22" width="129" height="21" uuid="4755d917-f02c-49d7-86f6-3b4d07f81de5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Berakhir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="365" y="1" width="176" height="43" uuid="a63589fc-19e0-4c37-92e7-ee4d302f2e5d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Jabatan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="28" y="0" width="113" height="43" uuid="611135ec-ad52-46a5-9b33-f6f00b0bd01f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[NIK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="1" width="28" height="42" uuid="4d3fc875-56be-4921-8230-0042706c586d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="141" y="0" width="223" height="44" uuid="cd35d72b-fa12-4e2b-be0b-f53485a3de32"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Nama]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="131">
+			<staticText>
+				<reportElement x="29" y="0" width="193" height="39" uuid="5dd0ab15-6b83-4816-a356-ece429c6dff4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Diajukan Oleh	:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="223" y="0" width="232" height="21" uuid="c283eaf0-b022-4e5c-ad37-3af7267522c9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Disetujui Oleh	:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="0" width="316" height="21" uuid="ca82d527-2818-4701-81a6-80addfbf0350"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Diketahui Oleh]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="21" width="158" height="18" uuid="762a27fb-306a-4c1e-b8f9-1c73b0b35585"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Mill Manager]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="613" y="21" width="158" height="18" uuid="d51ad053-81a7-4323-9b5b-addb6e0f9ae8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[HRD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="223" y="21" width="232" height="18" uuid="1167c721-8db5-4b3a-a3a3-cb234b7fcc30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Supervisor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="95" width="173" height="18" uuid="1d6806f1-38da-4023-9c16-2762a34f98ae"/>
+				<text><![CDATA[Nama	:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="223" y="95" width="158" height="18" uuid="0a754fcf-32c5-4bdb-b472-c77c0136211c"/>
+				<text><![CDATA[Nama	:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="28" y="39" width="743" height="1" uuid="4504cdad-bf86-4713-b172-56e2dd841180"/>
+			</line>
+			<line>
+				<reportElement x="28" y="0" width="742" height="1" uuid="eccb2b8c-5e6e-4ae6-8acc-881f32fd7ac8"/>
+			</line>
+			<line>
+				<reportElement x="28" y="112" width="743" height="1" uuid="ee199f07-2f0d-4662-a54c-70fedf809ad2"/>
+			</line>
+			<line>
+				<reportElement x="771" y="0" width="1" height="112" uuid="a2064a83-0009-4e5b-b10e-b98e3dbb13cc"/>
+			</line>
+			<line>
+				<reportElement x="455" y="0" width="1" height="113" uuid="968d5d98-2f19-4e37-82c7-b15921895924"/>
+			</line>
+			<line>
+				<reportElement x="222" y="2" width="1" height="111" uuid="4458f29a-d7f5-4972-9cf4-0390615e53cd"/>
+			</line>
+			<line>
+				<reportElement x="28" y="0" width="1" height="112" uuid="312c9cc3-b2e8-4cf3-a246-b888f8368346"/>
+			</line>
+			<line>
+				<reportElement x="613" y="21" width="1" height="92" uuid="cfc3d60c-afc7-42e9-89f3-b835261dac11"/>
+			</line>
+			<line>
+				<reportElement x="456" y="21" width="315" height="1" uuid="fa10fc40-9101-4e7d-8a62-2e4078a21291"/>
+			</line>
+		</band>
+	</pageFooter>
+</jasperReport>

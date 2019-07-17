@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTaxNumber" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="99f78114-8497-44ae-8285-304dd61c9aa6">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Status" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[Select vrs.documentno as docno,
+vrs.prefixno as prefix,
+vrs.sequencestartno as startno,
+vrs.sequenceendno as endno,
+vrs.daterequired as datereq,
+vrs.datereceived as datereceiv,
+org.name as org,
+vdn.taxinvoiceno as taxinvoice,
+CASE WHEN vdn.usagestatus='U' THEN 'Used'
+WHEN vdn.usagestatus='NU' THEN 'Not Used' ELSE 'Cancelled' END as status,
+COALESCE(i.documentno,'') as invoiceno,
+COALESCE(bpt.name,'') as bpartner,
+vrs.totalnumbers as totalnum,
+vat.documentno AS Vatdocno
+
+FROM UNS_VATRegisteredSequences vrs
+INNER JOIN AD_Org org ON org.AD_Org_ID=vrs.AD_Org_ID
+INNER JOIN UNS_VATDocNo vdn ON vdn.UNS_VATRegisteredSequences_ID=vrs.UNS_VATRegisteredSequences_ID
+LEFT JOIN C_Invoice i ON i.C_Invoice_ID=vdn.C_invoice_ID
+LEFT JOIN C_BPartner bpt ON bpt.C_Bpartner_ID=i.C_Bpartner_ID
+LEFT JOIN UNS_VATLine vl ON vl.C_Invoice_ID=i.C_Invoice_ID
+LEFT JOIN UNS_VAT vat ON vat.UNS_Vat_ID=vl.UNS_VAT_ID
+
+Where vrs.Docstatus IN ('CO','CL') AND (CASE WHEN $P{Status} <> '' THEN $P{Status}= vdn.usagestatus ELSE 1=1 END) AND vrs.AD_Org_ID = $P{AD_Org_ID}
+order by vdn.taxinvoiceno]]>
+	</queryString>
+	<field name="docno" class="java.lang.String"/>
+	<field name="prefix" class="java.lang.String"/>
+	<field name="startno" class="java.math.BigDecimal"/>
+	<field name="endno" class="java.math.BigDecimal"/>
+	<field name="datereq" class="java.sql.Timestamp"/>
+	<field name="datereceiv" class="java.sql.Timestamp"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="taxinvoice" class="java.lang.String"/>
+	<field name="status" class="java.lang.String"/>
+	<field name="invoiceno" class="java.lang.String"/>
+	<field name="bpartner" class="java.lang.String"/>
+	<field name="totalnum" class="java.math.BigDecimal"/>
+	<field name="vatdocno" class="java.lang.String"/>
+	<variable name="Number" class="java.lang.Number" calculation="Count">
+		<variableExpression><![CDATA[$V{Number} == null ? 1 : $V{Number}+1]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement uuid="be461c9e-f595-4e62-a6f2-40abb89989de" x="0" y="0" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="d80bcd2f-e910-4850-9dfe-b3a8da479ab9" x="31" y="20" width="96" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Tax Invoice No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6e160c42-0842-4440-840c-49a1fd8f016b" x="127" y="20" width="86" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Invoice No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e4336423-0132-465c-83bd-8dfee72dd0f3" x="457" y="20" width="98" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3f063c22-275a-4107-b9e6-1f36067e21a8" x="0" y="20" width="31" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="af1c0820-1846-452c-89e3-bfbfeb4eb94a" x="298" y="20" width="159" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Business Partner]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="325f6ffd-162b-4dfa-b4fe-6eb6c7fcd714" x="213" y="20" width="85" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Tax Reporting]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="db798a92-4795-463f-8b05-cc6b1055c4d0" x="31" y="0" width="96" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{taxinvoice}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="5fe2f2af-801c-4628-9002-8016502e14dc" x="127" y="0" width="86" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{invoiceno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="273752ad-9c94-4b49-981f-3dd0c23edea3" x="457" y="0" width="98" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement uuid="4d9fb97e-1589-4c6b-9349-dd4ddc030182" x="0" y="0" width="31" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Number}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="1335d8ff-5328-4149-b5d0-1b203a485c64" x="298" y="0" width="159" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{bpartner}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="2c143858-e9c6-4f90-94c9-a353539cec86" x="213" y="0" width="85" height="20"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vatdocno}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.1.final using JasperReports Library version 6.1.1  -->
+<!-- 2016-01-13T21:37:08 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PermohonanKasKeluar" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ae8c9b4a-dcc3-41dc-8be6-d2ca0635acea">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="UNS_Charge_RS_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select org.name as org,req.name as nmtrx,req.documentno as documentno,dt.docbasetype as docbasetype,req.datetrx as datedoc,bp.name as requestuser,cd.description as description,coalesce(cd.amountconfirmed, 0) as confirmedamt,
+(select coalesce(amountconfirmed, 0) from uns_charge_detail where uns_charge_detail_id = cd.reference_id) as referenceamt,confirmation.updatedby,
+(select name from ad_user where ad_user_id = $P{AD_User_ID}  ) as admin,
+ba.name as bankaccount
+from uns_charge_rs req
+inner join c_bpartner bp on bp.c_bpartner_id = req.c_bpartner_id
+inner join uns_charge_detail cd on cd.uns_charge_rs_id = req.uns_charge_rs_id
+inner join uns_charge_confirmation confirmation on confirmation.uns_charge_rs_id = req.uns_charge_rs_id
+left join c_bankstatement bs on bs.c_bankstatement_id = confirmation.c_bankstatement_id
+left join c_bankaccount ba on ba.c_bankaccount_id = bs.c_bankaccount_id
+inner join c_doctype dt on dt.c_doctype_id = req.c_doctype_id
+left join ad_org org on org.ad_org_id=req.ad_org_id
+where req.uns_charge_rs_id =$P{UNS_Charge_RS_ID}  and cd.chargetype='CS' and  cd.isactive = 'Y']]>
+	</queryString>
+	<field name="org" class="java.lang.String"/>
+	<field name="nmtrx" class="java.lang.String"/>
+	<field name="documentno" class="java.lang.String"/>
+	<field name="docbasetype" class="java.lang.String"/>
+	<field name="datedoc" class="java.sql.Timestamp"/>
+	<field name="requestuser" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="confirmedamt" class="java.math.BigDecimal"/>
+	<field name="referenceamt" class="java.math.BigDecimal"/>
+	<field name="updatedby" class="java.math.BigDecimal"/>
+	<field name="admin" class="java.lang.String"/>
+	<field name="bankaccount" class="java.lang.String"/>
+	<variable name="SubTotalDebit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{referenceamt} != null && $F{referenceamt}.signum() == 1 ? $F{confirmedamt}.subtract($F{referenceamt}).negate() : BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="SubTotalCredit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{referenceamt} != null && $F{referenceamt}.signum() == 1 ? $F{referenceamt} : $F{confirmedamt}]]></variableExpression>
+	</variable>
+	<variable name="Total" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{SubTotalCredit}.subtract($V{SubTotalDebit})]]></variableExpression>
+	</variable>
+	<variable name="Nourut" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$V{Nourut}== null ? 0 :$V{Nourut}+1]]></variableExpression>
+	</variable>
+	<group name="orgnasasi">
+		<groupExpression><![CDATA[$F{org}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement x="3" y="0" width="199" height="11" uuid="40685559-3df9-472a-bce6-eafccb501632"/>
+					<textElement>
+						<font size="8" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="88" splitType="Stretch">
+			<staticText>
+				<reportElement x="2" y="32" width="100" height="11" uuid="48112a7a-2912-475e-8d84-2c3ae556dd89"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nomor Permohonan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="42" width="100" height="11" uuid="08251031-eb71-428f-8566-57264efbd056"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="102" y="32" width="170" height="11" uuid="aacce0f8-35fa-4c91-8913-1b3a83fab41b"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="102" y="42" width="169" height="11" uuid="940cf6d4-db94-4006-af20-5dbd176a230c"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + new SimpleDateFormat("EEE, dd-MM-yyyy").format($F{datedoc})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="61" y="70" width="259" height="12" uuid="35a7530c-abdc-4c0b-a5ee-5b1612dbd2e3"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Uraian]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="70" width="100" height="12" uuid="31292a33-ec11-47cf-8402-7262121456e6"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Debit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="440" y="70" width="100" height="12" uuid="612497c9-42d1-4df4-916c-401346055c74"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Kredit]]></text>
+			</staticText>
+			<line>
+				<reportElement x="2" y="69" width="550" height="1" uuid="2b94bba2-86c9-49d8-a5b0-0424b77941ec"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="2" y="83" width="550" height="1" uuid="0bc339a0-3dee-495d-ab69-e8cecd2a5034"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="2" y="1" width="550" height="19" uuid="fdbb928f-469a-48ea-bf8f-5fb52fbd3c2a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="12"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{docbasetype}.equals("STL") ? "Realisasi Kas Keluar" : "Permohonan Kas Keluar"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="452" y="0" width="100" height="20" uuid="ea69ee4a-9f21-4f45-b486-23be5d9ce84c"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="53" width="100" height="11" uuid="688eec2f-473e-41b8-a04d-2e9ceab43f6f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="102" y="53" width="243" height="11" uuid="8b40a127-f70a-413b-978f-0f23592dae27"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{nmtrx}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="70" width="59" height="12" uuid="b40ea7ed-1b8f-4998-90fa-0d1da9b2188b"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="2" y="14" width="550" height="16" uuid="63ada1ac-aa6e-4d9c-bec7-b1dffd0ccac9"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="10"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{bankaccount} == null ? "" : $F{bankaccount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="37" y="0" width="283" height="11" uuid="bea13a17-c331-45fb-a68a-5cb2c6e3d516"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="330" y="0" width="100" height="11" uuid="10957877-2e8f-4529-a54a-5a20efda19c9"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[NumberFormat.getInstance().format($F{referenceamt} != null && $F{referenceamt}.signum() == 1 ? $F{confirmedamt}.subtract($F{referenceamt}).negate() : BigDecimal.ZERO)]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="440" y="0" width="100" height="11" uuid="5a16783b-e971-4934-9ce6-ab6649c8e258"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[NumberFormat.getInstance().format($F{referenceamt} != null && $F{referenceamt}.signum() == 1 ? $F{referenceamt} : $F{confirmedamt})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="0" width="24" height="11" uuid="0077bbe0-06a4-4e07-8a27-e085a5e9a382"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Nourut}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="121">
+			<line>
+				<reportElement x="3" y="1" width="549" height="1" uuid="efae20a5-812c-41a3-bcbb-6e7e71e4e96b"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="10" y="2" width="100" height="14" uuid="c88f001e-8c80-466b-b63a-95f1a1ecb6b6"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sub Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="11" y="16" width="100" height="14" uuid="bd059f51-07cd-4daf-b0b2-a7094339944f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total Cost]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="440" y="3" width="100" height="13" uuid="10939157-d76f-464e-8541-6ffbf580eb33"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[NumberFormat.getInstance().format($V{SubTotalCredit})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="330" y="3" width="100" height="13" uuid="341da26d-2eda-4a27-aba0-fc1b7e545dc2"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[NumberFormat.getInstance().format($V{SubTotalDebit})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="110" y="16" width="431" height="14" uuid="c92ea85c-6462-4e7c-861d-1576cbb7df79"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[NumberFormat.getInstance().format($V{Total})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="2" y="13" width="550" height="1" uuid="dfe2d6aa-284a-4a5c-be6f-a20ab1e228aa"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="12" y="35" width="530" height="1" uuid="97f0d8c0-d694-43bb-8260-1fb5b802c955"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="11" y="55" width="530" height="1" uuid="de43548a-10ee-475e-8df0-6332c7f06912"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="540" y="36" width="1" height="79" uuid="a961cd91-87c6-4e22-9418-8c2214d0a5f4"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="12" y="35" width="1" height="79" uuid="6e06150e-16b5-4f80-9b8c-855923f79d56"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="10" y="114" width="530" height="1" uuid="569ca447-6c91-4153-bc6c-b1382922fb36"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="410" y="35" width="1" height="79" uuid="352fc557-2ff6-4b0a-b4db-71cd146c33a1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="280" y="35" width="1" height="79" uuid="3f60abd9-be45-4439-aee2-9dd009ffbd05"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="140" y="35" width="1" height="79" uuid="21b3fc29-5317-4c0e-b995-74d11e5a6852"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="26" y="37" width="100" height="18" uuid="ec21f79b-286e-45a4-a997-7442929ebc18"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[DIREKTUR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="426" y="37" width="100" height="18" uuid="d9861957-4f54-4fc9-97b0-e07d999ae1a2"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[KASIR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="37" width="100" height="18" uuid="66492777-3d1e-403f-9404-942520e28315"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ADMIN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="295" y="37" width="100" height="18" uuid="5e3159da-887a-4b0c-b333-78f45686cd59"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[PEMOHON]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="13" y="95" width="128" height="20" uuid="ff4b26ce-1c7d-4507-bc8d-eaab0705a87a"/>
+				<box topPadding="5"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Hongiman]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="140" y="95" width="140" height="20" uuid="3fae393d-bd5e-4870-bc5b-0628627d0dd1"/>
+				<box topPadding="5"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{admin}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="280" y="95" width="130" height="20" uuid="d0d24076-7558-49b2-909f-a61ed7a1a8ba"/>
+				<box topPadding="5"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{requestuser}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

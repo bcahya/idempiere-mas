@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DocumentControl_CustomerReturn_Subreport1" language="groovy" pageWidth="730" pageHeight="15" orientation="Landscape" columnWidth="730" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e9b1088e-f33d-4386-9558-10f20f9e9072">
+	<property name="ireport.zoom" value="0.75"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="M_InOut_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_RMA_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[-- daftar customer return yg ga ada RMA nya (utamanya customer return)
+	SELECT
+	-- RMA
+		null AS rmano,
+		null AS rmadate,
+		null AS rmastatus,
+	-- Customer Return
+		io.documentno AS rtrnno,
+		io.movementdate AS rtrndate,
+		io.docstatus AS rtrnstatus,
+	-- Invoice Credit Memo
+		invc.documentno AS invCMno,
+		invc.dateinvoiced AS invCMdate,
+		invc.docstatus AS invCMstatus,
+	-- Invoice
+		inv.documentno AS invno,
+		inv.dateinvoiced AS invdate,
+		inv.docstatus AS invstatus
+FROM m_inout io
+
+LEFT OUTER JOIN c_invoice invc ON invc.c_invoice_id IN (SELECT c_invoice_id FROM c_invoiceline invl WHERE m_inoutline_id IN(SELECT m_inoutline_id FROM m_inoutline WHERE m_inout_id=$P{M_InOut_ID}))
+LEFT OUTER JOIN C_AllocationLine cal ON cal.C_Invoice_ID=invc.C_Invoice_ID
+LEFT OUTER JOIN c_invoice inv ON inv.c_invoice_id = cal.C_Invoice_ID AND inv.C_Invoice_ID <> invc.C_Invoice_ID AND cal.Amount > 0
+
+WHERE io.m_inout_id = $P{M_InOut_ID} AND(CASE WHEN invc.c_invoice_id > 0 THEN invc.docstatus IN ('DR','IP','IN') ELSE 1=1 END)
+
+UNION
+-- daftar rma (utamanya rma)
+	SELECT
+	-- RMA
+		rma.documentno AS rmano,
+		rma.datedoc AS rmadate,
+		rma.docstatus AS rmastatus,
+	-- Customer Return
+		io.documentno AS rtrnno,
+		io.movementdate AS rtrndate,
+		io.docstatus AS rtrnstatus,
+	-- Invoice Credit Memo
+		invc.documentno AS invCMno,
+		invc.dateinvoiced AS invCMdate,
+		invc.docstatus AS invCMstatus,
+	-- Invoice
+		inv.documentno AS invno,
+		inv.dateinvoiced AS invdate,
+		inv.docstatus AS invstatus
+FROM m_rma rma
+LEFT OUTER JOIN m_inout io ON io.m_rma_id = rma.m_rma_id
+LEFT OUTER JOIN ad_org org ON org.ad_org_id = rma.ad_org_id
+LEFT OUTER JOIN c_invoice invc ON invc.c_invoice_id IN (SELECT c_invoice_id FROM c_invoiceline invl
+		WHERE m_inoutline_id IN (SELECT m_inoutline_id FROM m_inoutline WHERE m_inout_id= 	$P{M_InOut_ID}))
+LEFT OUTER JOIN C_AllocationLine cal ON cal.C_Invoice_ID=invc.C_Invoice_ID
+LEFT OUTER JOIN c_invoice inv ON inv.c_invoice_id = cal.C_Invoice_ID AND inv.C_Invoice_ID <> invc.C_Invoice_ID AND cal.Amount > 0
+WHERE
+(CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN rma.datedoc BETWEEN $P{DateFrom}::timestamp AND $P{DateTo}::timestamp WHEN $P{DateFrom}::timestamp IS NOT NULL THEN rma.datedoc >= $P{DateFrom}::timestamp WHEN $P{DateTo}::timestamp IS NOT NULL THEN rma.datedoc <= $P{DateTo}::timestamp ELSE 1=1 END)
+]]>
+	</queryString>
+	<field name="rmano" class="java.lang.String"/>
+	<field name="rmadate" class="java.sql.Timestamp"/>
+	<field name="rmastatus" class="java.lang.String"/>
+	<field name="rtrnno" class="java.lang.String"/>
+	<field name="rtrndate" class="java.sql.Timestamp"/>
+	<field name="rtrnstatus" class="java.lang.String"/>
+	<field name="invcmno" class="java.lang.String"/>
+	<field name="invcmdate" class="java.sql.Timestamp"/>
+	<field name="invcmstatus" class="java.lang.String"/>
+	<field name="invno" class="java.lang.String"/>
+	<field name="invdate" class="java.sql.Timestamp"/>
+	<field name="invstatus" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="82" height="15" uuid="9824ec31-16cb-442c-927c-793c73b6e3f2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rmano} == null ? "-" : $F{rmano}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yy">
+				<reportElement x="82" y="0" width="67" height="15" uuid="1043f5c1-8dd3-42b0-b6df-421725d34b50"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rmadate} == null ? "-" : $F{rmadate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="149" y="0" width="34" height="15" uuid="28a02748-8d53-4ef7-8122-7837f9b9aaa3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rmastatus} == null ? "-" : $F{rmastatus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="183" y="0" width="82" height="15" uuid="b7e08c0f-8d19-4107-a1a8-f9da6a494aff"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rtrnno} == null ? "-" : $F{rtrnno}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yy">
+				<reportElement x="265" y="0" width="67" height="15" uuid="2a60ab74-7997-4ec8-bf6d-46e51612e3e5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rtrndate} == null ? "-" : $F{rtrndate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="332" y="0" width="34" height="15" uuid="d5a0b5a7-127f-4eac-af2a-b2fb43fe70d0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rtrnstatus} == null ? "-" : $F{rtrnstatus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="366" y="0" width="82" height="15" uuid="f688ecc0-d186-4960-9e5e-df587f7bf2bf"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{invcmno} == null ? "-" : $F{invcmno}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yy">
+				<reportElement x="448" y="0" width="67" height="15" uuid="1d4d0f49-7fb2-4565-8c95-810b89fdd903"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{invcmdate} == null ? "-" : $F{invcmdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="515" y="0" width="34" height="15" uuid="995536b1-43ae-4e84-b1db-9eee477fbf83"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{invcmstatus} == null ? "-" : $F{invcmstatus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="549" y="0" width="80" height="15" uuid="4408ccff-d41f-4e13-a313-f4a1ab86519f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{invno} == null ? "-" : $F{invno}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yy">
+				<reportElement x="629" y="0" width="67" height="15" uuid="095dfcf0-3736-4eed-b4a9-6644cfe64553"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{invdate} == null ? "-" : $F{invdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="696" y="0" width="34" height="15" uuid="fb6e15cf-5a68-4967-8825-65add22dac18"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{invcmstatus} == null ? "-" :$F{invstatus}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

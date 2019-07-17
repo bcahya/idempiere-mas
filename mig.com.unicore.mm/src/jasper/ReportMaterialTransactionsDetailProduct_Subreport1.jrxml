@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportMaterialTransactionsDetailProduct_Subreport1" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="fa347f83-c6cf-42c3-b38a-1c5eb81cdc0a">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateTrx" class="java.sql.Timestamp">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_Product_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SubQty" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="StockNow" class="java.math.BigDecimal"/>
+	<parameter name="M_Locator_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1, COALESCE((SELECT COALESCE(SUM(MovementQty),0) AS Transaction
+FROM M_Transaction mt WHERE mt.M_Locator_ID = $P{M_Locator_ID} AND mt.MovementDate > $P{DateTrx}::timestamp AND mt.M_Product_ID = $P{M_Product_ID}
+
+GROUP BY M_Product_ID,M_Locator_ID),0) AS Transaction]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<field name="transaction" class="java.math.BigDecimal"/>
+	<variable name="beginning_stock" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[($P{StockNow}.subtract($F{transaction}).subtract($P{SubQty}))]]></variableExpression>
+	</variable>
+	<variable name="ending_stock" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[($P{StockNow}.subtract($F{transaction}))]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="20">
+			<staticText>
+				<reportElement uuid="b21c77bb-a6d2-426b-89b7-e7509622bf09" x="139" y="0" width="139" height="20"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Transaction]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c984a35e-5961-4f8c-b703-8d30ebcefeea" x="0" y="0" width="139" height="20"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Beginning Stock]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="10a09dfa-80c5-413c-a3e7-20c2adcfaa87" x="278" y="0" width="139" height="20"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ending Stock]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0f83c6c2-87ec-4147-9c70-7f8811ebf26f" x="417" y="0" width="138" height="20"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Stock Now]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="50c88609-718d-4e7b-96e0-43562d0e842b" x="139" y="0" width="139" height="20"/>
+				<box topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("##0.00").format($P{SubQty})]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="8ef231fd-50ee-4ec3-9c09-6e3be9823777" x="0" y="0" width="139" height="20"/>
+				<box topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("##0.00").format(($P{StockNow}.subtract($F{transaction}).subtract($P{SubQty})))]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="2c7827a2-78b0-49d7-b270-24a7fa6b2192" x="278" y="0" width="139" height="20"/>
+				<box topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("##0.00").format(($P{StockNow}.subtract($F{transaction})))]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="7dbed422-654d-403f-b2df-dd7635e144ad" x="417" y="0" width="138" height="20"/>
+				<box topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="2">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new DecimalFormat("##0.00").format($P{StockNow})]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

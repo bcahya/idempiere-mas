@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportProductionWage" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0c0beb69-b7d3-4df1-88f0-e6dc548fa438">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ReportType" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UNS_Employee_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\project\\UntaCore@FLG\\com.unicore.ppic\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<subreport>
+				<reportElement uuid="40ce65ff-537d-4216-a5a3-4f0cff5964a5" x="0" y="0" width="555" height="25">
+					<printWhenExpression><![CDATA[$P{ReportType} == "SUM"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="DateFrom">
+					<subreportParameterExpression><![CDATA[$P{DateFrom}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DateTo">
+					<subreportParameterExpression><![CDATA[$P{DateTo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="UNS_Employee_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_Employee_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ReportType"/>
+				<subreportParameter name="AD_Org_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_Org_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportProductionWage_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement uuid="4120c322-33da-46c3-805e-06abe2c020af" x="0" y="0" width="555" height="25">
+					<printWhenExpression><![CDATA[$P{ReportType} == "DOE"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="DateFrom">
+					<subreportParameterExpression><![CDATA[$P{DateFrom}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DateTo">
+					<subreportParameterExpression><![CDATA[$P{DateTo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ReportType"/>
+				<subreportParameter name="UNS_Employee_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_Employee_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_Org_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_Org_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportProductionWage_Subreport2.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement uuid="8b70a548-f8b3-438d-9b9c-def3c7afa974" x="0" y="2" width="555" height="23">
+					<printWhenExpression><![CDATA[$P{ReportType} == "DOG"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="DateFrom">
+					<subreportParameterExpression><![CDATA[$P{DateFrom}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DateTo">
+					<subreportParameterExpression><![CDATA[$P{DateTo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="UNS_Employee_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_Employee_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_Org_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_Org_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportProductionWage_Subreport3.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

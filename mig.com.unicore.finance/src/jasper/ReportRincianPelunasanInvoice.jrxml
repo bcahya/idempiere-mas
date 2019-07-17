@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportRincianPelunasanInvoice" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3d3741ad-2224-4a6f-b336-e783af2baa95">
+	<property name="ireport.zoom" value="1.3310000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DocumentNo" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select now() as tglsekrang,pyment.datetrx as tanggal,invoiceopen(invg."c_invoice_id",0) as sisanota,
+invg."documentno" as nofaktur,invg."dateinvoiced" as  tglinvoice,invg."c_invoice_id",
+invg.dateinvoiced +interval '1 days' *(select "c_paymentterm"."netdays" from "c_paymentterm" where c_paymentterm_id=invg."c_paymentterm_id") as TglJtempo,
+cus."value" as kd_cus,cus."name" as nmcustomer,usr."name" as nama_sales,invg."grandtotal" as total_faktur,
+pyment."documentno",
+case when pyment.tendertype='X' AND pyment.payamt<>0 THEN pyal.amount else 0 end as tunai,
+case when pyment.tendertype='A' THEN pyal.amount ELSE 0 END as transfer,
+case when pyment.tendertype='K' THEN pyal.amount ELSE 0 END as giro,
+case when pyment.tendertype='X' AND pyment.payamt=0 THEN pyal.amount ELSE 0 END as retur,
+0 as discount,0 as notakredit,(select NAME from ad_ref_list adref where adref."ad_reference_id"='214' AND adref."value"=pyment."tendertype") as keterangan
+from c_invoice invg
+left join c_bpartner cus on cus."c_bpartner_id"=invg."c_bpartner_id"
+left join ad_user usr on usr."ad_user_id"=invg."salesrep_id"
+left join c_paymentallocate pyal on invg."c_invoice_id"=pyal."c_invoice_id"
+left join c_payment pyment on pyment."c_payment_id"=pyal."c_payment_id" and pyment.docstatus not IN('VO','RE')
+where invg.docstatus in('CO','CL') and invg.c_doctype_id in(select c_doctype_id from c_doctype where docbasetype='ARI')
+and invg.documentno= $P{DocumentNo}
+order by pyment.datetrx]]>
+	</queryString>
+	<field name="tglsekrang" class="java.sql.Timestamp"/>
+	<field name="tanggal" class="java.sql.Timestamp"/>
+	<field name="sisanota" class="java.math.BigDecimal"/>
+	<field name="nofaktur" class="java.lang.String"/>
+	<field name="tglinvoice" class="java.sql.Timestamp"/>
+	<field name="c_invoice_id" class="java.math.BigDecimal"/>
+	<field name="tgljtempo" class="java.sql.Timestamp"/>
+	<field name="kd_cus" class="java.lang.String"/>
+	<field name="nmcustomer" class="java.lang.String"/>
+	<field name="nama_sales" class="java.lang.String"/>
+	<field name="total_faktur" class="java.math.BigDecimal"/>
+	<field name="documentno" class="java.lang.String"/>
+	<field name="tunai" class="java.math.BigDecimal"/>
+	<field name="transfer" class="java.math.BigDecimal"/>
+	<field name="giro" class="java.math.BigDecimal"/>
+	<field name="retur" class="java.math.BigDecimal"/>
+	<field name="discount" class="java.lang.Integer"/>
+	<field name="notakredit" class="java.lang.Integer"/>
+	<field name="keterangan" class="java.lang.String"/>
+	<variable name="TtipePelunasan" class="java.lang.Number" resetType="Column">
+		<variableExpression><![CDATA[($F{tunai}+$F{transfer}+$F{discount}+$F{notakredit}+$F{retur}+$F{giro})]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="Tsisa" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[($F{tunai}+$F{transfer}+$F{discount}+$F{notakredit}+$F{retur}+$F{giro})]]></variableExpression>
+	</variable>
+	<variable name="Ket" class="java.lang.String">
+		<variableExpression><![CDATA[$F{sisanota}.intValue() == 0 ? "Lunas" : "Belum Lunas"]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="jml_bayar" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[($F{tunai}+$F{transfer}+$F{discount}+$F{notakredit}+$F{retur}+$F{giro})]]></variableExpression>
+	</variable>
+	<group name="invoice">
+		<groupExpression><![CDATA[$F{nofaktur}]]></groupExpression>
+		<groupFooter>
+			<band height="50">
+				<line>
+					<reportElement uuid="d1389009-d5b7-4d07-aeb5-1209abfb3ce0" x="2" y="0" width="796" height="1"/>
+				</line>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement uuid="ca8d2597-cc3c-40b3-bbf6-e42b56399538" x="710" y="22" width="79" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{sisanota}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="f2490de1-1b3b-44ba-b3d8-d6d05a2115e1" x="592" y="5" width="100" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Total Sisa Piutang :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="e61bef8c-a405-46bd-8836-41c8838a99cb" x="592" y="22" width="100" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Total Sisa Piutang Real :]]></text>
+				</staticText>
+				<line>
+					<reportElement uuid="6b4587a9-c9c8-4d05-9517-687b8caaf5b6" x="698" y="0" width="1" height="36"/>
+				</line>
+				<line>
+					<reportElement uuid="cee0e386-8c5e-42b7-aa92-5091161f7180" x="591" y="18" width="207" height="1"/>
+				</line>
+				<line>
+					<reportElement uuid="1eba1644-0d4b-41c2-ae24-91bf1b18ecce" x="591" y="36" width="207" height="1"/>
+				</line>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement uuid="719ea8d7-7e77-43bc-adfc-33c2c7a36622" x="698" y="5" width="91" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{total_faktur}-$V{jml_bayar}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="7ada04b5-373c-4cd3-8202-eba078a6f837" x="14" y="13" width="100" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Ket}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="80" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="30c6829c-eee1-4efd-9767-1de09b423e47" x="0" y="0" width="170" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[RINCIAN PELUNASAN INVOICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9be4b91e-cd5a-4284-b1eb-86658bff41f8" x="0" y="30" width="65" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4f041dae-a086-4804-b5aa-0bfffaca6b8f" x="0" y="43" width="65" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jatuh Tempo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2b815939-fe8e-4942-bea3-bd547a50205e" x="0" y="56" width="65" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="68b721f8-1ef4-42f4-8920-f10d9c176719" x="65" y="30" width="5" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="67fc8dd9-4c57-4fd1-99f0-d5414b275085" x="65" y="43" width="5" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="54b595ff-3a0a-4d4a-8890-3de2d2d9ae07" x="65" y="56" width="5" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fb1f350a-ca69-4ee7-a2e4-8b66cea06831" x="714" y="0" width="75" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaSoft Idempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f91d9f69-eb96-4e52-9433-1c3e3573feda" x="724" y="43" width="65" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Faktur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="aa7fdcdf-6259-4bf9-ba88-ea310aa6d3fd" x="477" y="56" width="59" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sales Penagih :]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement uuid="5a457887-a8ff-47d2-9904-118123eaaf42" x="698" y="56" width="100" height="13"/>
+			</rectangle>
+			<textField>
+				<reportElement uuid="ecc98e54-15ff-42b4-aa5f-d67a8280ca8d" x="710" y="56" width="79" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nofaktur}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="429eb115-2614-4646-8efc-a13ca8d08f96" x="536" y="56" width="125" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_sales}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="9f21391f-5057-40d7-9800-27112c807d02" x="605" y="1" width="105" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglsekrang}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement uuid="a250f0b6-886d-4cfb-8bfb-0d1c825be259" x="70" y="30" width="100" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglinvoice}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement uuid="69073d48-39a3-45d5-a033-ed1c3d4020c4" x="70" y="43" width="100" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgljtempo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="5210084a-c301-4150-ba0c-8ab7a27eddec" x="70" y="56" width="100" height="13" forecolor="#000099"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kd_cus}+' - '+$F{nmcustomer}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="33" splitType="Stretch">
+			<rectangle>
+				<reportElement uuid="4452d9e5-ff66-4e8b-972f-2a5b43ef4c43" x="0" y="0" width="798" height="33"/>
+			</rectangle>
+			<rectangle>
+				<reportElement uuid="071d65a0-c2ec-497e-a2d4-adb6e7841274" x="225" y="11" width="473" height="11"/>
+			</rectangle>
+			<rectangle>
+				<reportElement uuid="e18450f4-7656-4c39-9f48-18bd78dd86aa" x="225" y="0" width="473" height="11"/>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="e0221065-4cb8-408d-aaf9-9c84cfcc77c1" x="84" y="6" width="49" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b5802a61-fd89-4a85-aa56-86cb16bbf79f" x="17" y="6" width="67" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Kode Pelunasan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="50361ce1-d292-4f9e-83b2-46a0a11c83b9" x="1" y="6" width="13" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b10952b3-916d-4638-b496-c44b5ed7dc73" x="135" y="6" width="49" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sales]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61c8ea53-42ed-4c31-ac58-ec7dca558033" x="225" y="12" width="55" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tunai]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b7a211d4-8d51-417a-954d-e6fe9c8eb256" x="231" y="0" width="457" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[T I P E     P E L U N A S A N]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d5b63f06-bc9d-4152-a073-fdf087033626" x="283" y="12" width="67" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Transfer Bank]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c22a5b02-ad37-47db-b0ef-e3aaa4361538" x="351" y="12" width="68" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Discount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a7c0c03a-287c-43c2-8181-8c9630d20ee6" x="420" y="12" width="65" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Retur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a3510996-2165-4993-a23c-cdfdb56c9b1a" x="486" y="12" width="61" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Giro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="48200ff2-839a-48ac-8682-7811cd10bdea" x="549" y="12" width="62" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nota Kredit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a77ac5a4-463d-43e4-8cbb-ab096f240bc2" x="613" y="12" width="85" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Deskripsi Pelunasan]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement uuid="63f1e1e5-efcb-45c8-b2f7-a76421ebcb9f" x="0" y="22" width="798" height="11"/>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="fec5ef39-c2c8-4e69-98e4-06948915c85a" x="699" y="5" width="99" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="51c12281-1ade-47a5-8609-9c05ded20092" x="710" y="22" width="79" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{total_faktur}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement uuid="5ef75279-236b-4867-b777-2fd554b31040" x="2" y="24" width="690" height="6" backcolor="#C0C0C0"/>
+				<graphicElement>
+					<pen lineColor="#FFFFFF"/>
+				</graphicElement>
+			</rectangle>
+			<line>
+				<reportElement uuid="125bca02-5f06-4f29-b7a3-81c38b1130a4" x="224" y="0" width="1" height="33"/>
+			</line>
+			<line>
+				<reportElement uuid="27f8d3ed-0c6c-4cd4-b06b-04ce070e6ae2" x="282" y="11" width="1" height="22"/>
+			</line>
+			<line>
+				<reportElement uuid="5479d568-2c18-4414-8338-bca69c7ef7e3" x="548" y="11" width="1" height="22"/>
+			</line>
+			<line>
+				<reportElement uuid="a02955aa-c403-4d92-a0a7-aeaae1af1d3f" x="350" y="11" width="1" height="22"/>
+			</line>
+			<line>
+				<reportElement uuid="2d3db79e-ec90-4c36-806c-bdcf03af63ae" x="419" y="11" width="1" height="22"/>
+			</line>
+			<line>
+				<reportElement uuid="ba8a6110-41da-4a5a-b561-94d115c6cf96" x="485" y="11" width="1" height="22"/>
+			</line>
+			<line>
+				<reportElement uuid="799df7d4-3c09-420f-b2b2-8c311679dc98" x="611" y="11" width="1" height="22"/>
+			</line>
+			<line>
+				<reportElement uuid="c3f08778-bfbd-4c30-a289-76bc3327fbb3" x="698" y="0" width="1" height="33"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement uuid="35374e15-0eb7-45c1-ba8e-880014c00a3f" x="2" y="1" width="12" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="617f8642-c80e-4b64-9065-b48b1737b23b" x="17" y="1" width="67" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement uuid="d8bf1282-93fe-4b23-8056-7ddd715a4445" x="84" y="1" width="49" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tanggal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d38e93b8-4120-4e47-91be-1a85edc367d2" x="135" y="1" width="79" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_sales}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="deefef2a-96ef-4a4b-ae6c-b14ddc1fe3b8" x="224" y="0" width="1" height="12"/>
+			</line>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="687a7f8d-8d7c-49eb-abc2-64c5c586f809" x="225" y="1" width="55" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tunai}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="124e659a-d571-4db0-a31d-ce28d03a8b5a" x="357" y="1" width="58" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="a0a4da70-8b44-4ed7-8d39-4820e201d7c7" x="288" y="1" width="58" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{transfer}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="d3ab2748-88b6-41b7-b2ba-d793aa84fdd0" x="425" y="1" width="58" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{retur}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="f607f348-cb3b-4a89-b740-0df0aa5c0bb1" x="489" y="1" width="58" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{giro}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c87a1912-a17d-49d2-8970-cdd451ac6f6f" x="551" y="1" width="58" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{notakredit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f4a9986b-28d6-4aea-b819-4c7e6f4f2a0c" x="613" y="1" width="79" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="bc82ca82-eee1-41c4-83d2-6e59247d8d0e" x="710" y="1" width="79" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TtipePelunasan}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="8bf5c6c1-218b-4812-9343-b4e953aa0a7c" x="282" y="0" width="1" height="12"/>
+			</line>
+			<line>
+				<reportElement uuid="0f3b713a-8287-40a8-bbe9-8894787cbad6" x="350" y="0" width="1" height="12"/>
+			</line>
+			<line>
+				<reportElement uuid="ade21de5-c83b-4faa-9397-995fb8dbdef8" x="419" y="0" width="1" height="12"/>
+			</line>
+			<line>
+				<reportElement uuid="3a8c64ac-77af-451e-a473-8baf4f01ff03" x="485" y="0" width="1" height="12"/>
+			</line>
+			<line>
+				<reportElement uuid="77cb66e1-2b3b-4610-bbb8-ab4df02aee84" x="611" y="0" width="1" height="12"/>
+			</line>
+			<line>
+				<reportElement uuid="3ac0faba-6b8b-4bce-9325-1c5498330532" x="698" y="0" width="1" height="12"/>
+			</line>
+			<line>
+				<reportElement uuid="a434721e-7ef1-47db-9cdf-96c39b0f33bf" x="548" y="0" width="1" height="12"/>
+			</line>
+			<line>
+				<reportElement uuid="fac1c085-1339-4b29-87d5-d970a9ce7dca" x="698" y="-11" width="1" height="11"/>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

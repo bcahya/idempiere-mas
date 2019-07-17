@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintSuratJalanEkspedisi" language="groovy" pageWidth="612" pageHeight="396" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7c0c71bd-b79f-4f85-bc23-41b01ea0c8b0">
+	<property name="ireport.zoom" value="1.2100000000000029"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Shipping_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_User_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT sh.DocumentNo AS Number, exp.DocumentNo as DO, sh.DateDoc AS Date, ar.Name AS Armada, ei.ProductName AS Item, (CASE WHEN ei.M_Product_ID > 0 THEN uomconversiontostr(ei.M_Product_ID, ei.Qty) ELSE CEILING(ei.Qty) || ' ' || COALESCE(UOM.UOMSymbol, UOM.Name) END) AS QtyUOM, usr.Name AS Adm, sh.Driver AS Driver, COALESCE(ei.Description,'') AS desc, es.UNS_ExpeditionSign_ID AS signid, es.BPartnerName AS Partner, es.Address AS Address
+FROM UNS_Shipping sh
+INNER JOIN UNS_Armada ar ON ar.UNS_Armada_ID = sh.UNS_Armada_ID
+INNER JOIN AD_User usr ON usr.AD_User_ID = $P{AD_User_ID}
+INNER JOIN UNS_ShippingFreight sf ON sf.UNS_Shipping_ID = sh.UNS_Shipping_ID
+INNER JOIN UNS_Expedition exp ON exp.UNS_Expedition_ID = sf.UNS_Expedition_ID
+INNER JOIN UNS_ExpeditionDetail ed ON ed.UNS_Expedition_ID = exp.UNS_Expedition_ID
+INNER JOIN UNS_ExpeditionSign es ON es.UNS_ExpeditionDetailSO_ID = ed.UNS_ExpeditionDetail_ID
+INNER JOIN UNS_ExpeditionItems ei ON ei.UNS_ExpeditionSign_ID = es.UNS_ExpeditionSign_ID
+INNER JOIN C_UOM uom ON uom.C_UOM_ID = ei.C_UOM_ID
+
+WHERE sh.UNS_Shipping_ID = $P{UNS_Shipping_ID}
+
+ORDER BY TRIM(es.BPartnerName) ASC]]>
+	</queryString>
+	<field name="number" class="java.lang.String"/>
+	<field name="do" class="java.lang.String"/>
+	<field name="date" class="java.sql.Timestamp"/>
+	<field name="armada" class="java.lang.String"/>
+	<field name="item" class="java.lang.String"/>
+	<field name="qtyuom" class="java.lang.String"/>
+	<field name="adm" class="java.lang.String"/>
+	<field name="driver" class="java.lang.String"/>
+	<field name="desc" class="java.lang.String"/>
+	<field name="signid" class="java.math.BigDecimal"/>
+	<field name="partner" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<group name="sign" isStartNewPage="true" footerPosition="ForceAtBottom">
+		<groupExpression><![CDATA[$F{signid}]]></groupExpression>
+		<groupHeader>
+			<band height="102">
+				<staticText>
+					<reportElement uuid="da01e54f-028b-47ba-8939-87d9683a020e" x="0" y="85" width="93" height="17"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[BANYAKNYA]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="fa84ec33-16d0-4be9-bb5d-2fbe85dfe8c7" x="93" y="85" width="249" height="17"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[NAMA BARANG]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="ae911c73-ce9b-4929-b3fa-6d0db8958190" x="342" y="85" width="228" height="17"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[KETERANGAN]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="e0557274-527d-4a91-9cd4-c1f6dcdc7b46" x="0" y="69" width="572" height="17"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Dengan kendaraan No. Polisi " + $F{armada} + " kami ada kirim barang tersebut dibawah ini"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="5f039046-a3a5-4155-8f8c-40998b4a2172" x="77" y="35" width="113" height="17"/>
+					<box leftPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="da01e54f-028b-47ba-8939-87d9683a020e" x="0" y="35" width="77" height="17"/>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[No.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="da01e54f-028b-47ba-8939-87d9683a020e" x="0" y="52" width="77" height="17"/>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[No DO.]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="5f039046-a3a5-4155-8f8c-40998b4a2172" x="77" y="52" width="113" height="17"/>
+					<box leftPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{do}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="da01e54f-028b-47ba-8939-87d9683a020e" x="330" y="35" width="50" height="17"/>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Tuan]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="da01e54f-028b-47ba-8939-87d9683a020e" x="330" y="52" width="50" height="17"/>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Toko]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="5f039046-a3a5-4155-8f8c-40998b4a2172" x="380" y="35" width="192" height="17"/>
+					<box leftPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{partner}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="5f039046-a3a5-4155-8f8c-40998b4a2172" x="380" y="52" width="192" height="17"/>
+					<box leftPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="a6965f4a-637c-464a-80a4-76498bbde465" x="0" y="0" width="572" height="20"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["B. Lampung, " + new SimpleDateFormat("dd-MM-yyyy").format($F{date})]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="da01e54f-028b-47ba-8939-87d9683a020e" x="0" y="18" width="570" height="17"/>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<text><![CDATA[SURAT JALAN]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="75">
+				<staticText>
+					<reportElement uuid="b62f67ee-015a-4954-bb11-d80b0d97fea3" x="0" y="0" width="190" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Hormat Kami,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="f8a5eea5-4375-4d4a-bb68-d0625d779b13" x="190" y="0" width="190" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Supir,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="f6c4b3f6-89b8-4b30-9815-61ca2d94e7a8" x="380" y="0" width="190" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Tanda Terima,]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="7247ac07-0c65-4c17-9935-e46fb8bd8945" x="0" y="58" width="190" height="17"/>
+					<textElement textAlignment="Center">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{adm}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="7247ac07-0c65-4c17-9935-e46fb8bd8945" x="190" y="58" width="190" height="17"/>
+					<textElement textAlignment="Center">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{driver}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="e7cae9d3-5a3b-4085-aa0d-cddd8de67d95" x="380" y="58" width="190" height="17"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[(.................................................................)]]></text>
+				</staticText>
+				<line>
+					<reportElement uuid="2857a52c-2740-45bb-a91f-77feedfd0600" x="0" y="0" width="570" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<detail>
+		<band height="17">
+			<textField pattern="#,##0">
+				<reportElement uuid="7247ac07-0c65-4c17-9935-e46fb8bd8945" x="0" y="0" width="93" height="17"/>
+				<box leftPadding="0" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qtyuom}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7294d12c-71f5-4e22-84de-0f879c91d9f6" x="93" y="0" width="249" height="17"/>
+				<box leftPadding="4">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{item}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7294d12c-71f5-4e22-84de-0f879c91d9f6" x="342" y="0" width="228" height="17"/>
+				<box leftPadding="4">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{desc}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SuratPermohonanPengeluaranBarang" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a8a99af4-b706-43f6-ba74-7498f34807f7">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="57"/>
+	<parameter name="DateFrom" class="java.util.Date"/>
+	<parameter name="DateTo" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[SELECT
+mp.name AS Product,
+iol.qtyEntered AS Qty,
+uom.name AS UOM,
+io.M_InOut_ID as ioID,
+io.dateordered as dateordered
+
+FROM M_InOut io
+INNER JOIN M_InOutLine iol ON iol.M_InOut_ID = io.M_InOut_ID
+INNER JOIN M_Product mp ON mp.M_Product_ID = iol.M_Product_ID
+INNER JOIN C_UOM uom ON uom.C_UOM_ID = iol.C_UOM_ID
+
+WHERE io.dateordered BETWEEN $P{DateFrom} AND $P{DateTo}]]>
+	</queryString>
+	<field name="product" class="java.lang.String"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="uom" class="java.lang.String"/>
+	<field name="ioid" class="java.math.BigDecimal"/>
+	<field name="dateordered" class="java.sql.Timestamp"/>
+	<variable name="No" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$F{product}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="236" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="4766c03b-430c-422d-913e-54922746933d" x="101" y="182" width="100" height="12"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[di tempat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1d85fafa-5ed4-4030-bcee-735cca2268b7" x="41" y="171" width="48" height="11"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Kepada yth :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="68739bb6-cb41-4f6a-ac73-ea338d2e2604" x="52" y="211" width="474" height="11"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Mohon agar dapat dikeluarkan material yang tersebut dibawah ini dari gudang Kawasan Berikat ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="153bd67c-7bbb-4088-a181-dcfb801e0691" x="41" y="222" width="145" height="13"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[untuk keperluan Produksi :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a31aabc1-cb89-49d3-aef0-96b5574d9998" x="41" y="197" width="63" height="11"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Dengan hormat,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="165b0a0b-ba8a-44a8-871a-8b14563299f1" x="101" y="171" width="120" height="11"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Ka. Hanggar Bea Cukai PT PSG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a94774a6-a828-4ad9-979c-fd6391b0de70" x="162" y="149" width="245" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[SURAT PERMOHONAN PENGELUARAN BARANG]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="7012a3af-ac0f-43ca-a5bd-217b85dace10" x="41" y="143" width="471" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="688f5e9e-7487-405c-9333-3293fb11d112" x="57" y="120" width="32" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ISO 9001-2000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5e336851-8a0c-455c-afed-85600561010c" x="130" y="130" width="37" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[HACCP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9a52c37f-e59b-4722-a7c6-d8d1c90cd886" x="201" y="120" width="37" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BRC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c21d2b0c-be3e-47e9-a6e1-be60652ab4e7" x="281" y="120" width="37" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ISO 14001:2004]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0801eaa2-e1d8-4495-8242-61e738b7c651" x="370" y="120" width="37" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[OHSAS 18001]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7af672ab-7e67-49ba-84ca-3514d9686fde" x="452" y="120" width="37" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ISO 17025]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="7d57858c-fe32-4196-b6dd-71385affb2cb" x="41" y="71" width="471" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="19ce5962-20a5-4ae4-b213-cb496ef3badb" x="130" y="59" width="32" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Email : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="78d17972-fb96-4a58-9d51-d0e493e2b3a1" x="162" y="59" width="100" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[p1-general@kara.co.id]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="93320cf6-c4a2-444a-837a-184809002c6d" x="130" y="47" width="32" height="12"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Tel    :	]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="78d17972-fb96-4a58-9d51-d0e493e2b3a1" x="162" y="47" width="100" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[(62) 779 552888]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0de82983-58d1-48f4-bf3a-f3ff31264c79" x="263" y="47" width="32" height="12"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Fax    :	]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="78d17972-fb96-4a58-9d51-d0e493e2b3a1" x="295" y="47" width="100" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[(62) 779 552888]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d6f821e0-ac74-4ab0-8f8a-d83b1655aa98" x="130" y="35" width="277" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Sungai Guntung, Kec Kateman, Kab Indragiri Hilir, Riau 29255 - Indonesia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="83cdcbde-7406-4869-849c-8628bafc76ca" x="130" y="15" width="188" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PT PULAU SAMBU GUNTUNG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="688f5e9e-7487-405c-9333-3293fb11d112" x="57" y="130" width="32" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="4"/>
+				</textElement>
+				<text><![CDATA[ID08/0724]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9a52c37f-e59b-4722-a7c6-d8d1c90cd886" x="201" y="130" width="37" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="4"/>
+				</textElement>
+				<text><![CDATA[GB04/60928]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c21d2b0c-be3e-47e9-a6e1-be60652ab4e7" x="281" y="130" width="37" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="4"/>
+				</textElement>
+				<text><![CDATA[AJA03/6790]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0801eaa2-e1d8-4495-8242-61e738b7c651" x="370" y="130" width="37" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<text><![CDATA[AP/IN/04/HS/059]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7af672ab-7e67-49ba-84ca-3514d9686fde" x="452" y="130" width="37" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<text><![CDATA[LP-167-IDN]]></text>
+			</staticText>
+			<image>
+				<reportElement uuid="db8a5314-381f-4659-a985-4818aad14f67" x="41" y="15" width="89" height="56"/>
+				<imageExpression><![CDATA["images/logo_sambugroup.PNG"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement uuid="35a4a511-c69b-4581-ae7d-75793af93dc4" x="47" y="82" width="52" height="38"/>
+				<imageExpression><![CDATA["images/iso9001-2000.gif"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement uuid="8e4c6890-4574-443f-b0a0-b42efac42e01" x="124" y="82" width="49" height="38"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<imageExpression><![CDATA["images/edit haccp1.png"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement uuid="1a356bf1-dc62-4d51-96ed-4845c7b7de0e" x="186" y="82" width="59" height="38"/>
+				<imageExpression><![CDATA["images/BRC.jpg"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement uuid="ddd580af-c445-4c68-990f-6bbe4ac2b4ab" x="263" y="82" width="62" height="38"/>
+				<imageExpression><![CDATA["images/ISO14001-ukas.JPG"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement uuid="ef24c096-091e-4402-aea9-2245844c5efc" x="359" y="82" width="58" height="38"/>
+				<imageExpression><![CDATA["images/ohsas.png"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement uuid="cac87348-7139-477e-8f64-095d070175bd" x="436" y="82" width="58" height="38"/>
+				<imageExpression><![CDATA["images/KAN.jpg"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="6" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="6" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement uuid="60815922-91ad-4f5f-b9d0-c893bb7630e6" x="57" y="0" width="338" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{product}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="15fc4572-e6dd-404a-87ca-884bb84d50fb" x="395" y="0" width="74" height="11"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f98e02ee-e09c-45c1-86ae-dc39e49ce1d4" x="469" y="0" width="43" height="11"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{uom}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b3258adb-b6ef-438b-a5d1-1beb578c20f9" x="36" y="0" width="14" height="11"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{No}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="11" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="10" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="162" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="5962523f-08ce-41c7-be22-7e5b865f46ac" x="73" y="11" width="455" height="20"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Demikian permohonan ini kami buat atas perhatian dan kerjasamanya kami ucapkan terima kasih]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c8f800f7-b68f-4958-91cf-12e0e9de7dbb" x="36" y="31" width="137" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Sei Guntung,      .      .  2012]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="67580021-b2df-448c-87be-e5ea61ce810f" x="36" y="63" width="63" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Pemohon]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d8e16628-3335-4f1d-8f5b-5dcc468c7705" x="407" y="46" width="72" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Disetujui oleh,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e83be1d9-4a06-4fa1-8d81-9d40fa44cbfa" x="407" y="63" width="72" height="14"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ka. Hanggar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="265681e2-72b3-45f6-a76c-cb0be5d255dd" x="36" y="77" width="94" height="43"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="06c26840-0d34-4ec1-8f87-7dc21ccf327c" x="36" y="120" width="94" height="20"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Reymond Julius]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d9bf1226-6b57-4d27-b552-6802cb8663b0" x="36" y="140" width="94" height="20"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MGR - WHS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a0fcf533-ec80-464a-bbdd-ccac1adfce32" x="407" y="77" width="94" height="43"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3ba1e608-92d9-4bf1-80ac-4dbba7204097" x="407" y="120" width="94" height="20"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Mukhlis Musa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1425e37c-5711-405f-bde4-be289decfa14" x="407" y="140" width="94" height="20"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[196208271981081001]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

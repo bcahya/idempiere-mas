@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintDriverPerPackingList" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="14819d3d-90ee-47a9-a03c-67b75f9e222e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DocumentNo" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT pl.documentno as nodcoument,pl.datedoc as tanggal,xp.documentno as joborder,xp.datedoc as tgljob,coalesce(xp.description,'') as Keterangan,
+xpjj.documentno as jobspeckno,xpjj.datedoc as tglspek,ar.name as nmarmada,sh.driver,sh.documentno as noShipping
+FROM UNS_PackingList as pl
+LEFT JOIN UNS_ExpeditionDetail xd on xd.UNS_PackingList_ID=pl.UNS_PackingList_ID
+LEFT JOIN UNS_Expedition xp on xp.uns_expedition_id=xd.uns_expedition_id
+--INNER JOIN UNS_ExpeditionDetail xpj on xpj.uns_expedition_id=xp.uns_expedition_id
+LEFT JOIN UNS_Expedition xpjj on xpjj.jobso_id=xp.uns_expedition_id
+LEFT JOIN UNS_ShippingFreight shf on shf.uns_expedition_id=xpjj.uns_expedition_id
+LEFT JOIN UNS_Shipping sh on sh.UNS_Shipping_id=shf.uns_shipping_id
+LEFT JOIN UNS_Armada ar on sh.uns_armada_id=ar.uns_armada_id
+where pl.documentno=$P{DocumentNo}]]>
+	</queryString>
+	<field name="nodcoument" class="java.lang.String"/>
+	<field name="tanggal" class="java.sql.Timestamp"/>
+	<field name="joborder" class="java.lang.String"/>
+	<field name="tgljob" class="java.sql.Timestamp"/>
+	<field name="keterangan" class="java.lang.String"/>
+	<field name="jobspeckno" class="java.lang.String"/>
+	<field name="tglspek" class="java.sql.Timestamp"/>
+	<field name="nmarmada" class="java.lang.String"/>
+	<field name="driver" class="java.lang.String"/>
+	<field name="noshipping" class="java.lang.String"/>
+	<pageHeader>
+		<band height="70" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="50" width="752" height="20" uuid="99cb1659-c715-44f7-aaa0-11f7237de163"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="752" height="13" uuid="a5674b9d-a5db-460a-90d1-3b775ff7b5e3"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[PRINT DATA SUPIR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="50" width="90" height="20" uuid="05ca93d9-cdea-4c24-826d-604f0129f22c"/>
+				<text><![CDATA[No.Packing List]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="90" y="50" width="90" height="20" uuid="cb1879a5-c493-416c-bb2e-51f81bfb0bb4"/>
+				<text><![CDATA[Tgl. Packing]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="50" width="216" height="20" uuid="ffd1e943-bd5c-47bc-9460-5281694ad492"/>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="396" y="50" width="67" height="20" uuid="edb3dae1-b2c4-4651-b784-f3f155b9e731"/>
+				<text><![CDATA[Job.Order]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="463" y="50" width="67" height="20" uuid="d5199244-9a9b-48c7-8126-5d3b4b67fc75"/>
+				<text><![CDATA[Job.Speck]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="530" y="50" width="67" height="20" uuid="dbfa272f-e9e5-4270-8966-c34fb89dfa13"/>
+				<text><![CDATA[Armada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="597" y="50" width="92" height="20" uuid="d4093963-2d81-4d06-a00c-d5e0ef99d8a8"/>
+				<text><![CDATA[Supir]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="90" height="14" uuid="f55ced65-860a-4ca1-b494-f1cfd840d7a8"/>
+				<textFieldExpression><![CDATA[$F{nodcoument}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="90" y="0" width="90" height="14" uuid="13396839-04e6-44c9-bf58-dc65dab356da"/>
+				<textFieldExpression><![CDATA[$F{tanggal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="0" width="216" height="14" uuid="53b8cc32-d080-4378-8388-a56b2b97dc32"/>
+				<textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="396" y="0" width="67" height="14" uuid="37538923-b661-49ce-90cf-7404878419f6"/>
+				<textFieldExpression><![CDATA[$F{joborder}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="463" y="1" width="67" height="13" uuid="fb21cf28-8e55-4168-a93e-d8de200a28e3"/>
+				<textFieldExpression><![CDATA[$F{noshipping}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="530" y="0" width="67" height="14" uuid="0e96aaf7-0d5d-4d5b-a377-44c309bc8b0c"/>
+				<textFieldExpression><![CDATA[$F{nmarmada}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="597" y="1" width="155" height="13" uuid="e521fc2c-dac0-4831-92b8-e844b2a7d980"/>
+				<textFieldExpression><![CDATA[$F{driver}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+</jasperReport>

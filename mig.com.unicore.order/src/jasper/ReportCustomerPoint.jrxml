@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportCustomerPoint" language="groovy" pageWidth="612" pageHeight="396" orientation="Landscape" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="585c085c-2db0-412b-b34a-73d7c2cc84c4">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="15"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT
+     now(),
+     bp."name" AS nama,
+     cpoint."starttrxdate" AS sdate,
+     cpoint."latesttrxdate" AS ldate,
+     pd."name" AS produkvalid,
+     pdid."name" AS produknotvalid,
+     cpline."qty" AS jmlvalid,
+     cpl."qty" AS jmlnotvalid,
+     cpline."point" AS poinvalid,
+     cpl."point" AS poinnotvalid
+FROM
+     "uns_customerpoint" cpoint
+     INNER JOIN "c_bpartner" bp ON cpoint."c_bpartner_id" = bp."c_bpartner_id"
+     INNER JOIN "uns_customerpoint_line" cpline ON cpoint."uns_customerpoint_id" = cpline."uns_customerpoint_id"
+     INNER JOIN "uns_customerpoint_line" cpl ON cpoint."uns_customerpoint_id" = cpl."uns_customerpoint_id"
+     INNER JOIN "m_product" pd ON cpline."m_product_id" = pd."m_product_id"
+     INNER JOIN "m_product" pdid ON cpl."m_product_id" = pdid."m_product_id"
+
+
+WHERE
+     bp.C_BPartner_ID = $P{C_BPartner_ID}]]>
+	</queryString>
+	<field name="now" class="java.sql.Timestamp"/>
+	<field name="nama" class="java.lang.String"/>
+	<field name="sdate" class="java.sql.Timestamp"/>
+	<field name="ldate" class="java.sql.Timestamp"/>
+	<field name="produkvalid" class="java.lang.String"/>
+	<field name="produknotvalid" class="java.lang.String"/>
+	<field name="jmlvalid" class="java.math.BigDecimal"/>
+	<field name="jmlnotvalid" class="java.math.BigDecimal"/>
+	<field name="poinvalid" class="java.math.BigDecimal"/>
+	<field name="poinnotvalid" class="java.math.BigDecimal"/>
+	<variable name="poinvalid" class="java.lang.String" calculation="Sum"/>
+	<variable name="poinvalid_1" class="java.math.BigDecimal" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{poinvalid}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="41" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="23" uuid="287843af-0708-4b8b-a42d-647bd34f385b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="false"/>
+				</textElement>
+				<text><![CDATA[LAPORAN POIN PELANGGAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="21" width="572" height="20" uuid="f183b70f-7a3b-4d94-b58f-9f13b5b46040"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[TEDMOND GROUP]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="45" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="108" height="15" uuid="46940599-8f4b-4817-ac1d-f09779fd75e1"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Tanggal Cetak]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="108" y="0" width="10" height="15" uuid="4b3ffdb2-0ed4-48c4-b7c3-be2b32b74794"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="118" y="0" width="100" height="15" uuid="3e1d90c5-e160-4341-af01-ce91891311c2"/>
+				<textFieldExpression><![CDATA[$F{now}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="30" width="108" height="15" uuid="e4c44488-1a66-46be-89cc-50bb52ef2112"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Tanggal Awal Transaksi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="108" y="30" width="10" height="15" uuid="f262d633-3fa1-4ba0-acba-ff057ef3fffc"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="118" y="30" width="100" height="15" uuid="04183478-a344-4379-bf68-714f1ffe9dff"/>
+				<textFieldExpression><![CDATA[$F{sdate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="354" y="30" width="108" height="15" uuid="87bd1958-3fdc-49e4-a0b5-de0877b512ce"/>
+				<text><![CDATA[Tanggal Akhir Transaksi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="462" y="30" width="10" height="15" uuid="3e77f038-9d44-4318-a444-8bab0b8b7edf"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="472" y="30" width="100" height="15" uuid="50ac765f-1e74-4a1a-ba04-b16a2c873398"/>
+				<textFieldExpression><![CDATA[$F{ldate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="15" width="108" height="15" uuid="2816e909-263c-49bd-b939-f5085775a1bf"/>
+				<text><![CDATA[Pelanggan ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="108" y="15" width="10" height="15" uuid="b4dde10e-e112-4565-b21a-9ca4f78b4cf6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="118" y="15" width="153" height="15" uuid="ae6284d7-1a87-4aae-9a61-c66252e4739a"/>
+				<textFieldExpression><![CDATA[$F{nama}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="43" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="300" height="40" uuid="a9eb8fb4-c2df-47ee-af6c-74b5a26bf79f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Nama Produk]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="0" width="136" height="20" uuid="a89278c5-ccf6-4308-88c7-0932f84c1709"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Poin Valid]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="436" y="0" width="136" height="20" uuid="11689e24-9992-4ba6-a375-6fface47b2a3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Poin Belum Valid]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="371" y="20" width="65" height="20" uuid="3692403c-1cad-41cb-b654-202632a44211"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Poin]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="20" width="71" height="20" uuid="7099586f-1a0c-45f7-9499-8c4259f800c6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Jumlah Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="436" y="20" width="71" height="20" uuid="2bec1d51-076e-416f-93de-e49d7b1f1fb0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Jumlah Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="507" y="20" width="65" height="20" uuid="4dbc9202-fe00-4c76-8141-9dacc8babd6d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Poin]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="0" width="572" height="1" uuid="a9e0c56f-bde7-498f-a727-b53aeb3942bc"/>
+			</line>
+			<line>
+				<reportElement x="300" y="20" width="272" height="1" uuid="c1ea2b1c-cc4e-4970-91ce-ccf394f8aae4"/>
+			</line>
+			<line>
+				<reportElement x="1" y="42" width="571" height="1" uuid="2b6adbeb-5426-4592-b9c3-3bef60e1e0ca"/>
+			</line>
+			<line>
+				<reportElement x="572" y="1" width="1" height="42" uuid="6a5b05af-a758-47f3-a1ed-5b8a0a539917"/>
+			</line>
+			<line>
+				<reportElement x="300" y="1" width="1" height="42" uuid="9dd04f3f-c75b-4f1c-92ed-f70959080e82"/>
+			</line>
+			<line>
+				<reportElement x="436" y="1" width="1" height="41" uuid="5afb4370-6b92-4a18-b5c3-b52049894a9e"/>
+			</line>
+			<line>
+				<reportElement x="507" y="21" width="1" height="21" uuid="dd72c5ba-9c42-4fe6-956d-3f7657eab09e"/>
+			</line>
+			<line>
+				<reportElement x="371" y="20" width="1" height="23" uuid="871da2cc-ad2a-4a8d-8f10-4cd2f84d24b4"/>
+			</line>
+			<line>
+				<reportElement x="0" y="1" width="1" height="42" uuid="1d6af4cc-4393-4037-b7c6-13fd1c056690"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="300" height="20" uuid="72e1828f-adb2-4b2e-9459-1cbd15607029"/>
+				<textFieldExpression><![CDATA[$F{produkvalid}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="300" y="0" width="71" height="20" uuid="f8dd4fb2-8749-4636-bbae-59b7c6dc7d83"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{jmlvalid}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="372" y="1" width="64" height="20" uuid="e0f1fdf4-5741-4762-b546-8e8c74ebb256"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{poinvalid}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="507" y="0" width="65" height="20" uuid="87676f0d-9de0-4a7c-bc89-3bb036f6d985"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{poinnotvalid}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="572" y="0" width="1" height="23" uuid="df64c70b-b9d4-4261-a786-9d6dee54964c"/>
+			</line>
+			<line>
+				<reportElement x="507" y="0" width="1" height="23" uuid="2ed4cc9d-1882-40e2-94ac-2d6b356b7da1"/>
+			</line>
+			<line>
+				<reportElement x="436" y="0" width="1" height="23" uuid="e50c17b3-980d-4452-a05c-2222098b79e6"/>
+			</line>
+			<line>
+				<reportElement x="371" y="0" width="1" height="23" uuid="c401a7c4-15ca-48df-b0e1-173dddd34885"/>
+			</line>
+			<line>
+				<reportElement x="300" y="0" width="1" height="23" uuid="4476b557-4195-45f9-9ca5-a9d3691806b6"/>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="1" height="23" uuid="80dc6a20-1ce0-4955-ac64-fe7d70c2cf6d"/>
+			</line>
+			<line>
+				<reportElement x="1" y="21" width="571" height="1" uuid="09dee95c-0634-47cd-8856-c2e9cf59e120"/>
+			</line>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="437" y="1" width="70" height="20" uuid="eaec8bb4-932c-404a-8033-922d2bbef92e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{jmlnotvalid}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="42" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="421" height="20" uuid="f5d6b6f3-6b81-416b-8d67-3a2f5072d7c1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Jumlah Poin yang didapat ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="421" y="0" width="15" height="20" uuid="f994a497-0e3d-4a8e-91cb-bc3a5180e1f6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="###0">
+				<reportElement x="436" y="0" width="71" height="20" uuid="c5e8b6a6-5db0-4bbd-aaed-0223cb476eb4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{poinvalid_1}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="19" width="571" height="1" uuid="2046d093-d7ac-4cc1-8c96-56cdd7fd4331"/>
+			</line>
+			<staticText>
+				<reportElement x="2" y="20" width="174" height="12" uuid="29798261-9a62-48f4-ad18-a74b2a2c1b5f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[* Status Valid jika Faktur Telah Lunas]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

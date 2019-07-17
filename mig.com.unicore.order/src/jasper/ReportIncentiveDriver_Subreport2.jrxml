@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RekapIncentiveDriver_Subreport1" language="groovy" pageWidth="612" pageHeight="792" columnWidth="592" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="6fb1009e-3763-4314-a253-3b8ecd9a5da7">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="Driver" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select data.driver,coalesce(data.remarks,' ') as remarks,data.week,
+SUM(data.PL_DKT) AS PL_DKT,
+SUM(data.PL_LKT) as PL_LKT,
+SUM(data.jml_not) as jml_nota,
+sum(data.jml_iv) as langsir
+from(
+select (CASE WHEN loc.C_City_ID = sh.Destination_ID THEN 'DK' ELSE 'LK' END) AS Status, week_of_month(sh.datedoc,1) as week,
+sh.documentno as noshipping, am.name as aramada,sh.driver as driver,count(DISTINCT pl.documentno) as jml_pl,
+count(DISTINCT ci.c_bpartner_id) as jml_not,0 as jml_iv,
+(CASE WHEN loc.C_City_ID = sh.Destination_ID THEN count(DISTINCT sh.documentno) ELSE 0 END) AS PL_DKT,
+(CASE WHEN loc.C_City_ID <> sh.Destination_ID THEN count(DISTINCT sh.documentno) ELSE 0 END) AS PL_LKT,em.remarks
+from uns_packinglist pl
+inner join uns_packinglist_order po on po.uns_packinglist_id=pl.uns_packinglist_id
+inner join c_invoice ci on ci.c_invoice_id=po.c_invoice_id and ci.docstatus in('CO','CL')
+inner join uns_shippingfreight shf on pl.uns_packinglist_id=shf.uns_packinglist_id
+inner join uns_shipping sh on shf.uns_shipping_id=sh.uns_shipping_id
+inner join uns_armada am on sh.uns_armada_id=am.uns_armada_id and am.isexternalarmada='N'
+INNER JOIN AD_OrgInfo inf ON inf.AD_Org_ID = sh.AD_Org_ID
+INNER JOIN C_Location loc ON loc.C_Location_ID = inf.C_Location_ID
+INNER JOIN UNS_Employee em on em.uns_employee_id=sh.uns_employee_id
+--and em.c_job_id in(select c_job_id from c_job where name='Driver')
+where pl.docstatus in('CO','CL')
+and pl.ispickup='N'
+and sh.datedoc between $P{StartDate} and $P{EndDate}
+and (case when $P{Driver}='DPST' then pl.ad_org_id in(select ad_org_id from ad_org where c_salesregion_id   in(select c_salesregion_id from c_salesregion where c_salesregion_id=1000000) and em.uns_employee_id in(1001132,1001249,1001274)) else 1=1 end)
+group by sh.documentno,am.name,sh.driver, loc.C_City_ID, sh.Destination_ID,sh.datedoc,em.remarks
+union all
+select (CASE WHEN loc.C_City_ID = sh.Destination_ID THEN 'DK' ELSE 'LK' END) AS Status, week_of_month(sh.datedoc,1) as week,
+sh.documentno as noshipping, am.name as aramada,sh.driver as driver,0 as jml_pl,
+0 as jml_not,count(DISTINCT sh.documentno) as jml_iv,0 as PL_DKT,0 AS PL_LKT,em.remarks
+from M_Movement mv
+inner join uns_shippingfreight shf on mv.m_movement_id=shf.m_movement_id
+inner join uns_shipping sh on shf.uns_shipping_id=sh.uns_shipping_id
+inner join uns_armada am on sh.uns_armada_id=am.uns_armada_id and am.isexternalarmada='N'
+INNER JOIN AD_OrgInfo inf ON inf.AD_Org_ID = sh.AD_Org_ID
+INNER JOIN C_Location loc ON loc.C_Location_ID = inf.C_Location_ID
+INNER JOIN UNS_Employee em on em.uns_employee_id=sh.uns_employee_id
+--and em.c_job_id in(select c_job_id from c_job where name='Driver')
+where mv.docstatus in('CO','CL')
+and sh.datedoc between $P{StartDate} and $P{EndDate}
+and (case when $P{Driver}='DPST' then mv.ad_org_id in(select ad_org_id from ad_org where c_salesregion_id in(
+select c_salesregion_id from c_salesregion where c_salesregion_id=1000000) and em.uns_employee_id
+in(1001132,1001249,1001274)) else 1=1 end)
+group by sh.documentno,am.name,sh.driver, loc.C_City_ID,sh.Destination_ID,sh.datedoc,em.remarks
+) data
+GRoup BY data.driver,data.week,data.remarks
+order by data.driver,data.week
+--order by data.week,data.driver]]>
+	</queryString>
+	<field name="driver" class="java.lang.String"/>
+	<field name="remarks" class="java.lang.String"/>
+	<field name="week" class="java.lang.Integer"/>
+	<field name="pl_dkt" class="java.math.BigDecimal"/>
+	<field name="pl_lkt" class="java.math.BigDecimal"/>
+	<field name="jml_nota" class="java.math.BigDecimal"/>
+	<field name="langsir" class="java.math.BigDecimal"/>
+	<variable name="No" class="java.lang.Integer" incrementType="Group" incrementGroup="Driver" calculation="Count">
+		<variableExpression><![CDATA[new Integer("0")]]></variableExpression>
+		<initialValueExpression><![CDATA[new Integer("0")]]></initialValueExpression>
+	</variable>
+	<variable name="JmlPL" class="java.lang.Number" resetType="Group" resetGroup="Driver" calculation="Sum">
+		<variableExpression><![CDATA[$F{pl_lkt}+$F{pl_dkt}]]></variableExpression>
+	</variable>
+	<variable name="Rppl" class="java.lang.Number" resetType="Group" resetGroup="Driver">
+		<variableExpression><![CDATA[$V{JmlPL}>=20 & $V{JmlPL}<=25 ? ($V{JmlPL}-20)*40000 : $V{JmlPL}>=25 ? ($V{JmlPL}-($V{JmlPL}-5))*40000 : 0]]></variableExpression>
+	</variable>
+	<variable name="Rppl2" class="java.lang.Number" resetType="Group" resetGroup="Driver" calculation="Sum">
+		<variableExpression><![CDATA[$V{JmlPL}>=26 ? ($V{JmlPL}-25)*50000: 0]]></variableExpression>
+	</variable>
+	<variable name="Incentive" class="java.lang.Number">
+		<variableExpression><![CDATA[$V{Rppl2}+$V{Rppl}]]></variableExpression>
+	</variable>
+	<group name="Driver">
+		<groupExpression><![CDATA[$F{driver}]]></groupExpression>
+		<groupHeader>
+			<band height="25">
+				<textField>
+					<reportElement x="17" y="0" width="107" height="13" uuid="7e674c59-f128-490e-a780-bb9dadb148b1"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{driver}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="17" height="13" uuid="70d2146c-f63d-4cec-a043-e497b0cdf418"/>
+					<textFieldExpression><![CDATA[$V{No}+1]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="17" y="13" width="259" height="12" uuid="661b5879-7f33-4ed1-aacf-53a0cc1afac5"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{remarks}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="53">
+				<line>
+					<reportElement x="0" y="0" width="592" height="1" uuid="14a873f9-5d33-49be-aba7-fd9f6da4c415"/>
+					<graphicElement>
+						<pen lineStyle="Dotted"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement x="0" y="1" width="157" height="15" uuid="bb2c31ba-e84d-4b5e-a298-add3a40cdf3a"/>
+					<text><![CDATA[Jumlah Packing LIst ----->]]></text>
+				</staticText>
+				<textField pattern="#,##0">
+					<reportElement x="157" y="1" width="119" height="15" uuid="afaac600-2115-4052-b48c-0de7f1665fa3"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{JmlPL}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="15" width="157" height="15" uuid="0cb33f29-1389-42c2-be8b-0a7ac76691cb"/>
+					<text><![CDATA[Pl >20 dan <= 25 Rp. 40.000,- =]]></text>
+				</staticText>
+				<textField pattern="#,##0">
+					<reportElement x="157" y="16" width="119" height="15" uuid="36987700-26e5-484e-a1cd-86b0919a96d4"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{Rppl}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="30" width="157" height="15" uuid="eaf16756-6c89-4ee1-9d69-d7c1efb199fa"/>
+					<text><![CDATA[Pl  > = 26      Rp. 50.000,- =]]></text>
+				</staticText>
+				<textField pattern="#,##0">
+					<reportElement x="157" y="31" width="119" height="14" uuid="ccade3c4-6a04-4a2e-bd35-0a212a0d8a06"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{Rppl2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0">
+					<reportElement x="408" y="0" width="167" height="44" uuid="2627258e-dbb4-4dd1-995f-6c0734eccddf"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Incentive}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement x="286" y="1" width="122" height="43" uuid="15ac328e-07ef-4b53-839f-c6242fb16d11"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Incentive yang di terima"]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="49" width="592" height="1" uuid="3b522840-c5b3-4a3d-b66a-2a714f7746e9"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<columnHeader>
+		<band height="45" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="43" width="592" height="1" uuid="7f23fc79-c332-43e6-8bf9-791829bdf886"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="0" width="592" height="15" uuid="e99fbba9-9298-4515-8ef0-850481d8e1c8"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[INCENTIVE PACKING LIST GROUP BULANAN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="11" width="592" height="15" uuid="dda7053b-24d8-4506-8273-c5f6143fe706"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode : "+new SimpleDateFormat('dd/MM/yyyy').format($P{StartDate})+" s/d "+new SimpleDateFormat('dd/MM/yyyy').format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="26" width="17" height="17" uuid="e3246dad-a6dd-4958-b852-e28532a05043"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="17" y="26" width="90" height="17" uuid="7a369461-2c86-4244-9e76-77c599c60bc6"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Driver]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="107" y="26" width="29" height="17" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Week]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="26" width="65" height="17" uuid="b9f2ad89-deaf-4854-a3b2-bd20a4873a87"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[PL (Dlm Kota)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="484" y="27" width="108" height="16" uuid="c7f8e642-2341-440a-acbd-9955017d35fe"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Tanda Tangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="201" y="26" width="75" height="17" uuid="b78ae75b-f9bb-444b-a883-d58a000054af"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[PL (Luar Kota)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="295" y="26" width="91" height="17" uuid="b2a46d56-4d58-4769-9882-bf4cf8673939"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Lembur (Luar Kota)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="386" y="26" width="98" height="17" uuid="850a7e4d-0974-4f42-b6c2-c18acd7d9662"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Lembur (Dalam Kota)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement x="107" y="0" width="29" height="14" uuid="af8ed2ce-6795-4bb4-a935-fcd5e7247eea"/>
+				<textFieldExpression><![CDATA[$F{week}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="136" y="0" width="65" height="14" uuid="5ca5d722-ea04-4273-a2fd-c13abd46eecb"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{pl_dkt}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="201" y="0" width="75" height="14" uuid="0166e06d-0e67-4999-859b-35738eb68870"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{pl_lkt}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

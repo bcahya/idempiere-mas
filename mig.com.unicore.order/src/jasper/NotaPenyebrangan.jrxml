@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="NotaPenyebrangan" language="groovy" pageWidth="610" pageHeight="394" columnWidth="580" leftMargin="10" rightMargin="20" topMargin="10" bottomMargin="5" uuid="6b9f9d70-fadc-415e-877e-2a84a2689457">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="192.168.1.212:5432/UniCoreFLG@RealTime-SebelumRevisiDivis"/>
+	<property name="ireport.zoom" value="1.0245201830476065"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Shipping_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[1000018]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+	org.name as org,
+	org.description as orgdescription,
+	orgloc.address1 as address,
+	orginfo.phone as phone,
+	orginfo.fax as fax,
+	vendor.name as vendor,
+	vendorregion.name as vendorregion,
+	armada.name as carnumber,
+	armadatype.name as armadatype,
+	cd.vouchercode as vouchercode,
+	ship.datedoc as datedoc,
+	ship.driver as driver
+from
+	uns_shipping ship
+inner join
+	ad_org org
+	on
+	org.ad_org_id = ship.ad_org_id
+inner join
+	ad_orginfo orginfo
+	on
+	 orginfo.ad_org_id = org.ad_org_id
+left join
+	c_location orgloc on orgloc.c_location_id = orginfo.c_location_id
+inner join
+	uns_charge_detail cd
+	on
+	cd.uns_shipping_id = ship.uns_shipping_id
+left join
+	c_bpartner vendor
+	on
+	vendor.c_bpartner_id = cd.c_bpartner_id
+left join
+	c_bpartner_location bploc
+	on
+	bploc.c_bpartner_location_id = cd.c_bpartner_location_id
+left join
+	uns_armada armada
+	on
+	armada.uns_armada_id = ship.uns_armada_id
+left join
+	uns_armadatype armadatype
+	on
+	armadatype.uns_armadatype_id = armada.uns_armadatype_id
+left join
+	c_region vendorregion
+	on
+	vendorregion.c_region_id = bploc.c_location_id
+where
+	ship.uns_shipping_id =  $P{UNS_Shipping_ID}
+and
+	cd.chargetype = 'VC'
+and
+	cd.isfuel = 'N']]>
+	</queryString>
+	<field name="org" class="java.lang.String"/>
+	<field name="orgdescription" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="phone" class="java.lang.String"/>
+	<field name="fax" class="java.lang.String"/>
+	<field name="vendor" class="java.lang.String"/>
+	<field name="vendorregion" class="java.lang.String"/>
+	<field name="carnumber" class="java.lang.String"/>
+	<field name="armadatype" class="java.lang.String"/>
+	<field name="vouchercode" class="java.lang.String"/>
+	<field name="datedoc" class="java.sql.Timestamp"/>
+	<field name="driver" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="379" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="590" height="17" uuid="853bba71-95f0-442d-8984-4db6894b26c6"/>
+				<box topPadding="5" leftPadding="5"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="17" width="590" height="17" uuid="3d4f5133-8960-41f6-97c5-6bced576f872"/>
+				<box topPadding="3" leftPadding="5"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{orgdescription}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="32" width="590" height="20" uuid="363e9167-66b5-4c44-9d53-c8f29651772f"/>
+				<box topPadding="3" leftPadding="5"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="40" y="52" width="100" height="16" uuid="1d59826e-a5c7-4b65-9e12-28c209e4866d"/>
+				<textFieldExpression><![CDATA[$F{phone}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="150" y="51" width="100" height="16" uuid="e9e41451-ff2f-4d1e-bdcd-23ee7acc53e9"/>
+				<textFieldExpression><![CDATA[$F{fax}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="120" y="52" width="30" height="15" uuid="a1154dc5-232a-48a6-9079-fdb882c218c6"/>
+				<text><![CDATA[Fax.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="52" width="37" height="17" uuid="b59acb3f-9170-42de-a115-410cbcc19d95"/>
+				<box leftPadding="5"/>
+				<text><![CDATA[Telp. ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="2" y="69" width="372" height="1" uuid="c68aad35-12db-4bf8-9c79-74f68ae35f2d"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="70" width="590" height="16" uuid="5b8ac53b-20e6-412b-8501-235c724a1c6d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[NOTA PENYEBRANGAN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="3" y="107" width="374" height="13" uuid="ecc161b0-7dbe-4b17-a4b3-95cef2236338"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Mohon diseberangkan kendaraan tersebut di bawah ini : "]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="33" y="133" width="73" height="13" uuid="badede87-6892-40cf-9a5e-1ce0457141f0"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[No. Polisi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="120" width="73" height="13" uuid="af4aac3c-e792-4b46-b053-219792bccc79"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[No. Nota]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="146" width="60" height="13" uuid="5b7113a1-4596-4e68-ae14-1a5f752f4a1f"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Isi Muatan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="106" y="144" width="10" height="13" uuid="5f587444-2e31-4d6d-8ccb-34cd9ea860b8"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="106" y="174" width="222" height="1" uuid="ac310d57-d6af-482f-87fe-0954b29f2ff3"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="106" y="155" width="222" height="1" uuid="be46e24e-d166-457b-b061-73200946d421"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="1" y="175" width="589" height="15" uuid="7be6b18b-06b5-4ef8-a670-738662d2497e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Biaya Penyebrangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="230" width="73" height="13" uuid="303b799a-129f-4a3f-9c05-ea480ac83f40"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="254" width="590" height="19" uuid="9ce529bd-f780-42cb-8f9d-a10d27b15cf5"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Demikian atas kerja sama yang baik kami ucapkan terima kasih.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="307" y="290" width="251" height="13" uuid="86ad922e-5be5-44eb-a52f-f26e0b674d0e"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Cap & TTD Pengirim]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="230" width="24" height="13" uuid="ffe69128-2ae9-48af-8010-70ff9b0739de"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[RP. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="16" y="290" width="147" height="13" uuid="771158e0-a9f2-4e14-bdf1-892019202383"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Supir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="216" width="83" height="13" uuid="00dff909-abb2-4e59-bbd9-5c9a9c5da798"/>
+				<textElement markup="none">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Biaya Lain - Lain]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="203" width="73" height="13" uuid="13af992e-cdfd-4e2d-91c2-a33b8090b302"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Retribusi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="216" width="23" height="13" uuid="6d3b60e9-a0e6-41bd-a3b8-6af96542c532"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[RP. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="203" width="23" height="13" uuid="830cf32c-45c0-469a-a025-d63dec4f19a0"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[RP. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="190" width="24" height="13" uuid="02601e9a-5006-482c-b1b7-0f3fb32e3893"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[RP. ]]></text>
+			</staticText>
+			<line>
+				<reportElement x="120" y="215" width="222" height="1" uuid="232dc40e-1e51-4296-b569-f9dc1ea220fc"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="120" y="229" width="222" height="1" uuid="286d00f8-40e3-42e1-8dc2-01bd99b07ef4"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="120" y="203" width="222" height="1" uuid="124aedf1-945d-42dc-bd5a-d632bd6665b2"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="120" y="243" width="222" height="1" uuid="6de9de0a-7a32-4aad-b4c3-783dbce323ed"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="307" y="273" width="251" height="17" uuid="31f3a114-a907-415c-8634-dc618c534c54"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[", " + new SimpleDateFormat("dd - MM - yyyy").format($F{datedoc})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="6" y="316" width="124" height="16" uuid="9559b86a-aa82-4f08-9489-a8791b37483c"/>
+				<box topPadding="5"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(   " + $F{driver} + "   )"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="342" width="377" height="1" uuid="aa5d81ee-48bb-4b6c-9ba3-38ab2a3c9ec8"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="3" y="356" width="374" height="1" uuid="053c12ba-bb46-4477-884b-2d141dcaa962"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="1" y="373" width="376" height="1" uuid="cbb77d58-fac2-4884-bb62-d1516e0f418d"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="344" width="1" height="29" uuid="53bb533a-09d2-4f86-afc3-95ae371892f2"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="374" y="343" width="1" height="31" uuid="db854a86-3b7b-4d9d-8824-3e7673d9c2e9"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="279" y="357" width="1" height="16" uuid="59add926-3ed5-4ce9-a85b-c97ef31a98a1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="342" width="184" height="15" uuid="58eca197-6962-4b6a-8da8-1b8f44ca8a7c"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Masuk Pelabuhan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="184" y="343" width="191" height="14" uuid="2a8b14d2-f7fb-4357-9de2-8db35eb18ada"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Berangkat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="357" width="90" height="16" uuid="3b68a835-f494-4628-a86f-2777362e0f4e"/>
+				<box topPadding="5"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="93" y="357" width="91" height="16" uuid="a614539f-7364-4857-83f7-172f1abe1fba"/>
+				<box topPadding="5"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jam.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="281" y="357" width="94" height="16" uuid="092db673-ecb0-4458-8c7a-0dca5c1ff408"/>
+				<box topPadding="5"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jam.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="184" y="357" width="96" height="16" uuid="79885c55-f8a1-468d-83bd-6c2e979e6d03"/>
+				<box topPadding="5"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="159" width="60" height="13" uuid="0edf733a-5d7d-482d-83fc-de194b19f62d"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Jenis Kendaraan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="307" y="324" width="251" height="11" uuid="dfcd686c-a4be-42ff-ac20-8edca4dfcad0"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[     (                                                                )]]></text>
+			</staticText>
+			<line>
+				<reportElement x="184" y="345" width="1" height="29" uuid="28891239-b61a-4d8e-b346-3bf8f552eab7"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="92" y="358" width="1" height="16" uuid="c5bcff30-1671-4f55-b7cc-d8be9c3caed2"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="33" y="190" width="73" height="13" uuid="76beec9c-23d9-48a8-bd38-04aba49269ab"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Tonase]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="104" y="159" width="144" height="15" uuid="c5fab660-9dbb-43a4-b9c1-f3faa5adefe7"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{armadatype}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="133" width="142" height="13" uuid="f5fb1068-e3e6-44a9-b467-6c8e35b264d9"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{carnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="120" width="220" height="13" uuid="ec6185d0-b4a3-40dd-9b31-05518263a7b1"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{vouchercode}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="363" y="83" width="216" height="36" uuid="353b30bd-ad34-46e3-a9fe-80018483d7a9"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Kepada\nYth. " + $F{vendor} + "\ndi\n" + $F{vendorregion}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

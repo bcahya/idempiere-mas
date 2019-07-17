@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RekapPackingListDriver_Subreport2" language="groovy" pageWidth="612" pageHeight="792" columnWidth="592" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="6fb1009e-3763-4314-a253-3b8ecd9a5da7">
+	<property name="ireport.zoom" value="1.652892561983471"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="Driver" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select data.driver,coalesce(data.remarks,''),
+SUM(data.PL_DKT) AS PL_DKT,
+SUM(data.PL_LKT) as PL_LKT,
+SUM(data.jml_not) as jml_nota,
+sum(data.jml_iv) as langsir
+from(
+select (CASE WHEN loc.C_City_ID = sh.Destination_ID THEN 'DK' ELSE 'LK' END) AS Status,sh.documentno as noshipping, am.name as aramada,sh.driver as driver,count(DISTINCT pl.documentno) as jml_pl,
+count(DISTINCT ci.c_bpartner_id) as jml_not,0 as jml_iv,
+(CASE WHEN loc.C_City_ID = sh.Destination_ID THEN count(DISTINCT sh.documentno) ELSE 0 END) AS PL_DKT,
+(CASE WHEN loc.C_City_ID <> sh.Destination_ID THEN count(DISTINCT sh.documentno) ELSE 0 END) AS PL_LKT,em.remarks
+from uns_packinglist pl
+inner join uns_packinglist_order po on po.uns_packinglist_id=pl.uns_packinglist_id
+inner join c_invoice ci on ci.c_invoice_id=po.c_invoice_id and ci.docstatus in('CO','CL')
+inner join uns_shippingfreight shf on pl.uns_packinglist_id=shf.uns_packinglist_id
+inner join uns_shipping sh on shf.uns_shipping_id=sh.uns_shipping_id
+inner join uns_armada am on sh.uns_armada_id=am.uns_armada_id and am.isexternalarmada='N'
+INNER JOIN AD_OrgInfo inf ON inf.AD_Org_ID = sh.AD_Org_ID
+INNER JOIN C_Location loc ON loc.C_Location_ID = inf.C_Location_ID
+INNER JOIN UNS_Employee em on em.uns_employee_id=sh.uns_employee_id
+--and em.c_job_id in(select c_job_id from c_job where name='Supir') and em.regno<>'SUPIR EXTERNAL'
+where pl.docstatus in('CO','CL')
+and pl.ispickup='N'
+and sh.datedoc between $P{StartDate} and $P{EndDate}
+and (case when $P{Driver}='DPST' then pl.ad_org_id in(select ad_org_id from ad_org where c_salesregion_id   in(select c_salesregion_id from c_salesregion where c_salesregion_id=1000000) and em.uns_employee_id in(1001132,1001249,1001274)) else 1=1 end)
+group by sh.documentno,am.name,sh.driver, loc.C_City_ID, sh.Destination_ID,em.remarks
+union all
+select (CASE WHEN loc.C_City_ID = sh.Destination_ID THEN 'DK' ELSE 'LK' END) AS Status,
+sh.documentno as noshipping, am.name as aramada,sh.driver as driver,0 as jml_pl,
+0 as jml_not,count(DISTINCT sh.documentno) as jml_iv,0 as PL_DKT,0 AS PL_LKT,em.remarks
+from M_Movement mv
+inner join uns_shippingfreight shf on mv.m_movement_id=shf.m_movement_id
+inner join uns_shipping sh on shf.uns_shipping_id=sh.uns_shipping_id
+inner join uns_armada am on sh.uns_armada_id=am.uns_armada_id and am.isexternalarmada='N'
+INNER JOIN AD_OrgInfo inf ON inf.AD_Org_ID = sh.AD_Org_ID
+INNER JOIN C_Location loc ON loc.C_Location_ID = inf.C_Location_ID
+INNER JOIN UNS_Employee em on em.uns_employee_id=sh.uns_employee_id
+--and em.c_job_id in(select c_job_id from c_job where name='Supir') and em.regno<>'SUPIR EXTERNAL'
+where mv.docstatus in('CO','CL')
+and sh.datedoc between $P{StartDate} and $P{EndDate}
+and (case when $P{Driver}='DPST' then mv.ad_org_id in(select ad_org_id from ad_org where c_salesregion_id in(
+select c_salesregion_id from c_salesregion where c_salesregion_id=1000000) and em.uns_employee_id in(1001132,1001249,1001274)) else 1=1 end)
+group by sh.documentno,am.name,sh.driver, loc.C_City_ID,sh.Destination_ID,em.remarks
+) data
+GRoup BY data.driver,data.remarks
+order by data.driver]]>
+	</queryString>
+	<field name="driver" class="java.lang.String"/>
+	<field name="coalesce" class="java.lang.String"/>
+	<field name="pl_dkt" class="java.math.BigDecimal"/>
+	<field name="pl_lkt" class="java.math.BigDecimal"/>
+	<field name="jml_nota" class="java.math.BigDecimal"/>
+	<field name="langsir" class="java.math.BigDecimal"/>
+	<variable name="jumlah" class="java.lang.Double">
+		<variableExpression><![CDATA[($F{pl_lkt}*30000)+($F{pl_dkt}*23000)+($F{jml_nota}*500)+($F{langsir}*10000)]]></variableExpression>
+	</variable>
+	<variable name="no" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[new Integer("0")]]></variableExpression>
+		<initialValueExpression><![CDATA[new Integer("0")]]></initialValueExpression>
+	</variable>
+	<pageHeader>
+		<band height="63" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="592" height="15" uuid="e99fbba9-9298-4515-8ef0-850481d8e1c8"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[PACKING LIST]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="11" width="592" height="15" uuid="d44e49d5-5efc-4cb0-89ba-195176feedcf"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[GROUP BULANAN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="27" width="592" height="15" uuid="dda7053b-24d8-4506-8273-c5f6143fe706"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode : "+new SimpleDateFormat('dd/MM/yyyy').format($P{StartDate})+" s/d "+new SimpleDateFormat('dd/MM/yyyy').format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="44" width="17" height="16" uuid="e3246dad-a6dd-4958-b852-e28532a05043"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="17" y="43" width="104" height="17" uuid="7a369461-2c86-4244-9e76-77c599c60bc6"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Driver]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="121" y="44" width="106" height="16" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="227" y="44" width="43" height="16" uuid="b9f2ad89-deaf-4854-a3b2-bd20a4873a87"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Jumlah PL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="44" width="58" height="16" uuid="caec6f05-3f2b-415a-8305-cead40b86cc1"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Nilai PL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="44" width="58" height="16" uuid="20a247fa-3bfb-44f8-ab5f-a22ad375e133"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Jumlah]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="386" y="44" width="53" height="16" uuid="659f9fa6-0832-4528-a71c-1bd5050da547"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Potongan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="439" y="44" width="56" height="16" uuid="a83c771e-6723-4baa-942c-776a8f866576"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Sisa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="495" y="44" width="75" height="16" uuid="c7f8e642-2341-440a-acbd-9955017d35fe"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Tanda Tangan]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="6" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="592" height="1" uuid="7f23fc79-c332-43e6-8bf9-791829bdf886"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="85" splitType="Stretch">
+			<staticText>
+				<reportElement x="121" y="0" width="106" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[PL (Dalam Kota)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="121" y="13" width="106" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[PL (Luar Kota)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="121" y="26" width="106" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Lembur (Dalam Kota)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="121" y="39" width="106" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Lembur (Luar Kota)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="121" y="52" width="87" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Angsur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="121" y="65" width="87" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Nota]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="0" width="58" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Rp.  23.000,-]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="13" width="58" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Rp.  30.000,-]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="26" width="58" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Rp.  80.000,-]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="39" width="58" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Rp.  90.000,-]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="52" width="58" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Rp.  10.000,-]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="65" width="58" height="13" uuid="91af2812-2c18-410b-8ca2-b8787d80d7f0"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Rp.       500,-]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement x="228" y="64" width="37" height="14" uuid="cc5213fa-268f-436c-8a97-cdf4ae8b37f3"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jml_nota}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="17" y="0" width="104" height="52" uuid="53781400-08cb-4498-8bf4-fdc9d7e70b87"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{driver}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="328" y="0" width="58" height="78" uuid="9364bf10-8eaa-44e9-85d7-65831eff2960"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{jumlah}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="80" width="592" height="1" uuid="14a873f9-5d33-49be-aba7-fd9f6da4c415"/>
+				<graphicElement>
+					<pen lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<textField pattern="#,##0">
+				<reportElement x="227" y="51" width="37" height="13" uuid="a5d5bb5b-6724-4042-b981-183e4a579889"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{langsir}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="228" y="0" width="37" height="13" uuid="b0001ad4-fc30-4845-8be8-ec547a3e2c4a"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pl_dkt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="228" y="13" width="37" height="13" uuid="1101c1d2-4504-4d77-a33f-f65f39d367d3"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pl_lkt}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="17" height="78" uuid="23efe1f2-b03b-49a4-82ca-e3cffaee44ec"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="17" y="52" width="100" height="26" uuid="fdf1bd87-6994-4486-9922-fb0f59d7801f"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{remarks}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

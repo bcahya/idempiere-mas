@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportStatusKaryawan" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a7d9ca50-6490-4ca4-8775-2127295477b5">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Status" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UNS_Employee_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EmploymentType" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_Period_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT org.name AS orgname,
+emp.Name AS nm_karyawan,
+coalesce(jb.name,'') AS jabatan,
+CASE WHEN DateContractEnd <= now() THEN 'Expired' WHEN DateContractEnd >= now() THEN 'Active' ELSE 'Not Contract' END,
+DateContractEnd AS tgl_kontrak,
+reg.C_SalesRegion_ID AS salesregionid,
+Reg.Name AS Region,
+org.Name AS Organisasi
+
+FROM UNS_Employee emp
+
+LEFT JOIN UNS_Contract_Recommendation cr ON cr.UNS_Contract_Recommendation_ID = emp.UNS_Contract_Recommendation_ID
+LEFT JOIN ad_org org ON org.ad_org_id=emp.ad_org_id
+LEFT JOIN c_job jb ON jb.c_job_id=emp.c_job_id
+LEFT JOIN C_SalesRegion reg ON reg.AD_Org_ID=org.C_SalesRegion_ID
+
+WHERE emp.IsActive='Y' AND (CASE WHEN $P{C_SalesRegion_ID} IS NOT NULL THEN org.C_SalesRegion_ID=$P{C_SalesRegion_ID} ELSE 1=1 END) AND (CASE WHEN $P{UNS_Employee_ID} IS NOT NULL THEN emp.UNS_Employee_ID=$P{UNS_Employee_ID} ELSE 1=1 END) AND
+(CASE WHEN $P{Status} = 'ACT' THEN cr.UNS_Contract_Recommendation_ID > 0 AND DateContractEnd >= now() WHEN $P{Status} = 'EXP' THEN cr.UNS_Contract_Recommendation_ID > 0 AND DateContractEnd <= now() WHEN $P{Status} ='NCT' THEN cr.UNS_Contract_Recommendation_ID IS NULL ELSE 1=1 END) AND (CASE WHEN $P{EmploymentType} IS NOT NULL THEN emp.EmploymentType=$P{EmploymentType} ELSE 1=1 END)AND CASE WHEN $P{C_Period_ID} IS NOT NULL THEN DateContractEnd BETWEEN (SELECT StartDate FROM C_Period WHERE C_Period_ID=$P{C_Period_ID}) AND (SELECT EndDate FROM C_Period WHERE C_Period_ID=$P{C_Period_ID}) ELSE 1=1 END AND CASE WHEN $P{AD_Org_ID} IS NOT NULL THEN org.AD_Org_ID=$P{AD_Org_ID} ELSE 1=1 END
+
+GROUP BY salesregionid,emp.UNS_Employee_ID,org.name,jb.c_job_id,DateContractEnd
+ORDER BY reg.C_SalesRegion_ID]]>
+	</queryString>
+	<field name="orgname" class="java.lang.String"/>
+	<field name="nm_karyawan" class="java.lang.String"/>
+	<field name="jabatan" class="java.lang.String"/>
+	<field name="case" class="java.lang.String"/>
+	<field name="tgl_kontrak" class="java.sql.Timestamp"/>
+	<field name="salesregionid" class="java.math.BigDecimal"/>
+	<field name="region" class="java.lang.String"/>
+	<field name="organisasi" class="java.lang.String"/>
+	<variable name="No" class="java.lang.Number" resetType="Group" resetGroup="Region">
+		<variableExpression><![CDATA[$V{No} == null ? 1 : $V{No} +1]]></variableExpression>
+	</variable>
+	<group name="Region" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{salesregionid}]]></groupExpression>
+		<groupHeader>
+			<band height="50">
+				<staticText>
+					<reportElement x="1" y="30" width="27" height="20" uuid="485c37ec-f68c-4168-b956-a0de7b8e6a99"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="138" y="30" width="117" height="20" uuid="2104b9ab-5740-4910-b1fc-350b1e50815e"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Nama Karyawan]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="462" y="30" width="93" height="20" uuid="aeeb09db-d3af-47e6-a53c-6b20bc4f645c"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Keterangan]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="254" y="30" width="109" height="20" uuid="719cc792-a9d8-4253-ae17-eb92ef43e485"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Jabatan]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="362" y="30" width="100" height="20" uuid="4a5b8057-b134-440d-af69-d8eb05d9bf5b"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Tgl. Terakhir Kontrak]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="10" width="206" height="20" uuid="dd61cff5-6adc-447e-8405-24366b15c32a"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{region}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="27" y="30" width="111" height="20" uuid="ea3b6a56-1d4c-4fab-b1d9-45079b83dbc8"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Organisasi]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="26">
+			<staticText>
+				<reportElement x="0" y="1" width="555" height="25" uuid="5c938d0c-6072-492c-815f-29c0bdc87d05"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Report Status Contract Karyawan]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement x="462" y="0" width="93" height="16" uuid="41031e45-9090-43a2-a40b-5a860146ffa5"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{case}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="138" y="0" width="117" height="16" uuid="c55a22b2-c7b9-4bed-9472-90556138b82a"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{nm_karyawan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="254" y="0" width="109" height="16" uuid="d7925bbd-96bb-46cf-bc28-f191c9a78f6b"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{jabatan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="362" y="0" width="100" height="16" uuid="65738bf8-8f7b-44bd-85c0-2c732d08780c"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{tgl_kontrak}!=null ? new SimpleDateFormat("dd-MM-yyyy").format($F{tgl_kontrak}) : " "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="27" height="16" uuid="01a10d68-9f8c-4cf6-8f36-db43f3d7f65f"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{No}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="27" y="0" width="111" height="16" uuid="02d71149-a200-4556-a2b0-bb89d98d0785"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{organisasi}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="50">
+			<textField>
+				<reportElement x="438" y="30" width="80" height="20" uuid="d0fe6d44-281c-44d3-a02e-df7e169ec6fa"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="518" y="30" width="40" height="20" uuid="f2346b0b-e5ef-4d56-a75a-e79a4373ac71"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

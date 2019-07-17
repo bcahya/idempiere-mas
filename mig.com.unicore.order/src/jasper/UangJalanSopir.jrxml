@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="UangJalanSopir" pageWidth="611" pageHeight="395" columnWidth="571" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ae8c9b4a-dcc3-41dc-8be6-d2ca0635acea">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="192.168.1.212:5432/UniCoreFLG@RealTime-SebelumRevisiDivis"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Dataset1" uuid="d68fabdb-5c59-4e54-a2ac-79d61163e896">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="192.168.1.212:5432/UniCoreFLG@RealTime-SebelumRevisiDivis"/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+	</subDataset>
+	<parameter name="UNS_Shipping_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select org.value as orgname,ship.documentno as documentno,ship.datedoc as datedoc,armada.name as carnumber,ship.lastom as odometer,
+ship.driver as driver, COALESCE(city.Name, 'Undefined') as destination,coalesce(its.item_shipping,ship.name) as freight,cd.description as description,
+CASE WHEN cd.reference_id is null then '(Tambahan->)' else '' end as ket,
+coalesce(cd.amountconfirmed, 0) as confirmedamt,
+(select coalesce(amountconfirmed, 0) from uns_charge_detail where uns_charge_detail_id = cd.reference_id) as  referenceamt,confirmation.updatedby,(select name from ad_user where ad_user_id =  $P{AD_User_ID}) as admin,
+CASE WHEN ship.uns_shipping_reff_id is not null then (select concat('Shipping Reference : ',sh.documentno,' Tgl :',TO_CHAR(sh.datedoc,'DD/MM/YYYY')) from UNS_Shipping sh where sh.uns_shipping_id=ship.uns_shipping_reff_id) else ' ' end as data3,
+CASE WHEN shf.freighttype='EXP' THEN (select concat('Job Order Receipt :',xp.documentno,' Tgl :',TO_CHAR(xp.datedoc,'DD/MM/YYYY'),' by :',(select n.name from ad_user n where n.ad_user_id=xp.createdby)) from UNS_Expedition xp where xp.UNS_Expedition_id=shf.Uns_Expedition_id)
+WHEN shf.freighttype='PLS' THEN      (select concat('PackingList       :',pl.documentno) from UNS_PackingList pl where pl.Uns_PackingList_ID=shf.Uns_PackingList_ID)
+WHEN shf.freighttype='MVM' THEN      (select concat('Movement          :',mv.documentno) from M_Movement mv where mv.M_Movement_ID=shf.M_Movement_ID) else ' ' end as data,
+CASE WHEN shf.freighttype='EXP' THEN (select concat('Job Order         :',xp.documentno,' Tgl :',TO_CHAR(xp.datedoc,'DD/MM/YYYY'),' by :',(select n.name from ad_user n where n.ad_user_id=xp.createdby)) from UNS_Expedition xp where xp.UNS_Expedition_id in(
+select xpp.jobso_id from UNS_Expedition xpp where xpp.UNS_Expedition_id=shf.Uns_Expedition_id)) else ' ' end as data2
+from uns_shipping ship
+LEFT join uns_shippingfreight shf on ship.uns_shipping_id=shf.uns_shipping_id
+inner join uns_armada armada on armada.uns_armada_id = ship.uns_armada_id
+inner join uns_charge_detail cd on cd.uns_shipping_id = ship.uns_shipping_id
+inner join uns_charge_confirmation confirmation on confirmation.uns_shipping_id = ship.uns_shipping_id
+inner join ad_org org on ship.ad_org_id=org.ad_org_id
+LEFT JOIN C_City city ON city.C_City_ID = ship.Origin_ID
+left join item_shipping its on its.uns_shipping_id=ship.uns_shipping_id
+where ship.uns_shipping_id = $P{UNS_Shipping_ID}
+and cd.chargetype='CS'
+and cd.isactive = 'Y']]>
+	</queryString>
+	<field name="orgname" class="java.lang.String"/>
+	<field name="documentno" class="java.lang.String"/>
+	<field name="datedoc" class="java.sql.Timestamp"/>
+	<field name="carnumber" class="java.lang.String"/>
+	<field name="odometer" class="java.math.BigDecimal"/>
+	<field name="driver" class="java.lang.String"/>
+	<field name="destination" class="java.lang.String"/>
+	<field name="freight" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="ket" class="java.lang.String"/>
+	<field name="confirmedamt" class="java.math.BigDecimal"/>
+	<field name="referenceamt" class="java.math.BigDecimal"/>
+	<field name="updatedby" class="java.math.BigDecimal"/>
+	<field name="admin" class="java.lang.String"/>
+	<field name="data3" class="java.lang.String"/>
+	<field name="data" class="java.lang.String"/>
+	<field name="data2" class="java.lang.String"/>
+	<variable name="SubTotalDebit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{referenceamt} != null && $F{referenceamt}.signum() == 1 ? $F{confirmedamt}.subtract($F{referenceamt}).negate() : BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="SubTotalCredit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{referenceamt} != null && $F{referenceamt}.signum() == 1 ? $F{referenceamt} : $F{confirmedamt}]]></variableExpression>
+	</variable>
+	<variable name="Total" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{SubTotalCredit}.subtract($V{SubTotalDebit})]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="137" splitType="Stretch">
+			<staticText>
+				<reportElement x="10" y="0" width="550" height="26" uuid="3b30f720-c94c-4816-a192-dee0b6d004f1"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="20"/>
+				</textElement>
+				<text><![CDATA[Pengiriman Uang Jalan Supir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="24" width="100" height="16" uuid="48112a7a-2912-475e-8d84-2c3ae556dd89"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Nomor Pengiriman]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="82" width="98" height="16" uuid="9caed6d6-5c67-4b32-bffb-bfb4d2a71893"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Kilometer Berangkat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="55" width="100" height="13" uuid="6db131c0-6294-4422-bb9f-476521330c8a"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Supir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="40" width="100" height="16" uuid="08251031-eb71-428f-8566-57264efbd056"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="25" width="80" height="15" uuid="fc11f928-cb19-4a60-a5f3-d270d7d12abe"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Nomor Polisi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="69" width="100" height="13" uuid="ebb3756b-3ff0-44b3-a655-92b0fdaff0cc"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Tujuan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="40" width="80" height="13" uuid="04d08713-7fde-413a-8701-b87267dbcec3"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Muatan]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="110" y="24" width="170" height="16" uuid="aacce0f8-35fa-4c91-8913-1b3a83fab41b"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="111" y="40" width="169" height="16" uuid="940cf6d4-db94-4006-af20-5dbd176a230c"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + new SimpleDateFormat("EEE, dd-MM-yyyy").format($F{datedoc})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="371" y="25" width="174" height="15" uuid="477a5116-44b5-406e-9b5e-d8060c52db6b"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{carnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="110" y="82" width="174" height="16" uuid="1a1965ac-df08-48bc-8d34-541a3cd0af84"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{odometer}.intValue()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="110" y="56" width="169" height="13" uuid="025b9f44-7582-4c2d-9a5b-626fd3c13fe7"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{driver}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="110" y="69" width="169" height="13" uuid="7805767a-b19e-42da-a30d-11a121841f27"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{destination}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="370" y="40" width="196" height="29" uuid="bf89dfde-aeea-4faf-88b3-c61a431b345b"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{freight}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="116" width="310" height="14" uuid="35a7530c-abdc-4c0b-a5ee-5b1612dbd2e3"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="116" width="100" height="14" uuid="31292a33-ec11-47cf-8402-7262121456e6"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Debit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="440" y="116" width="100" height="14" uuid="612497c9-42d1-4df4-916c-401346055c74"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Kredit]]></text>
+			</staticText>
+			<line>
+				<reportElement x="10" y="114" width="530" height="1" uuid="2b94bba2-86c9-49d8-a5b0-0424b77941ec"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="11" y="134" width="530" height="1" uuid="0bc339a0-3dee-495d-ab69-e8cecd2a5034"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="290" y="69" width="250" height="13" uuid="369c5539-825e-47e0-bd96-8f61383d700f"/>
+				<textFieldExpression><![CDATA[$F{data}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="291" y="82" width="250" height="15" uuid="d93a68bc-3ae1-43db-aba8-4fd41e36969e"/>
+				<textFieldExpression><![CDATA[$F{data2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="291" y="96" width="249" height="13" uuid="565edd84-5d7a-4a18-ae01-874fa2fdd887"/>
+				<textFieldExpression><![CDATA[$F{data3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="411" y="2" width="149" height="13" uuid="604f4f3e-1477-42d9-acb4-af61b9bb89a0"/>
+				<textElement textAlignment="Right">
+					<font isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{orgname}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="10" y="0" width="280" height="20" uuid="bea13a17-c331-45fb-a68a-5cb2c6e3d516"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="330" y="0" width="100" height="20" uuid="10957877-2e8f-4529-a54a-5a20efda19c9"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[NumberFormat.getInstance().format($F{referenceamt} != null && $F{referenceamt}.signum() == 1 ? $F{confirmedamt}.subtract($F{referenceamt}).negate() : BigDecimal.ZERO)]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="440" y="0" width="100" height="20" uuid="5a16783b-e971-4934-9ce6-ab6649c8e258"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[NumberFormat.getInstance().format($F{referenceamt} != null && $F{referenceamt}.signum() == 1 ? $F{referenceamt} : $F{confirmedamt})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="271" y="0" width="59" height="20" uuid="c13bc3f2-8084-4b26-8d7d-01aae05378d0"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ket}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="143">
+			<line>
+				<reportElement x="10" y="-2" width="530" height="1" uuid="efae20a5-812c-41a3-bcbb-6e7e71e4e96b"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="10" y="0" width="100" height="14" uuid="c88f001e-8c80-466b-b63a-95f1a1ecb6b6"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Sub Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="11" y="17" width="100" height="16" uuid="bd059f51-07cd-4daf-b0b2-a7094339944f"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Total Cost]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="440" y="1" width="100" height="13" uuid="10939157-d76f-464e-8541-6ffbf580eb33"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[NumberFormat.getInstance().format($V{SubTotalCredit})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="330" y="1" width="100" height="13" uuid="341da26d-2eda-4a27-aba0-fc1b7e545dc2"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[NumberFormat.getInstance().format($V{SubTotalDebit})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="110" y="16" width="431" height="17" uuid="c92ea85c-6462-4e7c-861d-1576cbb7df79"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[NumberFormat.getInstance().format($V{Total})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="11" y="14" width="530" height="1" uuid="dfe2d6aa-284a-4a5c-be6f-a20ab1e228aa"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="12" y="50" width="530" height="1" uuid="97f0d8c0-d694-43bb-8260-1fb5b802c955"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="11" y="70" width="530" height="1" uuid="de43548a-10ee-475e-8df0-6332c7f06912"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="540" y="51" width="1" height="79" uuid="a961cd91-87c6-4e22-9418-8c2214d0a5f4"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="12" y="50" width="1" height="79" uuid="6e06150e-16b5-4f80-9b8c-855923f79d56"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="10" y="129" width="530" height="1" uuid="569ca447-6c91-4153-bc6c-b1382922fb36"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="410" y="50" width="1" height="79" uuid="352fc557-2ff6-4b0a-b4db-71cd146c33a1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="280" y="50" width="1" height="79" uuid="3f60abd9-be45-4439-aee2-9dd009ffbd05"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="140" y="50" width="1" height="79" uuid="21b3fc29-5317-4c0e-b995-74d11e5a6852"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="26" y="52" width="100" height="18" uuid="ec21f79b-286e-45a4-a997-7442929ebc18"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[DIREKTUR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="426" y="52" width="100" height="18" uuid="d9861957-4f54-4fc9-97b0-e07d999ae1a2"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[KASIR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="52" width="100" height="18" uuid="66492777-3d1e-403f-9404-942520e28315"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[ADMIN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="295" y="52" width="100" height="18" uuid="5e3159da-887a-4b0c-b333-78f45686cd59"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[SUPIR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="13" y="110" width="128" height="20" uuid="ff4b26ce-1c7d-4507-bc8d-eaab0705a87a"/>
+				<box topPadding="5"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<text><![CDATA[Hongiman]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="140" y="110" width="140" height="20" uuid="3fae393d-bd5e-4870-bc5b-0628627d0dd1"/>
+				<box topPadding="5"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{admin}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="280" y="110" width="130" height="20" uuid="d0d24076-7558-49b2-909f-a61ed7a1a8ba"/>
+				<box topPadding="5"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{driver}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

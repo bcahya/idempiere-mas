@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AnalisaECOutleExportToExcel" language="groovy" pageWidth="612" pageHeight="792" columnWidth="602" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="7bce7f2c-d02b-456b-ae06-d3f1076d6486">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select data2.nama_sales,data2.nama_vendor,sum(data2.tk_ambil)as ec,sum(data2.ao) as ao,sum(data2.qty) as qty,sum(data2.retur) as retur,sum(data2.discount) as discount,
+sum(data2.penjualan) as penjualan,sum(data2.target) as target
+ from(
+select data.nama_sales,data.nama_vendor,max(data.tk_ambil) as tk_ambil,0 as ao,0 as retur,0 as penjualan,0 as discount,0 as qty,0 as target
+from (
+SELECT u.name2 as NAMA_SALES,bp.name as NAMA_VENDOR,count(cs.c_bpartner_id) as tk_ambil
+FROM C_Invoice ci
+INNER JOIN C_InvoiceLine cl on cl.c_invoice_id=ci.c_invoice_id
+INNER JOIN M_Product mp on mp.m_product_id=cl.m_product_id
+INNER JOIN C_BPartner_Product bpp on bpp.m_product_id=mp.m_product_id
+INNER JOIN c_bpartner bp on bp.c_bpartner_id=bpp.c_bpartner_id
+INNER JOIN c_bpartner cs on cs.c_bpartner_id=ci.c_bpartner_id
+INNER JOIN AD_user u on u.ad_user_id=ci.salesrep_id
+INNER JOIN c_doctype cd on cd.c_doctype_id=ci.c_doctype_id
+inner join ad_org org on org.ad_org_id=ci.ad_org_id
+inner join c_salesregion so on so.c_salesregion_id=org.c_salesregion_id
+WHERE cd.docbasetype='ARI'
+AND ci.docstatus in('CO','CL')
+AND ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+AND CASE WHEN $P{C_SalesRegion_ID}!=0 THEN so.C_Salesregion_ID=$P{C_SalesRegion_ID} ELSE 1=1 END
+AND CASE WHEN $P{C_BPartner_ID}!=0 THEN bp.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END
+---AND u.AD_User_ID=1001267
+group by u.name2,bp.name,cs.c_bpartner_id
+order by bp.name,cs.name ) data
+group by  data.nama_sales,data.nama_vendor
+union all
+---AO tiga bulan kebelakang
+select data.nama_sales,data.nama_vendor,0 as tk_ambil,sum(data.ao) as ao,0 as retur,0 as penjualan,0 as discount,0 as qty,0 as target
+FROM (
+SELECT u.name2 as NAMA_SALES,bp.name as NAMA_VENDOR,0 as tk_ambil,count(DISTINCT cs.c_bpartner_id) as ao
+FROM C_Invoice ci
+INNER JOIN C_InvoiceLine cl on cl.c_invoice_id=ci.c_invoice_id
+INNER JOIN M_Product mp on mp.m_product_id=cl.m_product_id
+INNER JOIN C_BPartner_Product bpp on bpp.m_product_id=mp.m_product_id
+INNER JOIN c_bpartner bp on bp.c_bpartner_id=bpp.c_bpartner_id
+INNER JOIN c_bpartner cs on cs.c_bpartner_id=ci.c_bpartner_id
+INNER JOIN AD_user u on u.ad_user_id=ci.salesrep_id
+INNER JOIN c_doctype cd on cd.c_doctype_id=ci.c_doctype_id
+inner join ad_org org on org.ad_org_id=ci.ad_org_id
+inner join c_salesregion so on so.c_salesregion_id=org.c_salesregion_id
+WHERE cd.docbasetype='ARI'
+AND ci.docstatus in('CO','CL')
+AND ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+AND CASE WHEN $P{C_SalesRegion_ID}!=0 THEN so.C_Salesregion_ID=$P{C_SalesRegion_ID} ELSE 1=1 END
+AND CASE WHEN $P{C_BPartner_ID}!=0 THEN bp.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END
+group by u.name2,bp.name,cs.c_bpartner_id
+order by bp.name,cs.name ) data
+group by  data.nama_sales,data.nama_vendor
+union all
+--penjualan
+SELECT u.name2 as NAMA_SALES,bp.name as NAMA_VENDOR,0 as tk_ambil,0 as ao,0 as retur,SUM(cl.linenetamt) as penjualan,sum(cl.discountamt) as discount,0 as qty,0 as target
+FROM C_Invoice ci
+INNER JOIN C_InvoiceLine cl on cl.c_invoice_id=ci.c_invoice_id
+INNER JOIN M_Product mp on mp.m_product_id=cl.m_product_id
+INNER JOIN C_BPartner_Product bpp on bpp.m_product_id=mp.m_product_id
+INNER JOIN c_bpartner bp on bp.c_bpartner_id=bpp.c_bpartner_id
+INNER JOIN c_bpartner cs on cs.c_bpartner_id=ci.c_bpartner_id
+INNER JOIN AD_user u on u.ad_user_id=ci.salesrep_id
+INNER JOIN c_doctype cd on cd.c_doctype_id=ci.c_doctype_id
+inner join ad_org org on org.ad_org_id=ci.ad_org_id
+inner join c_salesregion so on so.c_salesregion_id=org.c_salesregion_id
+WHERE cd.docbasetype='ARI'
+AND ci.docstatus in('CO','CL')
+AND ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+AND CASE WHEN $P{C_SalesRegion_ID}!=0 THEN so.C_Salesregion_ID=$P{C_SalesRegion_ID} ELSE 1=1 END
+AND CASE WHEN $P{C_BPartner_ID}!=0 THEN bp.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END
+--AND u.AD_User_ID=1001267
+group by u.name2,bp.name,cs.c_bpartner_id
+union all
+--RETURN
+SELECT u.name2 as NAMA_SALES,bp.name as NAMA_VENDOR,0 as tk_ambil,0 as ao,SUM(cl.linenetamt) as retur,0 as penjualan,0 as discount,0 as qty,0 as target
+FROM C_Invoice ci
+INNER JOIN C_InvoiceLine cl on cl.c_invoice_id=ci.c_invoice_id
+INNER JOIN M_Product mp on mp.m_product_id=cl.m_product_id
+INNER JOIN C_BPartner_Product bpp on bpp.m_product_id=mp.m_product_id
+INNER JOIN c_bpartner bp on bp.c_bpartner_id=bpp.c_bpartner_id
+INNER JOIN c_bpartner cs on cs.c_bpartner_id=ci.c_bpartner_id
+INNER JOIN AD_user u on u.ad_user_id=ci.salesrep_id
+INNER JOIN c_doctype cd on cd.c_doctype_id=ci.c_doctype_id
+inner join ad_org org on org.ad_org_id=ci.ad_org_id
+inner join c_salesregion so on so.c_salesregion_id=org.c_salesregion_id
+WHERE cd.docbasetype='ARC'
+AND ci.docstatus in('CO','CL')
+AND ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+AND CASE WHEN $P{C_SalesRegion_ID}!=0 THEN so.C_Salesregion_ID=$P{C_SalesRegion_ID} ELSE 1=1 END
+AND CASE WHEN $P{C_BPartner_ID}!=0 THEN bp.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END
+--AND u.AD_User_ID=1001267
+group by u.name2,bp.name,cs.c_bpartner_id
+union all
+--penjualan
+SELECT u.name2 as NAMA_SALES,bp.name as NAMA_VENDOR,0 as tk_ambil,0 as ao,0 as retur,0 as penjualan,0 as discount,satuandus(mp.m_product_id, sum(cl.qtyentered)) as qty,0 as target
+FROM C_Invoice ci
+INNER JOIN C_InvoiceLine cl on cl.c_invoice_id=ci.c_invoice_id
+INNER JOIN M_Product mp on mp.m_product_id=cl.m_product_id
+INNER JOIN C_BPartner_Product bpp on bpp.m_product_id=mp.m_product_id
+INNER JOIN c_bpartner bp on bp.c_bpartner_id=bpp.c_bpartner_id
+INNER JOIN c_bpartner cs on cs.c_bpartner_id=ci.c_bpartner_id
+INNER JOIN AD_user u on u.ad_user_id=ci.salesrep_id
+INNER JOIN c_doctype cd on cd.c_doctype_id=ci.c_doctype_id
+inner join ad_org org on org.ad_org_id=ci.ad_org_id
+inner join c_salesregion so on so.c_salesregion_id=org.c_salesregion_id
+WHERE cd.docbasetype='ARI'
+AND ci.docstatus in('CO','CL')
+AND ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+AND CASE WHEN $P{C_SalesRegion_ID}!=0 THEN so.C_Salesregion_ID=$P{C_SalesRegion_ID} ELSE 1=1 END
+AND CASE WHEN $P{C_BPartner_ID}!=0 THEN bp.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END
+--AND u.AD_User_ID=1001267
+group by u.name2,bp.name,cs.c_bpartner_id,mp.m_product_id
+--target
+union all
+select data.NAMA_SALES as NAMA_SALES,DATA.NAMA_VENDOR as NAMA_VENDOR,0 as tk_ambil,0 as ao,0 as retur,0 as penjualan,0 as discount,0 as qty,max(data.target) as target
+from (
+SELECT u.name2 as NAMA_SALES,bp.name as NAMA_VENDOR,satuandus(mp.m_product_id, sum(cl.qtyentered)) as target
+FROM C_Invoice ci
+INNER JOIN C_InvoiceLine cl on cl.c_invoice_id=ci.c_invoice_id
+INNER JOIN M_Product mp on mp.m_product_id=cl.m_product_id
+INNER JOIN C_BPartner_Product bpp on bpp.m_product_id=mp.m_product_id
+INNER JOIN c_bpartner bp on bp.c_bpartner_id=bpp.c_bpartner_id
+INNER JOIN c_bpartner cs on cs.c_bpartner_id=ci.c_bpartner_id
+INNER JOIN AD_user u on u.ad_user_id=ci.salesrep_id
+INNER JOIN c_doctype cd on cd.c_doctype_id=ci.c_doctype_id
+inner join ad_org org on org.ad_org_id=ci.ad_org_id
+inner join c_salesregion so on so.c_salesregion_id=org.c_salesregion_id
+WHERE cd.docbasetype='ARI'
+AND ci.docstatus in('CO','CL')
+AND ci.dateinvoiced between DATE($P{StartDate})-90 and DATE($P{EndDate})-90
+AND CASE WHEN $P{C_SalesRegion_ID}!=0 THEN so.C_Salesregion_ID=$P{C_SalesRegion_ID} ELSE 1=1 END
+AND CASE WHEN $P{C_BPartner_ID}!=0 THEN bp.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END
+--AND u.AD_User_ID=1001267
+group by u.name2,bp.name,cs.c_bpartner_id,mp.m_product_id) data
+group by  data.nama_sales,data.nama_vendor
+) data2
+group by data2.nama_sales,data2.nama_vendor]]>
+	</queryString>
+	<field name="nama_sales" class="java.lang.String"/>
+	<field name="nama_vendor" class="java.lang.String"/>
+	<field name="ec" class="java.math.BigDecimal"/>
+	<field name="ao" class="java.math.BigDecimal"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="retur" class="java.math.BigDecimal"/>
+	<field name="discount" class="java.math.BigDecimal"/>
+	<field name="penjualan" class="java.math.BigDecimal"/>
+	<field name="target" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="12" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="619eaeaf-2492-4778-aa44-c6c37fcc959c" x="0" y="0" width="81" height="12"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Salesman]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d7ba2b9d-f43d-4c1b-92b4-5b50454bc5aa" x="179" y="0" width="29" height="12"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[EC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a82d9a42-f5e6-4b61-b37b-9d22ceb88850" x="283" y="0" width="63" height="12"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty Penjualan Dus]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="195becdf-b8f2-45a9-8635-79f26586e3e0" x="346" y="0" width="72" height="12"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Value Retur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="40cf4a6e-2443-4e50-838f-d544da670b35" x="418" y="0" width="66" height="12"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Value Discount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="06027f04-ff80-474c-a226-66a11f1d3b8a" x="484" y="0" width="59" height="12"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Value Penjualan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="04ea263e-fb10-4704-bdf6-de0a958fa914" x="81" y="0" width="98" height="12"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Prinsiple]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d7ba2b9d-f43d-4c1b-92b4-5b50454bc5aa" x="208" y="0" width="29" height="12"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[AO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d7ba2b9d-f43d-4c1b-92b4-5b50454bc5aa" x="237" y="0" width="46" height="12"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Target Qty]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="06027f04-ff80-474c-a226-66a11f1d3b8a" x="543" y="0" width="59" height="12"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Share]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement uuid="2c5756a0-7305-41ef-a169-b7daa0813c86" x="0" y="0" width="81" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_sales}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="fea8e467-cc6e-4bf4-b964-65d5fd5d1415" x="81" y="0" width="98" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_vendor}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="7426fdd8-563b-4f1a-af6f-1c2936c66cf4" x="179" y="0" width="29" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ec}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="472be597-4faa-4742-89ba-55afbb89f8f0" x="208" y="0" width="29" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ao}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="3957784b-8fc4-4b61-917e-fbd08a851102" x="237" y="0" width="46" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{target}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement uuid="81849926-9fe9-490d-9e1a-0cfce9cb19ab" x="283" y="0" width="63" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="e6cbeacf-698d-4b9c-a351-fe00a4c5e671" x="346" y="0" width="72" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{retur}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="0fbeaf00-b1a4-419a-82a3-5c8bde79ec84" x="418" y="0" width="66" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="4b6eed89-304a-4d6c-9fb6-97533168b047" x="484" y="0" width="59" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{penjualan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="4b6eed89-304a-4d6c-9fb6-97533168b047" x="543" y="0" width="59" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[0]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

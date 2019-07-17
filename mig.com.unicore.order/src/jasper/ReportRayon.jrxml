@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportRayon" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ca1aa319-afee-46a5-9ebd-c3eeb1984172">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<parameter name="UNS_Rayon_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT
+     bp."name" AS nama,
+     ryn."name" AS rayon,
+     bp."c_bpartner_id" AS id,
+     ryn."uns_rayon_id" AS idr
+
+
+FROM
+     "c_bpartner" bp
+     INNER JOIN c_bpartner_location bpl ON bp."c_bpartner_id" = bpl."c_bpartner_id"
+     INNER JOIN uns_rayon ryn ON bpl."uns_rayon_id" = ryn."uns_rayon_id"
+
+WHERE
+     bp.C_BPartner_ID = $P{C_BPartner_ID} OR ryn.UNS_Rayon_ID = $P{UNS_Rayon_ID}
+
+ORDER BY bp."name"]]>
+	</queryString>
+	<field name="nama" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="id" class="java.math.BigDecimal"/>
+	<field name="idr" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="32" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="20" uuid="80ccae65-4ca7-47b5-9ce2-e3ce57f36d1e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[LAPORAN DAFTAR RAYON PELANGGAN]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="19" width="572" height="1" uuid="05d165a5-9c03-4733-91ed-19eebd88951c"/>
+				<graphicElement>
+					<pen lineWidth="0.75" lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="25" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="23" width="572" height="1" uuid="69c05956-0735-4b38-a14e-134a4badcae6"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="0" width="284" height="20" uuid="5ed42d10-c00f-4c12-b6ed-36349cd3bbd7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Nama Pelanggan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="289" y="0" width="283" height="20" uuid="31d03354-20c2-4c7d-b388-a9fb90e2e94c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Rayon]]></text>
+			</staticText>
+			<line>
+				<reportElement x="286" y="0" width="1" height="25" uuid="f45de89f-4ded-47a3-9546-7e265351317f"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="572" height="1" uuid="d07d6568-353d-4ef9-819b-3eb1e36d173d"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="572" y="0" width="1" height="25" uuid="1df2ae30-ba69-447b-945d-a3496c8f5960"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="1" width="1" height="24" uuid="6cd125f4-945b-4bb5-a69b-1e2f08321c92"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="289" y="0" width="283" height="20" uuid="ed0d7ae0-caba-400e-bb92-b7e0393f9d8f"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="284" height="20" uuid="9a504256-e19b-439b-8c1a-b9c80fd09b61"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nama}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="286" y="0" width="1" height="22" uuid="79d4aeb7-ec8e-45cb-b983-4b3188fb06fd"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="1" height="21" uuid="324deba6-e342-45f4-81bd-15443e0e0083"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="572" y="-3" width="1" height="24" uuid="5a81bc3e-5c26-47e6-b1d7-c8aeb191704e"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="21" width="573" height="1" uuid="70896c11-ee0d-4087-b508-69863889480a"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

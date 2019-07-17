@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportStockOnhandEndOffDay" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b37fa7e3-45e1-47b4-8afe-42adf8dc7bbb">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="M_Warehouse_ID" class="java.lang.Integer"/>
+	<parameter name="M_Product_ID" class="java.lang.Integer"/>
+	<parameter name="M_Locator_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() as tglskrg,wh.value as nama_gudang,u.name as nama,m.name as nm_barang,data.sm_product_id,loc.value as nmlok,
+round(coalesce(m.uomqtyl1,0),0) as isi1,
+round(coalesce(m.uomqtyl2,0),0) as isi2,
+round(coalesce(m.uomqtyl3,0),0) as isi3,
+round(coalesce(m.uomqtyl4,0),0) as isi4,
+coalesce((select cu.name from c_uom cu where cu.c_uom_id=m.uomconversionl1_id),'') as satuan1,
+coalesce((select cu.name from c_uom cu where cu.c_uom_id=m.uomconversionl2_id),'') as satuan2,
+coalesce((select cu.name from c_uom cu where cu.c_uom_id=m.uomconversionl3_id),'') as satuan3,
+coalesce((select coalesce(cu.name,'0') from c_uom cu where cu.c_uom_id=m.uomconversionl4_id),'') as satuan4,
+data.qty,data.onhand as onhand,
+uomconversiontostr(data.sm_product_id,data.onhand-data.qty) sqty,sum(t.movementqty) as qt,uomconversiontostr(data.sm_product_id,(sum(t.movementqty))) as sqt,
+(data.onhand-data.qty) as saldo,
+uomconversiontostr(data.sm_product_id,data.onhand-data.qty) as ssaldo,
+(data.onhand-data.qty)+sum(t.movementqty) as sakhir,
+uomconversiontostr(data.sm_product_id,(data.onhand-data.qty)+sum(t.movementqty)) as ssakhir
+from (
+select stock.sm_product_id,stock.sm_locator_id,stock.qty,sum(mo.qtyonhand) as onhand
+from (select mt.m_product_id as sm_product_id,ml.m_locator_id as sm_locator_id,sum(mt.movementqty) as qty
+from m_transaction mt
+left join m_locator ml on ml.m_locator_id=mt.m_locator_id
+left join m_warehouse wh on wh.m_warehouse_id=ml.m_warehouse_id
+where mt.movementdate>=$P{StartDate}
+AND case when $P{M_Warehouse_ID}!=0 then wh.m_warehouse_id=$P{M_Warehouse_ID} else 1=1 end
+AND case when $P{M_Product_ID}!=0 then mt.m_product_id=$P{M_Product_ID} else 1=1 end
+and case when $P{M_Locator_ID}!=0 then ml.m_locator_id=$P{M_Locator_ID} else 1=1 end
+group by mt.m_product_id,ml.m_locator_id) as stock
+left join m_storageonhand mo on stock.sm_product_id=mo.m_product_id and stock.sm_locator_id=mo.m_locator_id
+group by stock.sm_locator_id,stock.sm_product_id,stock.qty) as data
+left join m_transaction t on t.m_product_id=data.sm_product_id and t.m_locator_id=data.sm_locator_id
+left join m_product m on m.m_product_id=t.m_product_id
+left join m_locator loc on loc.m_locator_id=t.m_locator_id
+left join m_warehouse wh on wh.m_warehouse_id=loc.m_warehouse_id
+left join ad_user u on u.ad_user_id=$P{AD_User_ID}
+where t.movementdate between $P{StartDate} and $P{EndDate} and t.movementqty<>0
+group by u.name,wh.value,m.name,loc.value,data.sm_product_id,data.qty,data.onhand,m.uomqtyl1,m.uomqtyl2,m.uomqtyl3,m.uomqtyl4,m.uomconversionl1_id,m.uomconversionl2_id,m.uomconversionl3_id,m.uomconversionl4_id
+order by wh.value,loc.value]]>
+	</queryString>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="nama_gudang" class="java.lang.String"/>
+	<field name="nama" class="java.lang.String"/>
+	<field name="nm_barang" class="java.lang.String"/>
+	<field name="sm_product_id" class="java.math.BigDecimal"/>
+	<field name="nmlok" class="java.lang.String"/>
+	<field name="isi1" class="java.math.BigDecimal"/>
+	<field name="isi2" class="java.math.BigDecimal"/>
+	<field name="isi3" class="java.math.BigDecimal"/>
+	<field name="isi4" class="java.math.BigDecimal"/>
+	<field name="satuan1" class="java.lang.String"/>
+	<field name="satuan2" class="java.lang.String"/>
+	<field name="satuan3" class="java.lang.String"/>
+	<field name="satuan4" class="java.lang.String"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="onhand" class="java.math.BigDecimal"/>
+	<field name="sqty" class="java.lang.String"/>
+	<field name="qt" class="java.math.BigDecimal"/>
+	<field name="sqt" class="java.lang.String"/>
+	<field name="saldo" class="java.math.BigDecimal"/>
+	<field name="ssaldo" class="java.lang.String"/>
+	<field name="sakhir" class="java.math.BigDecimal"/>
+	<field name="ssakhir" class="java.lang.String"/>
+	<variable name="NamaSatuan" class="java.lang.String">
+		<variableExpression><![CDATA[$F{satuan1}+' '+$F{satuan2}+' '+$F{satuan3}+' '+$F{satuan4}]]></variableExpression>
+	</variable>
+	<variable name="SatuanIsi" class="java.lang.String">
+		<variableExpression><![CDATA[$F{isi1}+','+$F{isi2}+','+$F{isi3}+','+$F{isi4}]]></variableExpression>
+	</variable>
+	<group name="kdgudang">
+		<groupExpression><![CDATA[$F{nama_gudang}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField>
+					<reportElement x="0" y="0" width="100" height="15" uuid="b385acf0-3227-467e-8863-6fc6a6c2a75c"/>
+					<textElement verticalAlignment="Bottom">
+						<font size="8" isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nama_gudang}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="nmlocator">
+		<groupExpression><![CDATA[$F{nmlok}]]></groupExpression>
+		<groupHeader>
+			<band height="13">
+				<textField>
+					<reportElement x="36" y="0" width="132" height="11" uuid="9e68dd71-38da-4fa1-848e-c8cff7561059"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmlok}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="8">
+				<line>
+					<reportElement x="0" y="4" width="572" height="1" uuid="e25e3f52-b2a1-41c2-9eaf-d0d660de600e"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="43" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="31" width="572" height="12" uuid="a4263e05-b9ac-4d33-a1ad-9f31ecb19388"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="31" width="168" height="12" uuid="8c465bb4-0b98-4726-a66d-8a795de4e039"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[NAMA BARANG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="31" width="100" height="12" uuid="2d82ba23-53e5-4e7e-b3fc-67ee266a2e3b"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[KODE SATUAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="288" y="31" width="57" height="12" uuid="2137823f-c0f9-42b0-9cb2-e5468093280f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[ISI KEMASAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="469" y="0" width="100" height="11" uuid="b9fce32c-47bc-4ace-a8fb-1e12cc68b724"/>
+				<textElement textAlignment="Right">
+					<font size="7" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCore Imdepiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="0" width="235" height="20" uuid="3998fc52-f3d5-43a2-a4e6-8918e904f3dd"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Stock Onhand End Off Day]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="434" y="31" width="134" height="12" uuid="117b1940-499d-418c-b57b-3bb1dc86cae1"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[QTY DALAM SATUAN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="0" width="175" height="11" uuid="999aafc8-a0a0-4983-bd70-ae0e71894c90"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode :  "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+" s/d "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="168" height="11" uuid="cb8b8623-bf34-4505-a77a-ecccabd3f6ad"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nm_barang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="175" y="0" width="113" height="11" uuid="7378bc24-dacd-47d6-bb2a-a485f9888ce8"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{NamaSatuan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="false">
+				<reportElement x="293" y="0" width="57" height="11" uuid="0dd567b1-2f03-495f-a0b1-99a0b708fbef"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SatuanIsi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="431" y="0" width="137" height="12" uuid="2331dcf3-757e-4bce-a46f-65c50e66283a"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ssakhir}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="34">
+			<line>
+				<reportElement x="-1" y="15" width="240" height="1" uuid="c763aee0-0e30-4fc6-b7f2-9af2c4c4cda0"/>
+			</line>
+			<textField>
+				<reportElement x="478" y="9" width="50" height="18" uuid="e06baa12-77e4-4de9-a616-c926b4eaa48c"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="528" y="9" width="40" height="18" uuid="c3e560f9-9d23-4868-bb32-d89e5b5f5ebe"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="330" y="9" width="42" height="12" uuid="a686bb78-bf61-42e4-bc4e-7926673891c0"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Print Date :]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy HH.mm.ss">
+				<reportElement x="372" y="9" width="100" height="12" uuid="ffc5d7ba-3682-4d94-88de-aeed11f5244f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglskrg}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="240" y="9" width="34" height="12" uuid="64af0fbd-aedf-4f17-8ca7-d22254a54d3d"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Print By :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="274" y="9" width="52" height="12" uuid="bb82b206-ec5d-4121-9fac-3bb0dbcb0bab"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintShippingPlan" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b4a7d223-3d0c-482a-a02d-d1022296093b">
+	<property name="ireport.zoom" value="1.3310000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EndDate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT pc.DocumentNo AS NoPLConfirm, pl.DocumentNo AS NoPL, bp.Name AS Customer, mp.Name AS Product, pll.MovementQty AS Qty, COALESCE (r.Name, r.Name, '') AS Rayon  FROM UNS_PL_Confirm pc
+
+INNER JOIN UNS_PackingList pl ON pl.UNS_PackingList_ID = pc.UNS_PackingList_ID
+
+INNER JOIN UNS_PackingList_Order po ON po.UNS_PackingList_ID = pl.UNS_PackingList_ID
+
+INNER JOIN C_Order o ON o.C_Order_ID = po.C_Order_ID
+
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID = o.C_BPartner_ID
+
+INNER JOIN C_BPartner_Location bpl ON bpl.C_BPartner_ID = bp.C_BPartner_ID
+
+LEFT JOIN UNS_Rayon r ON r.UNS_Rayon_ID = bpl.UNS_Rayon_ID
+
+INNER JOIN UNS_PackingList_Line pll ON pll.UNS_PackingList_Order_ID = po.UNS_PackingList_Order_ID
+
+INNER JOIN M_Product mp ON mp.M_Product_ID = pll.M_Product_ID
+
+WHERE pc.DateDoc BETWEEN $P{StartDate} AND $P{EndDate} AND pc.Docstatus IN ('DR', 'IN') AND pc.AD_Org_ID = $P{AD_Org_ID}]]>
+	</queryString>
+	<field name="noplconfirm" class="java.lang.String"/>
+	<field name="nopl" class="java.lang.String"/>
+	<field name="customer" class="java.lang.String"/>
+	<field name="product" class="java.lang.String"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="rayon" class="java.lang.String"/>
+	<group name="documentno">
+		<groupExpression><![CDATA[$F{noplconfirm}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement uuid="58339630-743a-4e55-9c7d-43d5ba19dd5b" x="0" y="0" width="276" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="1.0" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA["No Packing List Confirmation : " + $F{noplconfirm}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="549e92a0-f0c0-4fa3-94b4-b92b890b56fe" x="0" y="0" width="572" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="1.0" lineStyle="Dashed"/>
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="1.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA["No Packing List : " + $F{nopl}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="9"/>
+		</groupFooter>
+	</group>
+	<group name="customer">
+		<groupExpression><![CDATA[$F{customer}]]></groupExpression>
+		<groupHeader>
+			<band height="40">
+				<staticText>
+					<reportElement uuid="91bf50bc-cb34-4cac-a181-6fc5888a736d" x="0" y="20" width="282" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="1.0" lineStyle="Dashed"/>
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="1.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Produk]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="d7095a99-14f1-4c03-bf1d-9777a709ba71" x="282" y="20" width="60" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="1.0" lineStyle="Dashed"/>
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="1.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Qty Plan]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="ca0f382e-c889-41ab-b82f-83a1431dc60a" x="0" y="0" width="572" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="1.0" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="1.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA["Customer / Toko : " + $F{customer} + " - " + $F{rayon}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="d7095a99-14f1-4c03-bf1d-9777a709ba71" x="342" y="20" width="60" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="1.0" lineStyle="Dashed"/>
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="1.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Qty Confirm]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="d7095a99-14f1-4c03-bf1d-9777a709ba71" x="402" y="20" width="170" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="1.0" lineStyle="Dashed"/>
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="1.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Description]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="54">
+			<staticText>
+				<reportElement uuid="7f050463-f0f7-437d-9022-3432a9071160" x="0" y="0" width="572" height="21"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Shipping Plan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="49f12c68-14a5-4407-989f-bf17f23b322e" x="0" y="21" width="237" height="17"/>
+				<textElement/>
+				<text><![CDATA[Supir :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3234c1d1-0964-43af-8aa4-fba4926987b5" x="0" y="37" width="237" height="17"/>
+				<textElement/>
+				<text><![CDATA[Plat Nomor  :]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="64baddd6-ae02-4b58-ad84-00582551faf9" x="0" y="0" width="282" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="1.0" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{product}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0b77033c-5ede-4349-ac99-726ba6cd318b" x="282" y="0" width="60" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="1.0" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="d7095a99-14f1-4c03-bf1d-9777a709ba71" x="402" y="0" width="170" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="1.0" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Bottom"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d7095a99-14f1-4c03-bf1d-9777a709ba71" x="342" y="0" width="60" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="1.0" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Bottom"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="c85f06b1-15f4-4411-bfd2-cabd07dde353" x="0" y="19" width="572" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

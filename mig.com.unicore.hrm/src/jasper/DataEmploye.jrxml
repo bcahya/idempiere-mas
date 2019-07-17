@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DataEmploye" language="groovy" pageWidth="612" pageHeight="396" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8259670a-5e1c-4259-940f-ab9a2b7d0cf4">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Employee_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() as tglnow,em.value as nik,em.name as nama,job.name as jabatan,
+ case when em.idtype='1' THEN 'SI,'
+      when em.idtype='2' THEN 'KTP' else 'Pasport' end as idtype,
+ em.idno as noidentitas,em.mobilephone as nohp,
+ case when em.religion='B' THEN 'Budha'
+      when em.religion='C' THEN 'Kristen'
+      when em.religion='H' THEN 'Hindu'
+      when em.religion='I' Then 'Islam'
+      when em.religion='K' then 'Katolik'
+      when em.religion='X' then 'free Thinker' else 'Unknown' end as religion,
+ case when em.maritalstatus='K0' then 'Kawin 0 Tanggungan'
+      when em.maritalstatus='K1' then 'Kawin 1 Tanggungan'
+      when em.maritalstatus='K2' then 'Kawin 2 Tanggungan'
+      when em.maritalstatus='K3' then 'Kawin 3 Tanggungan'
+      when em.maritalstatus='K4' then 'Kawin 4 Tanggungan'
+      when em.maritalstatus='K5' then 'Kawin 5 Tanggungan'
+      when em.maritalstatus='ND' then 'Not Definition'
+      when em.maritalstatus='TK0' then 'Tidak Kawin 0 Tanggungan'
+      when em.maritalstatus='TK1' then 'Tidak Kawin 1 Tanggungan' else 'Tidak Kawin 2 Tanggungan' end as marialstatus,
+ em.placeofbirth as tempatlahir,em.dateofbirth as tgllahir,em.address as alamat,em.homephone as tlprumah,
+ em.employeeinsured1 as anak1,em.employeeinsured2 as anak2,em.employeeinsured3 as anak3,em.hwname as namapasangan,
+ arl.name as pendidikan,arlj.name as jurusan,
+case when em.gender='F' then 'Wanita' else 'Pria' end as jkelamin
+ from UNS_Employee em
+ inner join c_job job on em.c_job_id=job.c_job_id
+ left join ad_ref_list arl on arl.value=em.highestedbackround and arl.AD_Reference_ID=1000050
+ left join ad_ref_list arlj on arlj.value=em.jurusan and arlj.AD_Reference_ID=1000051
+ where em.UNS_Employee_ID=$P{UNS_Employee_ID}]]>
+	</queryString>
+	<field name="tglnow" class="java.sql.Timestamp"/>
+	<field name="nik" class="java.lang.String"/>
+	<field name="nama" class="java.lang.String"/>
+	<field name="jabatan" class="java.lang.String"/>
+	<field name="idtype" class="java.lang.String"/>
+	<field name="noidentitas" class="java.lang.String"/>
+	<field name="nohp" class="java.lang.String"/>
+	<field name="religion" class="java.lang.String"/>
+	<field name="marialstatus" class="java.lang.String"/>
+	<field name="tempatlahir" class="java.lang.String"/>
+	<field name="tgllahir" class="java.sql.Timestamp"/>
+	<field name="alamat" class="java.lang.String"/>
+	<field name="tlprumah" class="java.lang.String"/>
+	<field name="anak1" class="java.lang.String"/>
+	<field name="anak2" class="java.lang.String"/>
+	<field name="anak3" class="java.lang.String"/>
+	<field name="namapasangan" class="java.lang.String"/>
+	<field name="pendidikan" class="java.lang.String"/>
+	<field name="jurusan" class="java.lang.String"/>
+	<field name="jkelamin" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="277" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="180" height="17" uuid="02744278-acd9-4960-a7b6-11611a18d3e1"/>
+				<textElement>
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Data Karyawan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="89" height="15" uuid="2ff7e869-a111-4f39-9355-657fbe58441b"/>
+				<text><![CDATA[Nomor NIK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="45" width="89" height="15" uuid="69b4256d-66ae-484e-9dcb-c9d929ad2518"/>
+				<text><![CDATA[Nama Karyawan]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="89" y="30" width="100" height="15" uuid="f9760639-96fc-4f36-9b1f-e4d3dd1d36cf"/>
+				<textFieldExpression><![CDATA[$F{nik}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="89" y="45" width="230" height="15" uuid="3d088a95-1279-4fb2-858b-7e07e713b9eb"/>
+				<textFieldExpression><![CDATA[$F{nama}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="90" width="89" height="15" uuid="8940033e-6800-49b5-a060-6206c6240b56"/>
+				<text><![CDATA[Alamat]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="89" y="90" width="270" height="44" uuid="4a50a59b-937b-4aed-bd05-076feaa6a741"/>
+				<textFieldExpression><![CDATA[$F{alamat}]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement x="443" y="17" width="100" height="114" uuid="b7fff32b-d765-49b5-a93a-6f60438722bb"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+			</frame>
+			<staticText>
+				<reportElement x="0" y="134" width="89" height="15" uuid="da661d03-eb59-4984-b45d-5752e33b99d6"/>
+				<text><![CDATA[Telpon]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="89" y="134" width="209" height="15" uuid="2ae51d74-ba9a-4656-84b6-fe6a81a6423b"/>
+				<textFieldExpression><![CDATA[$F{nohp}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="60" width="89" height="15" uuid="def3bded-8652-4b2d-ba93-b0269a2bcb51"/>
+				<text><![CDATA[Tempat Lahir]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="89" y="60" width="230" height="15" uuid="04af4ca5-5f78-41ab-b8c0-f6626b464384"/>
+				<textFieldExpression><![CDATA[$F{tempatlahir}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="89" y="75" width="230" height="15" uuid="15512243-7ebc-466e-844a-f8e808b451be"/>
+				<textFieldExpression><![CDATA[$F{tgllahir}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="75" width="89" height="15" uuid="18ec0408-d82e-4cf5-a173-b79252dbe4aa"/>
+				<text><![CDATA[Tanggal Lahir]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="89" y="179" width="209" height="15" uuid="33ee2c91-6ae3-4f50-b435-418d6aa97811"/>
+				<textFieldExpression><![CDATA[$F{jabatan}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="179" width="89" height="15" uuid="0c51d8cf-8869-4f19-8786-2fc135044716"/>
+				<text><![CDATA[Jabatan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="194" width="89" height="15" uuid="ef1879c6-e961-4471-a221-7c68d14af015"/>
+				<text><![CDATA[Pendidikan]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="89" y="194" width="209" height="15" uuid="98dd48fb-4ce9-453c-aaae-8bc0bdfb78b0"/>
+				<textFieldExpression><![CDATA[$F{pendidikan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="89" y="209" width="334" height="15" uuid="17797e30-a3ad-42b2-b8a2-866351620a4a"/>
+				<textFieldExpression><![CDATA[$F{jurusan}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="209" width="89" height="15" uuid="d0260f92-4d91-4ef2-a7f5-4c7e4e521338"/>
+				<text><![CDATA[Jurusan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="149" width="89" height="15" uuid="32bc64cc-dce3-468c-8934-b322d1e5e2e4"/>
+				<text><![CDATA[Agama]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="89" y="149" width="209" height="15" uuid="16271d76-c83c-4cc8-9bc6-b6786f463387"/>
+				<textFieldExpression><![CDATA[$F{religion}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="164" width="89" height="15" uuid="2187209f-990d-4ba1-98a7-7ed10b3dfe3b"/>
+				<text><![CDATA[Jenis Kelamin]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="89" y="164" width="209" height="15" uuid="1924e3ca-2e86-4ae2-ad85-c9d23b6bbe1e"/>
+				<textFieldExpression><![CDATA[$F{jkelamin}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="224" width="89" height="15" uuid="46896615-4937-49b2-a3b8-8ca9bae5bf7d"/>
+				<text><![CDATA[Nama Pasangan]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="89" y="224" width="209" height="15" uuid="a5c573ec-94d2-43bf-8c8d-c40fe2e183f8"/>
+				<textFieldExpression><![CDATA[$F{namapasangan}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="239" width="89" height="15" uuid="691e80d6-4f73-40d6-9ff5-59f38fbadd8a"/>
+				<text><![CDATA[Jumlah Anak]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="89" y="239" width="209" height="15" uuid="358fb9ec-7e50-457d-a253-725480109ad9"/>
+				<textFieldExpression><![CDATA[$F{anak1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="89" y="254" width="209" height="15" uuid="aaadac94-f5a3-4788-9644-e6858a97ae0d"/>
+				<textFieldExpression><![CDATA[$F{anak2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="5" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="74" splitType="Stretch">
+			<staticText>
+				<reportElement x="298" y="0" width="97" height="14" uuid="5bca4f32-c3fe-43f0-b836-7fe10ca41dc5"/>
+				<text><![CDATA[Bandar Lampung,]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="395" y="0" width="123" height="14" uuid="4b10eea9-6429-498d-a3d0-49613e0188b0"/>
+				<textFieldExpression><![CDATA[$F{tglnow}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="319" y="41" width="177" height="20" uuid="4688bb1c-8a45-4f7f-bee9-dbffbb013262"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{nama}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="20" y="0" width="214" height="14" uuid="dd448a1e-1677-4aa9-b4a9-23ed6394ed18"/>
+				<text><![CDATA[Mengetahui]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+</jasperReport>

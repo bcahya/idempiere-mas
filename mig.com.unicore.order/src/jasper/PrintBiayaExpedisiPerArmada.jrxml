@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintBiayaExpedisiPerArmada" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d0863483-25c7-4237-8ebb-971ee6472a2c">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="UNS_Armada_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["E:\\WORKER\\ProjectFLG\\com.unicore.order\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TypeReport" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="88" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="86" uuid="3a95708b-05e3-427d-8c1c-7ae596eb86c9">
+					<printWhenExpression><![CDATA[$P{TypeReport}=='DT']]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="StartDate">
+					<subreportParameterExpression><![CDATA[$P{StartDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="EndDate">
+					<subreportParameterExpression><![CDATA[$P{EndDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="UNS_Armada_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_Armada_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_User_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_User_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PrintBiayaExpedisiPerArmada_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="86" uuid="6d572b59-13ce-4aa5-8039-400f50eff70b">
+					<printWhenExpression><![CDATA[$P{TypeReport}=='RK']]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="StartDate">
+					<subreportParameterExpression><![CDATA[$P{StartDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="EndDate">
+					<subreportParameterExpression><![CDATA[$P{EndDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="UNS_Armada_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_Armada_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_User_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_User_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PrintBiayaExpedisiPerArmada_Subreport2.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

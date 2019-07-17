@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportDocumentChecking" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8ff6c4f3-f385-41de-9870-f5683ec7db48">
+	<property name="ireport.zoom" value="1.1289478601075549"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_DocChecking_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select docs.name as nmdocu,doc.documentno as noopanem,doc.datedoc as tgldocument,us.name as nam_sales,docl.documentno as nodoc,docl.amount as nilai,coalesce(refl.name,'-') as alasan,
+ coalesce(refls.name,'-') as status,coalesce(ry.name,'') as nmrayon,cbl.bpartnername as nmcustomer
+ from UNS_DocChecking doc
+ left join uns_doccheckingline docl on doc.uns_docchecking_id=docl.uns_docchecking_id
+ left join ad_user us on us.ad_user_id=doc.salesrep_id
+ left join uns_documentschema docs on docs.uns_documentschema_id=doc.uns_documentschema_id
+ left join c_bpartner_location cbl on cbl.c_bpartner_location_id=docl.c_bpartner_location_id
+ left join uns_rayon ry on ry.uns_rayon_id=doc.uns_rayon_id
+ left join AD_Ref_List refl on refl.value=docl.reason
+ left join AD_Ref_LIst refls on refls.value=docl.status
+  where doc.UNS_DocChecking_ID=$P{UNS_DocChecking_ID}]]>
+	</queryString>
+	<field name="nmdocu" class="java.lang.String"/>
+	<field name="noopanem" class="java.lang.String"/>
+	<field name="tgldocument" class="java.sql.Timestamp"/>
+	<field name="nam_sales" class="java.lang.String"/>
+	<field name="nodoc" class="java.lang.String"/>
+	<field name="nilai" class="java.math.BigDecimal"/>
+	<field name="alasan" class="java.lang.String"/>
+	<field name="status" class="java.lang.String"/>
+	<field name="nmrayon" class="java.lang.String"/>
+	<field name="nmcustomer" class="java.lang.String"/>
+	<variable name="no" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[new Integer("1")]]></variableExpression>
+		<initialValueExpression><![CDATA[new Integer("0")]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="104" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="2" width="572" height="19" uuid="5b3c2836-1f0c-4586-9535-6f74a3188295"/>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DOCUMENT CHECKING"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="21" width="572" height="20" uuid="72c1155d-e4c5-4b95-850f-66c98e3df02f"/>
+				<textElement textAlignment="Center">
+					<font size="14" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmdocu}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="74" y="41" width="212" height="14" uuid="11434421-a8c8-4d37-9afa-826423a82e2d"/>
+				<textFieldExpression><![CDATA[": "+$F{noopanem}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="74" y="55" width="212" height="14" uuid="3f5fd6ad-6d89-4465-9bb9-6d83f69e1582"/>
+				<textFieldExpression><![CDATA[": "+new SimpleDateFormat("dd/MM/yyyy").format($F{tgldocument})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="74" y="69" width="212" height="14" uuid="5161439c-0ce2-4a1e-a4dd-a72497bf66f6"/>
+				<textElement>
+					<font isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{nam_sales}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="326" y="41" width="246" height="14" uuid="36df9777-9b27-4366-9d66-4da2eb71deba"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Rayon  : "+$F{nmrayon}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="69" width="74" height="14" uuid="6665c8c6-4949-48ed-ad99-913e5d401966"/>
+				<textFieldExpression><![CDATA["Salesman "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="55" width="74" height="14" uuid="6d18e28c-7bae-4b3a-9ab1-84b5025ad2f3"/>
+				<textFieldExpression><![CDATA["Tanggal    "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="41" width="74" height="14" uuid="826b166d-0957-427d-9b78-885a2756f064"/>
+				<textFieldExpression><![CDATA["No Document  "]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="1" width="572" height="20" uuid="f9d2659c-a139-4d92-b566-199ad0781bdb"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="25" y="4" width="58" height="14" uuid="016cb9a0-2d31-4208-88f0-3a0c9260cfbe"/>
+				<text><![CDATA[No.Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="87" y="4" width="100" height="13" uuid="3c50ae37-6b7c-4391-81a7-579bf98922d4"/>
+				<text><![CDATA[Nama Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="246" y="4" width="72" height="13" uuid="c99f74ba-5bd0-4e5e-8560-b68dff52821c"/>
+				<text><![CDATA[Nilai Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="326" y="3" width="100" height="14" uuid="26a427f7-9102-424b-8e45-8089330b791e"/>
+				<text><![CDATA[Alasan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="457" y="2" width="100" height="14" uuid="eeefb8bc-a69e-410d-b60d-fa39e9d4dbe3"/>
+				<text><![CDATA[Status Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="4" width="20" height="14" uuid="6223b5a8-b996-4d94-832d-5d050a96b362"/>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement x="246" y="0" width="72" height="14" uuid="c7fc4696-04ff-4880-91a5-4e68512adeab"/>
+				<textFieldExpression><![CDATA[$F{nilai}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="457" y="0" width="100" height="14" uuid="0705b0f3-cb65-42be-b512-ae007e9c72ec"/>
+				<textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="326" y="0" width="100" height="14" uuid="a60e54f5-48fa-4a11-8cac-523bbd794efb"/>
+				<textFieldExpression><![CDATA[$F{alasan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="25" y="0" width="58" height="14" uuid="c6f63872-f4cb-45ad-93e3-712753184ce2"/>
+				<textFieldExpression><![CDATA[$F{nodoc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="87" y="0" width="151" height="14" uuid="3764c607-4b8c-4844-b5fe-d07b7fb7e69b"/>
+				<textFieldExpression><![CDATA[$F{nmcustomer}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="0" width="20" height="14" uuid="3d484b5f-1ce3-444a-bbfc-0062dded33f2"/>
+				<textFieldExpression><![CDATA[$V{no}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="17" splitType="Stretch">
+			<line>
+				<reportElement x="2" y="1" width="412" height="1" uuid="f9d86275-b881-4000-a947-a0a03b1b178a"/>
+			</line>
+		</band>
+	</pageFooter>
+</jasperReport>

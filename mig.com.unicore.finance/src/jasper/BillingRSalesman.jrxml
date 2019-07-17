@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BillingRSalesman" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="777" leftMargin="10" rightMargin="5" topMargin="10" bottomMargin="10" uuid="2c8eabee-dee3-48f6-9ce2-2773c014be5b">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<parameter name="TypeReport" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["E:\\WORKER\\ProjectFLG\\com.unicore.finance\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="194" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="194" uuid="4add97ab-b36a-4e57-b741-5e9a92edb54a">
+					<printWhenExpression><![CDATA[$P{TypeReport}=='DT']]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="StartDate">
+					<subreportParameterExpression><![CDATA[$P{StartDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="EndDate">
+					<subreportParameterExpression><![CDATA[$P{EndDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_User_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_User_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_SalesRegion_ID">
+					<subreportParameterExpression><![CDATA[$P{C_SalesRegion_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TypeReport">
+					<subreportParameterExpression><![CDATA[$P{TypeReport}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "BillingRSalesman_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="0" y="0" width="752" height="194" uuid="a4e56c70-8166-41c6-a4b3-9465ea33ff07">
+					<printWhenExpression><![CDATA[$P{TypeReport}=='RK']]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="StartDate">
+					<subreportParameterExpression><![CDATA[$P{StartDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="EndDate">
+					<subreportParameterExpression><![CDATA[$P{EndDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_User_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_User_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_SalesRegion_ID">
+					<subreportParameterExpression><![CDATA[$P{C_SalesRegion_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TypeReport">
+					<subreportParameterExpression><![CDATA[$P{TypeReport}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "BillingRSalesman_Subreport2.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

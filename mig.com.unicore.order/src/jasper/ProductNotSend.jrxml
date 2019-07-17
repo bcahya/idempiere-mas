@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ProductNotSend" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b6127395-5330-47ee-996a-8d16f091bd10">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+bp.name AS namatoko,
+pd.name AS namabrg,
+oql.qty AS qtybrg,
+ord.documentno AS nord
+
+FROM
+uns_orderqueue oq
+INNER JOIN uns_orderqueue_line oql ON oql.uns_orderqueue_id=oq.uns_orderqueue_id
+INNER JOIN m_product pd on pd.m_product_id=oq.m_product_id
+INNER JOIN c_bpartner bp ON bp.c_bpartner_id=oql.c_bpartner_id
+INNER JOIN c_orderline orl ON orl.c_orderline_id=oql.c_orderline_id
+INNER JOIN c_order ord ON ord.c_order_id=orl.c_order_id
+
+WHERE
+oql.c_bpartner_id = $P{C_BPartner_ID}]]>
+	</queryString>
+	<field name="namatoko" class="java.lang.String"/>
+	<field name="namabrg" class="java.lang.String"/>
+	<field name="qtybrg" class="java.math.BigDecimal"/>
+	<field name="nord" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="47" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="20" uuid="c38a8aaf-30bf-4c71-9d9b-2483059c6025"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[List Barang yang Belum Dikirim]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="27" width="83" height="15" uuid="f67698d5-ae3f-463c-9f66-3c29df2eb135"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Nama Customer :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="82" y="27" width="100" height="15" uuid="1db61a1a-8a07-450e-9dc3-028a33c2e25d"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{namatoko}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="-1" width="555" height="20" uuid="6daee1c6-5895-461a-9c00-3a095a600dbb"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="5" y="-1" width="100" height="20" uuid="93252be5-cbd2-4243-91fe-297de43aff75"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="450" y="-1" width="100" height="20" uuid="4c9e8cf0-e9e1-4e81-b498-dcedf49d1214"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Jumlah Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="341" y="-1" width="100" height="20" uuid="9bc3046f-733c-46ed-b24b-148a87d96c85"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[No Order]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="4" y="0" width="317" height="20" uuid="daf70d96-e151-44dd-a49c-e5383d0909e8"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{namabrg}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="0" width="100" height="20" uuid="c60d5cc2-0290-4590-afca-7fd2feab60d9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nord}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement x="454" y="0" width="71" height="20" uuid="50bdc970-7ad7-47dd-95ef-2446acaa6bb4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{qtybrg}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

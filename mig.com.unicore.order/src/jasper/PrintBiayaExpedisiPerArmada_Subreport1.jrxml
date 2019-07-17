@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintBiayaExpedisiPerArmada_Subreport1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d0863483-25c7-4237-8ebb-971ee6472a2c">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="155"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="UNS_Armada_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="TypeReport" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select now() tglskrg,org.name as org,u.name as uctk,sh.datedoc as tglshipping,amd.name as nmarmada,(case when cd.chargetype='CS' then cd.amount else 0 end) as tcost,
+coalesce(cg.name,'') as ncharge,
+(case when cd.chargetype='VC' then cd.amount else 0 end) as Vcost,coalesce(vc.name,'') as nvaouc
+from UNS_Shipping sh
+left join UNS_Charge_Detail cd on cd.uns_shipping_id=sh.uns_shipping_id and cd.iscancelled='N'
+inner join uns_armada amd on sh.uns_armada_id=amd.uns_armada_id
+left join ad_org org on org.ad_org_id=sh.ad_org_id
+left join c_charge cg on cg.c_charge_id=cd.c_charge_id
+left join uns_voucher_code vc on vc.uns_voucher_code_id=cd.uns_voucher_code_id
+left join ad_user u on ad_user_id=$P{AD_User_ID}
+where case when $P{UNS_Armada_ID}!=0 then amd.uns_armada_id=$P{UNS_Armada_ID} else 1=1 end
+and sh.datedoc between $P{StartDate} and $P{EndDate}
+AND sh.status='RS' AND sh.docstatus IN ('CO', 'CL')
+order by org.name,amd.name,sh.datedoc]]>
+	</queryString>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="uctk" class="java.lang.String"/>
+	<field name="tglshipping" class="java.sql.Timestamp"/>
+	<field name="nmarmada" class="java.lang.String"/>
+	<field name="tcost" class="java.math.BigDecimal"/>
+	<field name="ncharge" class="java.lang.String"/>
+	<field name="vcost" class="java.math.BigDecimal"/>
+	<field name="nvaouc" class="java.lang.String"/>
+	<variable name="tcost" class="java.lang.Integer" resetType="Group" resetGroup="organisasi" calculation="Sum">
+		<variableExpression><![CDATA[$F{tcost}]]></variableExpression>
+	</variable>
+	<variable name="tvou" class="java.lang.Integer" resetType="Group" resetGroup="organisasi" calculation="Sum">
+		<variableExpression><![CDATA[$F{vcost}]]></variableExpression>
+	</variable>
+	<variable name="no" class="java.lang.Integer" resetType="Group" resetGroup="armada" calculation="Count">
+		<variableExpression><![CDATA[new Integer('1')]]></variableExpression>
+	</variable>
+	<variable name="ttcost" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{tcost}]]></variableExpression>
+	</variable>
+	<variable name="ttvou" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{vcost}]]></variableExpression>
+	</variable>
+	<variable name="tavou" class="java.lang.Integer" resetType="Group" resetGroup="armada" calculation="Sum">
+		<variableExpression><![CDATA[$F{vcost}]]></variableExpression>
+	</variable>
+	<variable name="tavcost" class="java.lang.Integer" resetType="Group" resetGroup="armada" calculation="Sum">
+		<variableExpression><![CDATA[$F{tcost}]]></variableExpression>
+	</variable>
+	<group name="organisasi">
+		<groupExpression><![CDATA[$F{org}]]></groupExpression>
+		<groupHeader>
+			<band height="18">
+				<textField>
+					<reportElement uuid="9ef08434-9b63-4be5-b5d1-dc5d7eb9ce31" x="21" y="3" width="130" height="15"/>
+					<textElement>
+						<font isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<textField pattern="#,##0.00">
+					<reportElement uuid="284ebfeb-6582-491d-8896-b075d7470eab" x="310" y="0" width="100" height="14"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{tcost}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="08cd789d-0c56-42d5-90a0-23aef3677ded" x="442" y="0" width="100" height="14"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{tvou}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="eddf32f8-15e6-4ae9-b875-fe0949924a8e" x="127" y="2" width="229" height="14"/>
+					<textElement/>
+					<textFieldExpression><![CDATA['Total Organisasi ------> '+ $F{org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="armada">
+		<groupExpression><![CDATA[$F{nmarmada}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField>
+					<reportElement uuid="0a1dbec0-3405-4faf-94fe-a94c66c3631e" x="44" y="0" width="130" height="14"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[$F{nmarmada}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="17">
+				<textField pattern="#,##0.00">
+					<reportElement uuid="96ea5499-fcdc-46c0-8790-70589f939105" x="442" y="0" width="100" height="14"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{tavou}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="9af0fc92-6fb2-4090-96a1-de98e7115d2d" x="264" y="0" width="100" height="14"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{tavou}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="f93a34e8-a9d5-419e-95bd-1094e008679b" x="111" y="0" width="192" height="14"/>
+					<textElement/>
+					<textFieldExpression><![CDATA['Total Armada ------> '+ $F{nmarmada}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="34" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="9223c690-55ad-4630-8466-6c564c10125b" x="0" y="0" width="555" height="14"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Detail Biaya Expedisi]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="3725ebb9-9d79-4bd3-9d91-1ded2e20ba27" x="0" y="12" width="555" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Periode Tanggal '+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' sampai '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="67830709-1f8a-4310-b3d3-2926a6db3fa5" x="435" y="21" width="80" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="009e48ae-55d6-40bc-9e9d-0fd76b79acd1" x="515" y="21" width="40" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="ed56bf2a-2f6f-411e-9d39-9b986f622924" x="0" y="5" width="21" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9e225e4c-ae00-487d-a342-a3510aca80cf" x="21" y="5" width="65" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[KD KENDARAAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="149a7826-fb71-4a33-ba09-43ed55c7bb51" x="476" y="5" width="66" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[VOUCHER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="24863b89-c236-4b2e-80ff-1207c6cdea6e" x="293" y="5" width="71" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[COST]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="96f94814-a900-4451-b1f6-47ed85afe690" x="0" y="18" width="555" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="1cfa3d9d-bc15-4e91-80ac-94929aa14a96" x="0" y="1" width="555" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="81f657f3-2203-4022-bd8e-fd5b31c9c5a0" x="91" y="5" width="65" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[TGL SHIPPING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="275c2db3-4036-4b23-980a-250adf0ffb1a" x="156" y="5" width="147" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[NAMA CHARGE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="75cf08d4-3148-4cdb-b856-17c673e8a4d3" x="376" y="5" width="100" height="11"/>
+				<textElement textAlignment="Justified">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[KD VOUCHER]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement uuid="7029d9b8-aabe-4b33-910f-32328569d8ad" x="310" y="0" width="54" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{tcost}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="06ae2eb1-742f-4bb4-975c-ffe5a66f49af" x="476" y="0" width="66" height="14"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{vcost}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="950c6746-3be1-458e-b110-f92e06736eb0" x="0" y="0" width="32" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$V{no}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="a9d3f8b8-c55c-4f78-90c0-c6e974a9b930" x="86" y="0" width="70" height="13"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{tglshipping}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="aef6a63d-a29c-4eb9-bf46-d590c2785812" x="156" y="0" width="147" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{ncharge}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="30994b10-fb5e-423b-8e8c-a8b1928daedf" x="376" y="0" width="100" height="14"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{nvaouc}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="59">
+			<textField pattern="#,##0.00">
+				<reportElement uuid="632a2294-9739-467c-ae3d-ae7d9005133d" x="310" y="0" width="100" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{ttcost}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="d51758fd-8962-41ec-8a21-3efd8b30b4ed" x="442" y="0" width="100" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{ttvou}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="51458659-9936-4057-ab66-25dce6aa84db" x="174" y="0" width="136" height="20"/>
+				<textElement/>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="5691ed9b-9cb8-45fe-b221-eb4ecb4c01d4" x="0" y="34" width="151" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA['User Cetak :'+$F{uctk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0a8dc3e1-261b-4278-ac70-1a27cc1566a0" x="395" y="34" width="147" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA['Tgl Cetak :'+new SimpleDateFormat("dd/MM/yyyy").format($F{tglskrg})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="45d140d6-65e4-47f4-95aa-85fac4c35c35" x="0" y="26" width="555" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</lastPageFooter>
+</jasperReport>

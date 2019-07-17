@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintSuratPengirimanBarangShipping_Subreport2" language="groovy" pageWidth="611" pageHeight="395" columnWidth="571" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" uuid="9aed1e3a-6bff-41e6-a26c-90a889ce4a88">
+	<property name="ireport.zoom" value="1.3995221406292"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Shipping_ID" class="java.lang.Integer"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT data.namagudang,jobso.documentno as nojobso,mp.name as nmproduct,uomconversiontostr(mp.m_product_id,col.qtyentered) as qty,sh.documentno as noshipping,sh.datedoc as tglship,
+data.noorder as noorder,data.tglorder as tglorder,COALESCE (uat.name, uat.name, '') AS TipeKendaraan,
+COALESCE (ua.value, ua.value, '') AS NoKendaraan,sh.driver as supir,cb.name as nmbpartner,
+concat_ws(' ',coalesce(cl.address1,''),coalesce(cl.address2,''),coalesce(cl.address3,''),coalesce(cl.address4,''), coalesce(cbl.phone,'')) as al
+FROM
+(SELECT co.c_order_id as co_id,co.dateordered as tglorder,co.documentno noorder,Array_To_String(Array_Agg(DISTINCT(mw.name)), ';') as namagudang
+FROM C_ORDER co
+INNER JOIN m_warehouse mw on mw.m_warehouse_id=co.m_warehouse_id
+WHERE co.docstatus in('CO','CL')
+group by co.c_order_id ) data
+INNER JOIN c_orderline col on col.c_order_id=data.co_id
+INNER JOIN m_product mp on mp.m_product_id=col.m_product_id
+LEFT JOIN C_BPartner_Product mpb on mpb.m_product_id=mp.m_product_id
+LEFT JOIN C_BPartner cb on cb.c_bpartner_id=mpb.bpartner_original_id
+LEFT JOIN C_BPartner_Location cbl on cbl.c_bpartner_id=cb.c_bpartner_id
+left join c_location cl on cl.c_location_id=cbl.c_location_id
+INNER JOIN uns_expeditiondetail jobd on jobd.C_Order_id=data.co_id
+INNER JOIN uns_expedition jobso on jobso.uns_expedition_id=jobd.uns_expedition_id
+INNER JOIN uns_expedition jobs on jobs.jobso_id=jobso.UNS_Expedition_ID
+INNER JOIN uns_shippingfreight shf on shf.uns_expedition_id=jobs.uns_expedition_id
+INNER JOIN uns_shipping sh on sh.uns_shipping_id=shf.uns_shipping_id
+LEFT JOIN uns_armada ua ON ua.uns_armada_id = sh.uns_armada_id
+LEFT JOIN uns_armadatype uat ON uat.uns_armadatype_id = ua.uns_armadatype_id
+WHERE sh.UNS_shipping_id =$P{UNS_Shipping_ID} AND CASE WHEN sh.UNS_Shipping_ID IS NOT NULL THEN sh.DocStatus NOT IN ('VO', 'RE') ELSE 1=1 END]]>
+	</queryString>
+	<field name="namagudang" class="java.lang.String"/>
+	<field name="nojobso" class="java.lang.String"/>
+	<field name="nmproduct" class="java.lang.String"/>
+	<field name="qty" class="java.lang.String"/>
+	<field name="noshipping" class="java.lang.String"/>
+	<field name="tglship" class="java.sql.Timestamp"/>
+	<field name="noorder" class="java.lang.String"/>
+	<field name="tglorder" class="java.sql.Timestamp"/>
+	<field name="tipekendaraan" class="java.lang.String"/>
+	<field name="nokendaraan" class="java.lang.String"/>
+	<field name="supir" class="java.lang.String"/>
+	<field name="nmbpartner" class="java.lang.String"/>
+	<field name="al" class="java.lang.String"/>
+	<group name="merk">
+		<groupExpression><![CDATA[]]></groupExpression>
+	</group>
+	<group name="product">
+		<groupExpression><![CDATA[]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="158" splitType="Stretch">
+			<printWhenExpression><![CDATA[$V{PAGE_NUMBER}.intValue() == 1? new Boolean(true) : new Boolean(false)]]></printWhenExpression>
+			<rectangle>
+				<reportElement x="1" y="141" width="555" height="15" uuid="f5f7cfd9-e72e-4df2-8a27-aa8f660c7b4b"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="26" y="141" width="189" height="15" uuid="4394551b-a8f4-45b5-be90-a0ba76672501"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="215" y="141" width="156" height="15" uuid="bf3d61a0-aca1-4656-b5ba-acd89d7adc2a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Jumlah]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="0" width="88" height="11" uuid="861b604d-3695-4709-900b-7859552b33ad"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[CV. Fajar Lestari]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="10" width="172" height="11" uuid="7ce3aa82-8165-48e5-a3a1-06e198f7ff64"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jl. KH. Agus Anang No. 2 Bandar Lampung]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="20" width="172" height="11" uuid="7e4813fe-e2e9-4454-8488-5f9863c21b70"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Telp. (0721)-31914,33307,32823]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="47" width="172" height="11" uuid="a0e8e25e-694f-4e3d-94f3-8218339b7ea5"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Kepada Yth:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="371" y="0" width="68" height="11" uuid="9e71a173-81b0-4e06-8741-78290bcd8d13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Shipping]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="349" y="22" width="90" height="11" uuid="b6b8bd22-db6d-41f6-8748-2efc041e6ed4"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Packing List / DO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="111" width="570" height="13" uuid="ecd9b064-b573-4b39-8484-f0e28ab55941"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[DELIVERY ORDER]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="439" y="0" width="100" height="11" uuid="a8999962-e46a-40bd-a5b7-ec1e75969ed3"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" : "+$F{noshipping}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="371" y="11" width="68" height="11" uuid="0608b93e-9486-4bd0-98e0-9207c9b1cd23"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Shipping]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="349" y="33" width="90" height="11" uuid="b9cb7a6f-eda0-4844-9a44-0a999c270d02"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Packing List / DO]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="439" y="22" width="100" height="11" uuid="1958b149-d416-49f1-a8c7-bbfc515c0c6f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" : "+$F{noorder}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="439" y="11" width="100" height="12" uuid="5f496122-cb61-4bd5-bda1-5859a5391562"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" : "+new SimpleDateFormat("dd-MM-yyyy").format($F{tglship})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="439" y="33" width="100" height="12" uuid="0e0f8afe-722f-40c1-8c6d-43d51abbcdfa"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" : "+new SimpleDateFormat("dd-MM-yyyy").format($F{tglorder})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="31" width="172" height="11" uuid="89a1b2e3-658a-4499-91be-68d1af0e4808"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Fax. (0721)-32010]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="1" y="124" width="570" height="17" uuid="99bf2b5a-2a66-4f16-a571-becaff5c6cc9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Harap diberikan Estimasi Order barang-barang tersebut dibawah ini kepada Supir "+$F{supir} +" Nomor Kendaraan "+$F{nokendaraan}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="349" y="50" width="100" height="11" uuid="4066c7fd-263a-4703-8c54-2469954e18ac"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Delivered To :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="349" y="61" width="206" height="33" uuid="17933d7b-862a-49ad-b019-0c239da42037"/>
+				<textFieldExpression><![CDATA[$F{namagudang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="57" width="248" height="11" uuid="52b5f7b5-db8d-42be-a83f-53f1eea7ddf7"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmbpartner}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="1" y="67" width="237" height="37" uuid="fc4b8dca-1026-4fad-bbe9-34a0d63c878e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{al}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15">
+			<textField>
+				<reportElement x="26" y="0" width="223" height="14" uuid="4dbc7e54-a86e-419b-9729-335fcdca17e9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmproduct}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="268" y="0" width="181" height="14" uuid="9c33a166-333b-4d66-aaf6-563a45508622"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="73">
+			<staticText>
+				<reportElement x="0" y="48" width="125" height="15" uuid="26d608ed-f4f6-402a-bb51-b0a9aba11e21"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[( Adm. Penjualan )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="424" y="48" width="147" height="15" uuid="bc4d97bb-3177-417b-bcbf-59b67668e128"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[( Supir )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="48" width="114" height="15" uuid="f7e30966-2bcf-4055-af8f-cfa092ed29cf"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[( KA. Penjualan )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="424" y="0" width="147" height="15" uuid="7f14bc22-0a73-42a3-a626-2861c05a2a22"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Diterima Oleh,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="0" width="114" height="15" uuid="fc48c85b-1ed8-4769-bf16-5164b53a6fb6"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Disetujui Oleh,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="125" height="15" uuid="8c2f5e5e-b607-4a74-860a-b317da8f594a"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Dibuat Oleh, ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="154" y="0" width="114" height="15" uuid="b2058fc4-29a7-45a0-8338-259b204d0144"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Diketahui oleh,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="154" y="48" width="114" height="15" uuid="62a45175-bb70-4aff-b8df-c2dce7cc607b"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[( Expedisi )]]></text>
+			</staticText>
+			<line>
+				<reportElement x="1" y="0" width="554" height="1" uuid="c67b6270-34b4-4b02-a515-c84a0ad01c1b"/>
+			</line>
+		</band>
+	</columnFooter>
+</jasperReport>

@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportProductionWage_Subreport2" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e7e73cb6-8339-49ff-893a-1087c593662b">
+	<property name="ireport.zoom" value="1.3310000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UNS_Employee_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT org.Name AS Org, jr.Name AS Position, emp.Name AS Employee, prpt.Name AS Grade, COUNT(prpt.*) AS Count, prpt.PayableAmt AS PayAmt FROM UNS_Production pr
+
+INNER JOIN AD_Org org ON org.AD_Org_ID = pr.AD_Org_ID
+INNER JOIN UNS_Production_Detail pd ON pd.UNS_Production_ID = pr.UNS_Production_ID
+INNER JOIN M_Product p ON p.M_Product_ID = pd.M_Product_ID
+INNER JOIN UNS_ProductionPayConfig ppc ON ppc.UNS_ProductionPayConfig_ID = pr.UNS_ProductionPayConfig_ID
+INNER JOIN UNS_Production_Worker pw ON pw.UNS_Production_ID = pr.UNS_Production_ID
+INNER JOIN UNS_Job_Role jr ON jr.UNS_Job_Role_ID = pw.UNS_Job_Role_ID
+INNER JOIN UNS_PayRollLine prl ON prl.UNS_ProductionPayConfig_ID = ppc.UNS_ProductionPayConfig_ID AND jr.UNS_Job_Role_ID = prl.UNS_Job_Role_ID
+INNER JOIN UNS_Employee emp ON emp.UNS_Employee_ID = pw.ReplacementLabor_ID
+INNER JOIN UNS_PayRollPremiTarget prpt ON prpt.UNS_PayRollLine_ID = prl.UNS_PayRollLine_ID AND pd.MovementQty BETWEEN prpt.TargetMin AND prpt.TargetMax
+
+WHERE pr.MovementDate BETWEEN $P{DateFrom} AND $P{DateTo} AND pr.DocStatus IN ('CO', 'CL') AND pd.IsPrimary = 'Y' AND pr.AD_Org_ID = $P{AD_Org_ID} AND (CASE WHEN $P{UNS_Employee_ID} IS NOT NULL THEN emp.UNS_Employee_ID = $P{UNS_Employee_ID} ELSE 1=1 END)
+
+GROUP BY org.AD_Org_ID, jr.UNS_Job_Role_ID, emp.UNS_Employee_ID, prpt.UNS_PayRollPremiTarget_ID
+
+ORDER BY Position, Employee, Grade]]>
+	</queryString>
+	<field name="org" class="java.lang.String"/>
+	<field name="position" class="java.lang.String"/>
+	<field name="employee" class="java.lang.String"/>
+	<field name="grade" class="java.lang.String"/>
+	<field name="count" class="java.lang.Long"/>
+	<field name="payamt" class="java.math.BigDecimal"/>
+	<variable name="employee_amt" class="java.math.BigDecimal" resetType="Group" resetGroup="Employee" calculation="Sum">
+		<variableExpression><![CDATA[$V{amount}]]></variableExpression>
+	</variable>
+	<variable name="position_amt" class="java.math.BigDecimal" resetType="Group" resetGroup="position" incrementType="Group" incrementGroup="Employee" calculation="Sum">
+		<variableExpression><![CDATA[$V{employee_amt}]]></variableExpression>
+	</variable>
+	<variable name="total_amt" class="java.math.BigDecimal" incrementType="Group" incrementGroup="position" calculation="Sum">
+		<variableExpression><![CDATA[$V{position_amt}]]></variableExpression>
+	</variable>
+	<variable name="amount" class="java.math.BigDecimal" resetType="None">
+		<variableExpression><![CDATA[$F{count} * $F{payamt}]]></variableExpression>
+	</variable>
+	<variable name="variable1" class="java.lang.Integer" resetType="None">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
+	</variable>
+	<variable name="variable2" class="java.lang.Integer">
+		<variableExpression><![CDATA[$V{variable1} + 1]]></variableExpression>
+	</variable>
+	<group name="position">
+		<groupExpression><![CDATA[$F{position}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement uuid="a1bd1b70-0f59-408b-bbfb-a1e64c9d4534" x="0" y="0" width="555" height="17"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{position}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="17">
+				<textField pattern="#,##0.00">
+					<reportElement uuid="309c8f05-8447-45ed-a17f-0c1a1c083fad" x="455" y="0" width="100" height="17"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{position_amt}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="a1bd1b70-0f59-408b-bbfb-a1e64c9d4534" x="0" y="0" width="455" height="17"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["TOTAL " + $F{position}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Employee" keepTogether="true">
+		<groupExpression><![CDATA[$F{employee}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement uuid="309c8f05-8447-45ed-a17f-0c1a1c083fad" x="28" y="0" width="504" height="17"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{employee}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement uuid="f5d08ff7-c7b1-485d-abf0-55e72f1a6a3b" x="0" y="0" width="555" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="17">
+				<textField pattern="#,##0.00">
+					<reportElement uuid="309c8f05-8447-45ed-a17f-0c1a1c083fad" x="455" y="0" width="100" height="17"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{employee_amt}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="a1bd1b70-0f59-408b-bbfb-a1e64c9d4534" x="0" y="0" width="455" height="17"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["TOTAL " + $F{employee}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="59" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="f56c1c76-9eb6-4210-9f92-a9f012c9923f" x="0" y="0" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Production Wage]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="01b908d9-2e29-4155-8c0b-39a2f3e40ee3" x="455" y="4" width="100" height="20"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaERP System]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="ce9b96b2-be06-404d-9533-7ec81b66580b" x="0" y="15" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="83d75136-e9ab-4822-8080-74e8a96c5791" x="0" y="35" width="555" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Period : " + new SimpleDateFormat("dd/MM/yyy").format($P{DateFrom}) + " - "
++ new SimpleDateFormat("dd/MM/yyyy").format($P{DateTo})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<textField>
+				<reportElement uuid="309c8f05-8447-45ed-a17f-0c1a1c083fad" x="57" y="0" width="279" height="17"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{grade}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="309c8f05-8447-45ed-a17f-0c1a1c083fad" x="455" y="0" width="100" height="17"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{amount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="309c8f05-8447-45ed-a17f-0c1a1c083fad" x="336" y="0" width="47" height="17"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="309c8f05-8447-45ed-a17f-0c1a1c083fad" x="383" y="0" width="72" height="17"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{payamt}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="17" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement uuid="309c8f05-8447-45ed-a17f-0c1a1c083fad" x="455" y="0" width="100" height="17"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_amt}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="020b344e-a9f5-4d36-a17e-3cf001b8ec65" x="0" y="0" width="455" height="17"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="73c73aa7-5812-491d-8ef6-9e1401872349" x="0" y="0" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

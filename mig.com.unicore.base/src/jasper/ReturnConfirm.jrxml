@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReturnConfirm" language="groovy" pageWidth="612" pageHeight="396" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ceb3872b-3abf-4e95-9898-f40d37147d9d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="M_InOut_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() as tglsekarang,data.amount,data.docRMA,COALESCE(cr.description,'-') as description,
+cr.created as Tglbuat,rma.created as tglrma,ad.name as user,cr.documentno as documentno
+from
+(select sum(crl.qtyentered*col.PriceEntered) as amount,Array_To_String(Array_Agg(rma.documentno), ';') as docRMA
+ from M_InOut cr
+ inner join M_InOutLine crl on cr.m_inout_id=crl.m_inout_id
+ inner join M_RMALine rml on crl.m_rmaline_id=rml.m_rmaline_id
+ inner join  M_RMA rma on rml.m_rma_id=rma.m_rma_id
+ inner join  M_InOutLine sh on rml.m_inoutline_id=sh.m_inoutline_id
+ inner join c_orderline col on col.c_orderline_id=sh.c_orderline_id
+ where cr.docstatus in('CO','CL') and  cr.M_InOut_ID=$P{M_InOut_ID}) data
+left join ad_user ad on ad.ad_user_id=$P{AD_User_ID}
+inner join m_inout cr on cr.m_inout_id=$P{M_InOut_ID}
+inner join m_rma rma on cr.m_rma_id=rma.m_rma_id
+where cr.docstatus in('CO','CL') and  cr.M_InOut_ID=$P{M_InOut_ID}]]>
+	</queryString>
+	<field name="tglsekarang" class="java.sql.Timestamp"/>
+	<field name="amount" class="java.math.BigDecimal"/>
+	<field name="docrma" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="tglbuat" class="java.sql.Timestamp"/>
+	<field name="tglrma" class="java.sql.Timestamp"/>
+	<field name="user" class="java.lang.String"/>
+	<field name="documentno" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="69" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="9a4f4b58-8786-4f47-a20e-6b861e840aea" x="0" y="42" width="572" height="25"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[Validation]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="ccc73a74-ac79-4ee7-80fa-af56c86b1f86" x="244" y="23" width="328" height="17"/>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Print Date "+new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format($F{tglsekarang})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="168" splitType="Stretch">
+			<textField>
+				<reportElement uuid="e8fee499-ab89-4b3d-abf9-b1f342a665cc" x="0" y="50" width="572" height="22"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Description  :  "+$F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4995740f-9c55-4712-a14b-426bb75b98b1" x="0" y="72" width="320" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NoDocument Return : "+$F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ae8bdf11-e53f-4d34-b44d-24cfdba14ab8" x="375" y="72" width="197" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Tgl.Document : " +new SimpleDateFormat("dd/MM/yyyy").format($F{tglbuat})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="750688c6-63f7-4d6d-872f-093838a6bc8e" x="0" y="95" width="301" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{docrma}==" " ? " " :"NO. RMA  : "+$F{docrma}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="d0976f2a-5f6f-4f10-a413-10822071b17a" x="406" y="139" width="135" height="29"/>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="750688c6-63f7-4d6d-872f-093838a6bc8e" x="301" y="95" width="211" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglrma}== null ? " " : "   Tanggal RMA :"+ (new SimpleDateFormat("dd/MM/yyyy").format($F{tglrma}))]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<columnFooter>
+		<band height="50" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="8e912b57-b343-4b71-aba7-4b9615cdfd7d" x="0" y="24" width="114" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[(Admin Penerimaan)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="efb07a10-c377-4880-ab37-e55d705d633a" x="406" y="24" width="155" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[(Mengetahui Kepala Gudang)]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="1fd0c89a-bd6f-42ec-b9c2-108a9226f7b1" x="0" y="4" width="114" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{user}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+</jasperReport>

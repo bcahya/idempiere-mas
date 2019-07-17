@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintKartuStock" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4a1b15b3-2baf-4ed7-a2c8-d8a3500a3ada">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="M_Locator_ID" class="java.lang.Integer"/>
+	<parameter name="M_Product_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select loc.value as nmgudang,m.name as nmbarang,data.sm_product_id,data.sm_locator_id,data.qty,data.onhand as onhand,t.movementdate,
+uomconversiontostr(data.sm_product_id,data.onhand-data.qty) sqty,sum(t.movementqty) as qt,uomconversiontostr(data.sm_product_id,(sum(t.movementqty))) as sqt,
+(data.onhand-data.qty) as saldo,
+uomconversiontostr(data.sm_product_id,data.onhand-data.qty) as ssaldo,
+(data.onhand-data.qty)+sum(t.movementqty) as sakhir,
+uomconversiontostr(data.sm_product_id,(data.onhand-data.qty)+sum(t.movementqty)) as ssakhir,
+(case when t.m_inoutline_id is null then '' else (select documentno from m_inout where m_inout_id in(select m_inout_id from m_inoutline where m_inoutline_id=t.m_inoutline_id)) end) as no_inot,
+(case when t.m_inoutline_id is null then '' else (select name from c_doctype where c_doctype_id in(select c_doctype_id from m_inout where m_inout_id in
+(select m_inout_id from m_inoutline where m_inoutline_id=t.m_inoutline_id))) end) as ket_minout,
+(case when t.m_inoutline_id is null then '' else (select documentno from m_inout where m_inout_id in
+(select m_inout_id from m_inoutline where m_inoutline_id=t.m_inoutline_id)) end) as nominout,
+(case when t.uns_pl_confirmproduct_id is null then '' else (select plc.documentno from uns_pl_confirm plc where plc.uns_pl_confirm_id in(select plp.uns_pl_confirm_id from uns_pl_confirmproduct plp where
+plp.uns_pl_confirmproduct_id=t.uns_pl_confirmproduct_id)) end) as nopl,
+(case when t.uns_production_detail_id is null then '' else (select pr.documentno from m_production pr where pr.m_production_id in(select uns_production_detail_id from
+uns_production_detail as prd where prd.uns_production_detail_id=t.uns_production_detail_id)) end) as noprod,
+(case when t.m_inventoryline_id is null then '' else (select i.documentno from m_inventory as i where i.m_inventory_id in(select il.m_inventory_id from
+m_inventoryline il where il.m_inventoryline_id=t.m_inventoryline_id)) end) as inven,
+(case when t.m_movementline_id is null then '' else (select mv.documentno from m_movement mv where mv.m_movement_id in(select ml.m_movement_id from
+m_movementline ml where ml.m_movementline_id=t.m_movementline_id)) end) as move,
+(case when t.m_inoutline_id is null then '' else (select mi.documentno from m_inout as mi where mi.m_inout_id in(select mil.m_inout_id from
+m_inoutline mil where mil.m_inoutline_id=t.m_inoutline_id)) end) as tranfer
+from (
+select stock.sm_product_id,stock.sm_locator_id,stock.qty,sum(mo.qtyonhand) as onhand
+from (select mt.m_product_id as sm_product_id,ml.m_locator_id as sm_locator_id,sum(mt.movementqty) as qty
+from m_transaction mt
+left join m_locator ml on ml.m_locator_id=mt.m_locator_id
+where mt.movementdate>=$P{StartDate}
+AND mt.m_locator_id=$P{M_Locator_ID} and mt.m_product_id=$P{M_Product_ID}
+group by mt.m_product_id,ml.m_locator_id) as stock
+left join m_storageonhand mo on stock.sm_product_id=mo.m_product_id and stock.sm_locator_id=mo.m_locator_id
+group by stock.sm_locator_id,stock.sm_product_id,stock.qty) as data
+left join m_product m on m.m_product_id=data.sm_product_id
+left join m_transaction t on t.m_product_id=m.m_product_id
+left join m_locator loc on loc.m_locator_id=t.m_locator_id
+where t.movementdate between $P{StartDate} and $P{EndDate}
+and t.m_locator_id=$P{M_Locator_ID} and t.movementqty<>0
+group by loc.value,m.name,data.sm_product_id,data.sm_locator_id,data.qty,data.onhand,
+t.movementdate,t.uns_pl_confirmproduct_id,t.uns_production_detail_id,t.m_inventoryline_id,
+t.m_movementline_id,t.m_inoutline_id
+order by t.movementdate]]>
+	</queryString>
+	<field name="nmgudang" class="java.lang.String"/>
+	<field name="nmbarang" class="java.lang.String"/>
+	<field name="sm_product_id" class="java.math.BigDecimal"/>
+	<field name="sm_locator_id" class="java.math.BigDecimal"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="onhand" class="java.math.BigDecimal"/>
+	<field name="movementdate" class="java.sql.Timestamp"/>
+	<field name="sqty" class="java.lang.String"/>
+	<field name="qt" class="java.math.BigDecimal"/>
+	<field name="sqt" class="java.lang.String"/>
+	<field name="saldo" class="java.math.BigDecimal"/>
+	<field name="ssaldo" class="java.lang.String"/>
+	<field name="sakhir" class="java.math.BigDecimal"/>
+	<field name="ssakhir" class="java.lang.String"/>
+	<field name="no_inot" class="java.lang.String"/>
+	<field name="ket_minout" class="java.lang.String"/>
+	<field name="nominout" class="java.lang.String"/>
+	<field name="nopl" class="java.lang.String"/>
+	<field name="noprod" class="java.lang.String"/>
+	<field name="inven" class="java.lang.String"/>
+	<field name="move" class="java.lang.String"/>
+	<field name="tranfer" class="java.lang.String"/>
+	<variable name="stck" class="java.lang.Integer">
+		<variableExpression><![CDATA[$V{stck}==null ? $F{qty} : $F{saldo}.add($V{stck})]]></variableExpression>
+		<initialValueExpression><![CDATA[$V{stck}==null ? $F{qty} : $F{saldo}.add($V{stck})]]></initialValueExpression>
+	</variable>
+	<variable name="keterangan" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$F{no_inot}!="" ? $F{no_inot}+" "+$F{ket_minout} : $F{nopl}!="" ? 'Packing List Return'+"-"+$F{nopl} :
+$F{inven}!="" ? 'Inventory '+"-"+$F{inven} : $F{tranfer}!="" ? 'Transfer '+"-"+$F{tranfer} : $F{move}!="" ? 'Movement'+"-"+$F{tranfer} : ""]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="81" splitType="Stretch">
+			<staticText>
+				<reportElement x="455" y="0" width="100" height="11" uuid="763133a2-132c-43ad-ab27-988c86285050"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="11" uuid="4e3a862b-9e1d-4022-8be6-4915bd667ed1"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[K a r t u   S t o c k]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="11" width="555" height="12" uuid="95a9e0c1-664a-48aa-b88f-9f974c6a8d1f"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode :  "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+" s/d "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="63" y="23" width="293" height="13" uuid="39596c3d-ab13-4714-b89e-c11cceaaf9fa"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[': '+$F{nmbarang}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="23" width="63" height="13" uuid="b67ea98b-7a1d-4f9f-a52e-8ee1e7e9c886"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="62" width="62" height="13" uuid="793e2cdb-21e6-469d-b7ea-4636dab4fc36"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Transaksi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="406" y="62" width="149" height="13" uuid="fdfad5d0-1197-41d2-9f8b-5e70dd2814a4"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Stock Komputer]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="75" width="555" height="1" uuid="ed1dd4a3-7772-4035-b5e2-ea7f7727d266"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="58" width="555" height="1" uuid="979c5a11-72fd-4e44-85aa-661c0d01babf"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="36" width="63" height="13" uuid="89eaad17-3c5b-4f72-a398-21c6a69f2508"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Gudang]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="63" y="36" width="240" height="13" uuid="daabfe00-51d1-4f84-8513-c7000d5453cf"/>
+				<textFieldExpression><![CDATA[": "+$F{nmgudang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="406" y="36" width="149" height="20" uuid="6fc34308-c49d-41d3-93e8-5b0c7e063eb6"/>
+				<textFieldExpression><![CDATA[$F{sqty}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="303" y="36" width="103" height="20" uuid="07559ee1-38a6-45e0-830c-d8fdc323af8d"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Saldo Awal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="106" y="59" width="250" height="13" uuid="c669a3cb-6173-4e9a-b640-fae74db79ac4"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Keterangan Transaksi]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="1" y="0" width="92" height="14" uuid="95d779ca-867a-4daa-a407-f5c08c51b751"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{movementdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="406" y="0" width="149" height="14" uuid="9e7d14b5-479b-4c62-951c-145adf806ef3"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sqt}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="0" width="240" height="14" uuid="e389188c-eab9-4c84-a008-00dc58058f22"/>
+				<textFieldExpression><![CDATA[$V{keterangan}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="50">
+			<textField>
+				<reportElement x="406" y="0" width="149" height="14" uuid="3812ee9d-34de-435d-bc1a-a30b0b3bbb77"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ssakhir}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="303" y="0" width="103" height="20" uuid="657b6949-a07f-40c2-8f7a-497f9fd5bb4f"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Saldo Akhir]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+</jasperReport>

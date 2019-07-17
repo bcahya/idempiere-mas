@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportBillingReceipt" language="groovy" pageWidth="611" pageHeight="395" columnWidth="571" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4e079408-47c1-40de-8b32-a7d7a43aa112">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() as tglskrg,u.name as user,org.name as org,rg.datereceived as tanggal,
+sum(pm.receiptamt) as total,sum(pm.paidamtgiro) as giro
+from uns_paymentreceipt pm
+left join ad_org org on org.ad_org_id=pm.ad_org_id
+left join uns_preceipt_group rg on pm.uns_preceipt_group_id=rg.uns_preceipt_group_id
+left join ad_user u on u.ad_user_id=$P{AD_User_ID}
+where rg.docstatus='CO' and rg.datereceived between $P{StartDate} and $P{EndDate}
+and pm.ad_org_id in(select ad_org_id from ad_org where c_salesregion_id=$P{C_SalesRegion_ID})
+group by org.name,rg.datereceived,u.name
+order by org.name,rg.datereceived]]>
+	</queryString>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="user" class="java.lang.String"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="tanggal" class="java.sql.Timestamp"/>
+	<field name="total" class="java.math.BigDecimal"/>
+	<field name="giro" class="java.math.BigDecimal"/>
+	<variable name="No" class="java.lang.Integer" resetType="Group" resetGroup="org" calculation="Count">
+		<variableExpression><![CDATA[new Integer("1")]]></variableExpression>
+	</variable>
+	<variable name="ttunai" class="java.lang.Number" resetType="Group" resetGroup="org" calculation="Sum">
+		<variableExpression><![CDATA[$F{total}]]></variableExpression>
+	</variable>
+	<variable name="tgiro" class="java.lang.Number" resetType="Group" resetGroup="org" calculation="Sum">
+		<variableExpression><![CDATA[$F{giro}]]></variableExpression>
+	</variable>
+	<variable name="gttunai" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{total}]]></variableExpression>
+	</variable>
+	<variable name="gtgiro" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{giro}]]></variableExpression>
+	</variable>
+	<group name="org">
+		<groupExpression><![CDATA[$F{org}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement uuid="5fe430b4-211f-4f7f-b86c-933b172588f8" x="0" y="0" width="184" height="20"/>
+					<textElement>
+						<font isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="36">
+				<textField>
+					<reportElement uuid="f73c0b98-fb75-407a-aecb-f82f8fad5610" x="0" y="8" width="203" height="14"/>
+					<textElement/>
+					<textFieldExpression><![CDATA["Total : "+$F{org}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="bf5670ab-a66e-4905-a93e-fb08c664e787" x="184" y="8" width="100" height="14"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{ttunai}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="8adeefe9-a8fc-4558-9807-74aead14ed8b" x="314" y="8" width="109" height="14"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{tgiro}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement uuid="01cd0f24-ffd2-4561-9533-3a74de0ae236" x="0" y="22" width="571" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement uuid="0fc080d7-2eb0-4e46-964a-63a5315b58e0" x="0" y="3" width="571" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="68" splitType="Stretch">
+			<rectangle>
+				<reportElement uuid="6fff0f48-4ee3-421d-8fef-36de97e71129" x="0" y="54" width="571" height="14"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="a533c8fc-8eaa-4afb-9acc-1c083f9f6fd2" x="0" y="0" width="571" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Daily Billing Receipt Sales]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="0f029982-03f6-4d43-ada5-4a8cb9d09504" x="0" y="20" width="248" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA['Periode   :  '+ new SimpleDateFormat('dd/MM/yyyy').format($P{StartDate})+' s/d '+new SimpleDateFormat('dd/MM/yyyy').format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="85de222d-0633-4dcc-b26c-0117add0699d" x="0" y="54" width="26" height="14"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="51918624-b6b2-4314-90a3-87111ca8b338" x="50" y="54" width="86" height="14"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="57076d92-f73e-4226-946b-89af6957af20" x="314" y="54" width="83" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Giro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0ed08a5c-bdf6-41d0-a47f-e5f0c19e9db5" x="184" y="54" width="83" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Tunai]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b297875d-d419-4e3a-936a-66e07bef27bb" x="451" y="54" width="109" height="14"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="9aac0138-8cbb-452e-8cc5-38565e5740fc" x="451" y="20" width="80" height="20"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="51934899-0430-4dde-ac8c-3f1fc114cf3b" x="531" y="20" width="40" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement uuid="3fd0b4aa-ee4f-42fd-b722-b7dcd987f3b0" x="0" y="0" width="38" height="13"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$V{No}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="effbeef4-27fd-4773-b3d7-bcd78b88bc16" x="50" y="0" width="86" height="13"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{tanggal}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="ea00d445-5b75-444b-9f4f-8a930a116267" x="184" y="0" width="100" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="bdec9a32-fa03-43e2-aa8a-8af5ad29c8c6" x="314" y="0" width="109" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{giro}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="65">
+			<staticText>
+				<reportElement uuid="c5ea03b8-8d9f-4fbf-8dfd-42a232349298" x="0" y="35" width="52" height="20"/>
+				<textElement/>
+				<text><![CDATA[User Print]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="faa90983-54ae-4c62-bda9-7202f8602654" x="52" y="35" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[": " +$F{user}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="3b997696-5c34-4c71-aa1e-e9ac6e8d7ebc" x="417" y="35" width="71" height="20"/>
+				<textElement/>
+				<text><![CDATA[Tanggal Print]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="723f294a-57a7-4f3f-8235-5e8fd6586afe" x="489" y="35" width="71" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[": " +new SimpleDateFormat("dd/MM/yyyy").format($F{tglskrg})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="1b5ab0f1-aa32-478a-9f61-c1f916467387" x="0" y="0" width="571" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="aa100f87-9617-4103-9474-853cd3337295" x="184" y="6" width="100" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{gttunai}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="14714a5e-a252-46b7-ac79-358aa83fca72" x="314" y="6" width="109" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{gtgiro}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="6cb9fa14-636b-4bc4-8c75-f4cce01e0b81" x="0" y="25" width="571" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="935b4ee8-3792-4871-8dc3-d49aabd368ce" x="0" y="3" width="184" height="20"/>
+				<textElement/>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+</jasperReport>

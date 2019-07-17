@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportGiro" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c13cc824-f99e-4a42-b9bb-494e93af4500">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Action" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+cbg.name AS nmgiro,
+bp.name AS nmtoko,
+b.name AS nmbankgiro,
+cbga.action AS aksi,
+ba.name AS nmbankcair,
+cbg.receiptdate AS tglterima,
+cbg.duedate AS jatuhtempo,
+cbg.limitamt AS nilaigiro
+
+FROM uns_customerbg cbg
+INNER JOIN c_bpartner bp ON bp.c_bpartner_id=cbg.c_bpartner_id
+LEFT JOIN uns_customerbg_action cbga ON cbga.uns_customerbg_id=cbg.uns_customerbg_id
+LEFT JOIN c_bankaccount ba ON ba.c_bankaccount_id=cbga.c_bankaccount_id
+LEFT JOIN c_bank b ON b.c_bank_id=ba.c_bank_id
+INNER JOIN ad_org org ON org.ad_org_id=cbg.ad_org_id
+
+WHERE (CASE WHEN $P{AD_Org_ID} IS NOT NULL THEN cbg.ad_org_id=$P{AD_Org_ID} ELSE 1=1 END) AND
+(CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN cbg.receiptdate >= $P{DateFrom}::timestamp AND cbg.receiptdate <= $P{DateTo}::timestamp WHEN $P{DateTo}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN cbg.receiptdate >= $P{DateFrom}::timestamp WHEN $P{DateTo}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN cbg.receiptdate <= $P{DateTo}::timestamp ELSE 1=1 END)
+AND
+(CASE WHEN $P{Action} = 'DS' AND cbga.docstatus='CO' THEN cbga.action='DS' WHEN
+$P{Action} = 'RF' THEN cbga.action='RF'
+WHEN $P{Action}= 'NN' THEN cbga.action='NN' WHEN $P{Action} = 'HB' THEN cbga.action='HB' WHEN $P{Action} = 'RF' THEN cbga.action='RF'
+ELSE 1=2 END)
+
+ORDER BY tglterima, nmgiro]]>
+	</queryString>
+	<field name="nmgiro" class="java.lang.String"/>
+	<field name="nmtoko" class="java.lang.String"/>
+	<field name="nmbankgiro" class="java.lang.String"/>
+	<field name="aksi" class="java.lang.String"/>
+	<field name="nmbankcair" class="java.lang.String"/>
+	<field name="tglterima" class="java.sql.Timestamp"/>
+	<field name="jatuhtempo" class="java.sql.Timestamp"/>
+	<field name="nilaigiro" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="47" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="20" width="572" height="20" uuid="8d4cf45a-a53e-43ab-bb6b-9b43801f4867"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode : " +new SimpleDateFormat("dd-MM-yyyy").format($P{DateFrom}) +" s/d " +new SimpleDateFormat("dd-MM-yyyy").format($P{DateTo})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="20" uuid="617a821c-c2c9-47e4-8cec-108c42a3dae8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LAPORAN GIRO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="510" y="0" width="62" height="14" uuid="1b60f5c5-efaf-429d-b3f3-4ddd400a1be2"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreERP]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="29" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="1" width="111" height="28" uuid="e30a5745-7dfc-4c2a-9e09-d994d9e209e8"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[No. Giro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="273" y="1" width="68" height="28" uuid="2efef61b-e796-44f8-9fb3-0859a2ad3621"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Batas Tanggal ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="341" y="1" width="67" height="28" uuid="6c79fe5a-233a-48df-916d-534702bc4cf9"/>
+				<box rightPadding="2">
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Nilai Giro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="214" y="1" width="59" height="28" uuid="dcd3b140-85da-4f23-9d0e-cb9b82cfe874"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Tgl Terima]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="408" y="1" width="164" height="28" uuid="1a012717-5949-4f7a-b119-49e6c2919868"/>
+				<box leftPadding="5">
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="112" y="1" width="102" height="28" uuid="e0e0008e-2b95-4f1a-b643-ad9ec4b5b2aa"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Nama Toko]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="213" y="0" width="60" height="20" uuid="a1064c86-68c7-4222-a9f5-7f44d8e6723f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglterima}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="0" width="110" height="20" uuid="929dece8-34ab-4b3c-8295-52b5e518c0f6"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmgiro}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="273" y="0" width="68" height="20" uuid="67fd87c9-375d-4fba-86ca-db938d543499"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jatuhtempo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.-">
+				<reportElement x="341" y="0" width="67" height="20" uuid="6ed9e081-60ae-4763-8d09-c2a567531140"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nilaigiro}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="408" y="0" width="164" height="20" uuid="16779894-92d1-46c4-8cc6-3216a4ae5e24"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{aksi}=='DS' ? $F{nmbankgiro}+ ' - ' +$F{nmbankcair} : $F{aksi}=='RF' ? '*Dibatalkan*' : '#Belum Cair#']]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="112" y="1" width="102" height="20" uuid="81eb9c88-31bf-408d-8fc5-99399e47403f"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmtoko}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="4" splitType="Stretch"/>
+	</columnFooter>
+	<summary>
+		<band height="29" splitType="Stretch">
+			<textField>
+				<reportElement x="456" y="9" width="78" height="20" uuid="ae00ea12-5e14-4f2d-94c5-1c8eb233ac08"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["HAL "+$V{PAGE_NUMBER}+" dari"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="534" y="9" width="38" height="20" uuid="af116ec5-d71d-46b2-9730-9884de06e9cf"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="4" width="572" height="1" uuid="25ad5d61-7f22-4c76-ab21-ebbd1daca0d6"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

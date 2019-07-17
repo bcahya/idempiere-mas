@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Customer Return" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="814" leftMargin="14" rightMargin="14" topMargin="14" bottomMargin="14" uuid="9edde278-88f7-4f1f-9e27-c5cf086f9881">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\dev\\FLG\\com.unicore.base\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+	(SELECT name FROM c_salesregion WHERE c_salesregion_id = $P{C_SalesRegion_ID}) AS region,
+	org.name AS org,
+	usr.name AS created,
+	a.rmaid,
+	a.returnid
+FROM
+(
+-- daftar id customer return yg ga ada RMA nya (utamanya customer return)
+	SELECT
+		io.ad_org_id AS orgid,
+		io.createdby AS createdid,
+		null AS rmaid,
+		io.m_inout_id AS returnid
+	FROM m_inout io
+
+	WHERE
+		io.m_rma_id is null
+		AND
+		io.c_doctype_id = 1000368
+		AND
+		io.issotrx = 'Y'
+		AND
+		io.docstatus IN ('CO','CL')
+		AND
+		io.ad_org_id IN (select ad_org_id from ad_org where c_salesregion_id = $P{C_SalesRegion_ID})
+		AND
+		(CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN io.movementdate BETWEEN $P{DateFrom}::timestamp AND $P{DateTo}::timestamp WHEN $P{DateFrom}::timestamp IS NOT NULL THEN io.movementdate >= $P{DateFrom}::timestamp WHEN $P{DateTo}::timestamp IS NOT NULL THEN io.movementdate <= $P{DateTo}::timestamp ELSE 1=1 END)
+
+UNION
+-- daftar id rma (utamanya rma)
+	SELECT
+		rma.ad_org_id AS orgid,
+		rma.createdby AS createdid,
+		rma.m_rma_id AS rmaid,
+		io.m_inout_id AS returnid
+	FROM m_rma rma
+	LEFT OUTER JOIN
+		m_inout io ON io.m_rma_id = rma.m_rma_id
+	WHERE
+		rma.c_doctype_id = 1000384
+		AND
+		rma.issotrx = 'Y'
+		AND
+		rma.docstatus IN ('CO','CL')
+		AND
+		rma.ad_org_id IN (select ad_org_id from ad_org where c_salesregion_id = $P{C_SalesRegion_ID})
+		AND
+		(CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN rma.datedoc BETWEEN $P{DateFrom}::timestamp AND $P{DateTo}::timestamp WHEN $P{DateFrom}::timestamp IS NOT NULL THEN rma.datedoc >= $P{DateFrom}::timestamp WHEN $P{DateTo}::timestamp IS NOT NULL THEN rma.datedoc <= $P{DateTo}::timestamp ELSE 1=1 END)
+) AS a
+INNER JOIN
+	ad_org org ON org.ad_org_id = a.orgid
+INNER JOIN
+	ad_user usr ON usr.ad_user_id = a.createdid
+
+order by org]]>
+	</queryString>
+	<field name="region" class="java.lang.String"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="created" class="java.lang.String"/>
+	<field name="rmaid" class="java.lang.Integer"/>
+	<field name="returnid" class="java.lang.Integer"/>
+	<variable name="No" class="java.math.BigDecimal" incrementType="Group" incrementGroup="Org" calculation="Count">
+		<variableExpression><![CDATA[$V{No} == null ? 1 : $V{No}++]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<group name="Org" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{org}]]></groupExpression>
+		<groupHeader>
+			<band height="78">
+				<staticText>
+					<reportElement x="84" y="47" width="183" height="15" uuid="22fc5c39-d329-43cf-9307-9fc143735529"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Customer RMA]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="47" width="29" height="30" uuid="e4bf00c8-be7f-4468-8aa3-4d699a30e6fd"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="84" y="62" width="82" height="15" uuid="a3276d6a-f4ac-4bcd-8a01-ecfc8090ea74"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Document No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="29" y="47" width="55" height="30" uuid="2b717bf9-0e15-4f3a-8487-2f9bab27fcdb"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Created]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="166" y="62" width="67" height="15" uuid="fdab56ee-4c88-4ab5-b02e-25ba1fe03c3b"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="233" y="62" width="34" height="15" uuid="50934567-3f95-42ff-8a82-4c05f4b0c18f"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Status]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="267" y="47" width="183" height="15" uuid="9894e130-4b23-402b-85aa-f4fe555abe2b"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Customer Return]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="0" y="23" width="814" height="20" uuid="d75fd4f6-0caf-4a4c-882f-c7d2d6b1961f"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="450" y="47" width="183" height="15" uuid="4492dc1e-32d2-4134-bce8-b313a90a87a4"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Invoice Credit Memo]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="633" y="47" width="181" height="15" uuid="68a8e15f-a481-4410-b9d1-754e09a6f403"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[AR Invoice]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="267" y="62" width="82" height="15" uuid="2ca75c7f-30e3-4f37-8db4-82f69be01369"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Document No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="349" y="62" width="67" height="15" uuid="5da66f65-3368-422d-8cb7-d7fa1220fa34"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="416" y="62" width="34" height="15" uuid="0ee2c933-9074-47eb-893a-1101acee8212"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Status]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="450" y="62" width="82" height="15" uuid="328d5544-46fa-469e-a339-28535d8c96d6"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Document No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="532" y="62" width="67" height="15" uuid="9678c08c-364b-4262-b8c1-fe255048cf7a"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="599" y="62" width="34" height="15" uuid="6bc514aa-4057-4967-bf6e-b6071571914f"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Status]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="633" y="62" width="80" height="15" uuid="95ba73b1-06d6-44d4-834a-d037b20ca310"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Document No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="713" y="62" width="67" height="15" uuid="0ab37ca2-aecc-4a35-9e86-db56ed77bd14"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="780" y="62" width="34" height="15" uuid="a06f701b-12e3-444b-a83b-a661955ac226"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Status]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="0" width="52" height="15" uuid="f1172217-d262-4f07-9443-8e8f9597dbb7"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[REGION :]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="52" y="0" width="324" height="15" uuid="a80f591d-cbb9-4603-a56c-05419682a931"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{region}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="481" y="0" width="333" height="15" uuid="81d43081-5313-4918-b89b-817e200daca9"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA["Date Parameter :  "+$P{DateFrom}!=null && $P{DateTo}!=null ?
+    new SimpleDateFormat("dd MMMMM yyyy").format($P{DateFrom})+
+    "  -  "+ new SimpleDateFormat("dd MMMMM yyyy").format($P{DateTo})
+    : $P{DateFrom} != null ? new SimpleDateFormat("dd MMMMM yyyy").format($P{DateFrom})+
+    "  - End"
+    : $P{DateTo} != null ? "Beginning  -  "+ new SimpleDateFormat("dd MMMMM yyyy").format($P{DateTo})
+    : "All"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="15">
+				<subreport>
+					<reportElement x="84" y="0" width="730" height="15" uuid="cf1babcf-d579-4d5c-8db2-087d4d7c9618"/>
+					<subreportParameter name="DateTo">
+						<subreportParameterExpression><![CDATA[$P{DateTo}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="M_RMA_ID">
+						<subreportParameterExpression><![CDATA[$F{rmaid}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="DateFrom">
+						<subreportParameterExpression><![CDATA[$P{DateFrom}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="M_InOut_ID">
+						<subreportParameterExpression><![CDATA[$F{returnid}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[$P{SUBREPORT_DIR}+"DocumentControl_CustomerReturn_Subreport1.jasper"]]></subreportExpression>
+				</subreport>
+				<textField>
+					<reportElement x="29" y="0" width="55" height="15" uuid="16cc76b7-2281-4323-b2d2-2178991c5729"/>
+					<textFieldExpression><![CDATA[$F{created}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="29" height="15" uuid="d301e576-c4eb-45d9-82be-9f5bd78e58cc"/>
+					<textFieldExpression><![CDATA[$V{No}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="42" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="814" height="42" uuid="534c50b9-b71b-4f4e-85bc-f22eee6f0ad1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CUSTOMER RETURN]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="14" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band/>
+	</columnHeader>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="694" y="0" width="80" height="20" uuid="c7f94124-e9cb-49b4-9860-7051d5610c74"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="774" y="0" width="40" height="20" uuid="1fde721c-4c62-4890-b200-1aa4618a2a4d"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="20" forecolor="#CCCCCC" uuid="0651db58-2bf3-4dd3-ae5b-c52cf2cdb633"/>
+				<textElement verticalAlignment="Bottom">
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaERP System]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

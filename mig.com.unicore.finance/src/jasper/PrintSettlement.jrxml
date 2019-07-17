@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PriintSettlement" pageWidth="611" pageHeight="395" columnWidth="581" leftMargin="10" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ae8c9b4a-dcc3-41dc-8be6-d2ca0635acea">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="192.168.1.212:5432/UniCoreFLG@RealTime-SebelumRevisiDivis"/>
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="179"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="UNS_Charge_RS_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT aduser.name as ucetak,now() as tglskrg,crs.documentno as nofaktur,crs.datetrx as tgltrk,crs.name as nmtrx,cd.description as keterangan,cd.amount as nilairp
+FROM UNS_Charge_RS crs
+left join uns_charge_detail cd on crs.uns_charge_rs_id=cd.uns_charge_rs_id
+left join ad_user aduser on aduser.ad_user_id=$P{AD_User_ID}
+WHERE crs.UNS_Charge_RS_ID=$P{UNS_Charge_RS_ID}]]>
+	</queryString>
+	<field name="ucetak" class="java.lang.String"/>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="nofaktur" class="java.lang.String"/>
+	<field name="tgltrk" class="java.sql.Timestamp"/>
+	<field name="nmtrx" class="java.lang.String"/>
+	<field name="keterangan" class="java.lang.String"/>
+	<field name="nilairp" class="java.math.BigDecimal"/>
+	<variable name="Jumlah" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{nilairp}]]></variableExpression>
+	</variable>
+	<group name="nofaktur">
+		<groupExpression><![CDATA[$F{nofaktur}]]></groupExpression>
+		<groupFooter>
+			<band height="257">
+				<line>
+					<reportElement uuid="b18f211a-1f32-4a4f-ac47-e49c68e728e9" x="0" y="134" width="581" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement uuid="63a4edd4-5205-4564-a88f-05f63bd326c5" x="5" y="220" width="174" height="20"/>
+					<textElement textAlignment="Center">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[(                                                         )]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="f527c150-70b1-4521-be21-cbbfd2764852" x="380" y="220" width="196" height="20"/>
+					<textElement textAlignment="Center">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[(                                                         )]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="5bc815ef-c5ba-4a48-98f7-0a01c6c2a6b0" x="5" y="179" width="174" height="20"/>
+					<textElement textAlignment="Center">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[ACCOUNTING,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="95198f8e-81f9-477b-89e7-f263262ee7f0" x="179" y="220" width="200" height="20"/>
+					<textElement textAlignment="Center">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[(                                                         )]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="4136b184-2b97-4570-ae30-d13d5e519320" x="379" y="179" width="197" height="20"/>
+					<textElement textAlignment="Center">
+						<font size="6"/>
+					</textElement>
+					<text><![CDATA[Yang Terima Uang,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="129695cf-1490-4f64-b5d0-912609a8c82b" x="179" y="179" width="200" height="20"/>
+					<textElement textAlignment="Center">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[KASIR,]]></text>
+				</staticText>
+				<line>
+					<reportElement uuid="80ccc9b9-8aea-4be6-8419-c466efa521b8" x="0" y="158" width="581" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement uuid="7c5cd858-fd2b-4af3-b52c-563531808994" x="102" y="138" width="100" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Jumlah]]></text>
+				</staticText>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="b200dc54-566f-4a89-a778-8d6e15f0d244" x="476" y="138" width="100" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Jumlah}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="9c0bc5ad-18a1-45eb-aa4b-4937e6114cf5" x="344" y="159" width="224" height="20"/>
+					<textElement/>
+					<textFieldExpression><![CDATA["Bandar Lampung, "+new SimpleDateFormat("dd/MM/yyyy").format($F{tglskrg})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="f3d61da2-b155-43d9-b85d-de720c75ead4" x="5" y="240" width="174" height="17"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Dicetak Oleh : "+$F{ucetak}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="73">
+			<staticText>
+				<reportElement uuid="c6fab638-e337-48ff-9d3e-3efec10a1a29" x="0" y="0" width="581" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Settlement]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c87809f7-63a9-4594-bfba-456675a89285" x="0" y="15" width="52" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Document ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8cc3516a-84fd-45db-9382-3fa6fe67bb20" x="0" y="26" width="52" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="58f83f1f-18be-48e6-8578-5f7ec0144c0c" x="52" y="26" width="119" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+new SimpleDateFormat("dd/MM/yyyy").format($F{tgltrk})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="bef2b402-36f8-4f5b-93fe-9e320d6b8ba8" x="52" y="15" width="119" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{nofaktur}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="b059ae9f-6d28-4a98-bc53-7917960a23df" x="0" y="37" width="52" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Keterang]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="572d58c2-be9e-4ba5-98c7-64b2c93a641f" x="52" y="37" width="228" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{nmtrx}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="7fa64727-4ca0-4f61-ab48-7398eb807f6a" x="76" y="57" width="281" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Uraian]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a336105d-5393-43ad-a4cd-e9ff0e7aa508" x="468" y="57" width="100" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jumlah]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d332c871-44f2-4105-842d-4231dfa521a9" x="0" y="57" width="52" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="f1c60103-9309-475f-9ab9-d62824f94e83" x="0" y="70" width="581" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="6e0fa9d5-9d51-49ca-b9e0-b840f1e718cb" x="0" y="56" width="581" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement uuid="a3a9f7d0-ff1b-401f-9ba1-1c9a0b06f88c" x="76" y="0" width="281" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="801ba824-2382-4835-9f47-04453694783d" x="468" y="0" width="100" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nilairp}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8b940d76-f359-41ca-98f8-ea80fec3cf69" x="0" y="0" width="52" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

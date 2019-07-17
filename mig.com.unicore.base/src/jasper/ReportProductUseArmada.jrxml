@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportProductUseArmada" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="96dcc3fa-866f-4a9e-8cd4-90c1249538cb">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="266"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Armada_ID" class="java.lang.Integer"/>
+	<parameter name="M_Product_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select org.name as orgname,am.name as nm_armada,amc.usedate as tgl_use,mp.name as nm_barang,uomconversiontostr(mp.m_product_id,cl.qtyordered) as qty,amc.description
+from uns_armada am
+inner join UNS_ArmadaCost amc on am.uns_armada_id=amc.uns_armada_id
+inner join c_orderline cl on amc.c_orderline_id=cl.c_orderline_id
+inner join c_order co on cl.c_order_id=co.c_order_id
+inner join m_product mp on cl.m_product_id=mp.m_product_id
+inner join ad_org org on am.ad_org_id=org.ad_org_id
+where am.isexternalarmada='N'
+and case when $P{M_Product_ID}!=0 then mp.m_product_id=$P{M_Product_ID} else 1=1 end
+and case when $P{UNS_Armada_ID}!=0 then am.uns_armada_id=$P{UNS_Armada_ID} else 1=1 end
+--group by org.name,am.name,mp.name,mp.m_product_id,cl.qtyordered
+order by am.name,amc.usedate desc]]>
+	</queryString>
+	<field name="orgname" class="java.lang.String"/>
+	<field name="nm_armada" class="java.lang.String"/>
+	<field name="tgl_use" class="java.sql.Timestamp"/>
+	<field name="nm_barang" class="java.lang.String"/>
+	<field name="qty" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<variable name="item" class="java.lang.Integer" resetType="Group" resetGroup="armada" calculation="Count">
+		<variableExpression><![CDATA[$V{item}==null ? 1 : $V{item}+1]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="armada" class="java.lang.Integer" incrementType="Group" incrementGroup="armada" calculation="Count">
+		<variableExpression><![CDATA[new Integer("0")]]></variableExpression>
+		<initialValueExpression><![CDATA[new Integer("0")]]></initialValueExpression>
+	</variable>
+	<group name="armada">
+		<groupExpression><![CDATA[$F{nm_armada}]]></groupExpression>
+		<groupHeader>
+			<band height="13">
+				<textField>
+					<reportElement uuid="257d5757-178a-4ad2-ac42-85425f50a154" x="37" y="0" width="100" height="13"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nm_armada}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="f75d60cc-bc1b-4632-9fbb-c620e357c05e" x="0" y="0" width="37" height="13"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{armada}+1]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="6"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="26" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="add18d1e-2bca-407f-9efe-d7c013005538" x="0" y="0" width="186" height="15"/>
+				<textElement/>
+				<text><![CDATA[List Product yang digunakan Armada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a4ede5cd-15a7-4641-bf30-545837dee354" x="37" y="15" width="78" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nomor Armada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a4ede5cd-15a7-4641-bf30-545837dee354" x="167" y="15" width="159" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Product]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a4ede5cd-15a7-4641-bf30-545837dee354" x="455" y="15" width="100" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty yang digunakan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="618dc24d-b1e7-46a0-adbd-aaeb1006f3e4" x="0" y="15" width="37" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="996331a9-cb66-42be-94da-d0a7e920d7cb" x="115" y="15" width="52" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl Digunakan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a4ede5cd-15a7-4641-bf30-545837dee354" x="326" y="15" width="129" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="96040486-3af6-469e-b428-14dc61cb4ed0" x="115" y="0" width="52" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgl_use}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ef4bca49-83f6-42b7-9092-b23b3a9c3e0e" x="167" y="0" width="159" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nm_barang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="36b1fab9-e1c7-415d-98d6-91427cd965a8" x="455" y="0" width="100" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8fb6699e-47e5-4031-ae50-f70cac632b2e" x="81" y="0" width="34" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{armada}+"."+$V{item}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="28a706f4-1e84-47cf-9c7e-3cd2a4f7a561" x="326" y="0" width="129" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

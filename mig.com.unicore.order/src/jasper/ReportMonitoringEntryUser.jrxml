@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportMonitoringEntryUser" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e77db413-ee92-43de-8cb5-720456b8098f">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select ci.documentno nofaktur,ci.dateinvoiced tglfaktur,ci.grandtotal as tfak,cb.name nm_customer,u.name as sales,
+(select us.name from ad_user as us where ci.createdby=us.ad_user_id) as nmuser
+from c_invoice as ci
+left join c_bpartner as cb on ci.c_bpartner_id=cb.c_bpartner_id
+left join ad_user as u on u.ad_user_id=ci.salesrep_id
+where ci.dateinvoiced>=$P{StartDate} and ci.dateinvoiced<=$P{EndDate}
+group by ci.documentno,ci.dateinvoiced,ci.grandtotal,cb.name,u.name,ci.createdby
+order by nmuser,sales,tglfaktur]]>
+	</queryString>
+	<field name="nofaktur" class="java.lang.String"/>
+	<field name="tglfaktur" class="java.sql.Timestamp"/>
+	<field name="tfak" class="java.math.BigDecimal"/>
+	<field name="nm_customer" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="nmuser" class="java.lang.String"/>
+	<variable name="Nourut" class="java.lang.Integer" resetType="Group" resetGroup="Salesman" calculation="Count">
+		<variableExpression><![CDATA[new Integer("1")]]></variableExpression>
+	</variable>
+	<group name="Admin">
+		<groupExpression><![CDATA[$F{nmuser}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement x="0" y="0" width="137" height="20" uuid="21966ca6-3dc9-4547-b0a0-259ca3e75e83"/>
+					<textElement>
+						<font isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmuser}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="Salesman">
+		<groupExpression><![CDATA[$F{sales}]]></groupExpression>
+		<groupHeader>
+			<band height="21">
+				<textField>
+					<reportElement x="37" y="0" width="100" height="15" uuid="8bc8f43b-0355-4b39-8bd9-a5a0b9bd0d75"/>
+					<textElement>
+						<font isBold="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{sales}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="15"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="43" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="572" height="20" uuid="1c97acb5-5334-48c3-a498-0fdb48f5fe5a"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Monitoring Entry Data oleh Admin Periode :'+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' s/d '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="21" width="174" height="20" uuid="1615127c-74e8-4a3e-b05e-5bc947c52fdf"/>
+				<text><![CDATA[Nama Admin  /  Nama Sales  / Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="174" y="21" width="80" height="20" uuid="95ca2c79-501a-451c-9490-c79410063168"/>
+				<text><![CDATA[No faktur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="254" y="21" width="100" height="20" uuid="5d3ba8e7-6864-4559-8d36-bb0708cb99cc"/>
+				<text><![CDATA[Nama Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="472" y="21" width="100" height="20" uuid="eee6cbdc-138d-447f-b83b-aeab178c0ba3"/>
+				<text><![CDATA[Nilai Faktur]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement x="254" y="0" width="243" height="16" uuid="d4409d3c-b811-4f11-a98d-0097a68c7aee"/>
+				<textFieldExpression><![CDATA[$F{nm_customer}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="154" y="1" width="100" height="15" uuid="41489a1f-a0b0-43b9-b209-eda3ff419317"/>
+				<textFieldExpression><![CDATA[$F{nofaktur}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="497" y="1" width="75" height="14" uuid="db2ed4b3-fd4f-4670-a487-6cb3e51ebbd7"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{tfak}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="54" y="0" width="100" height="15" uuid="8d5341fa-1dea-421b-a208-a1202f7dc16a"/>
+				<textFieldExpression><![CDATA[$F{tglfaktur}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="37" height="15" uuid="3e8e9d8c-8ebb-4282-9ebe-e7c9df16b181"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{Nourut}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="22"/>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportSalesIncentive" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e7eb9352-3a88-4c01-8e75-8ac871294480">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_AchievedIncentive_ID" class="java.lang.Integer"/>
+	<parameter name="C_Year_ID" class="java.lang.Integer"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<parameter name="C_Period_ID" class="java.lang.Integer"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\project\\UntaCore@FLG\\com.unicore.order\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="isSummary" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<title>
+		<band height="50">
+			<subreport>
+				<reportElement uuid="57b15058-5706-49fe-978a-21d67dcd7e4c" x="0" y="0" width="555" height="50">
+					<printWhenExpression><![CDATA[$P{isSummary} == "N"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="C_SalesRegion_ID">
+					<subreportParameterExpression><![CDATA[$P{C_SalesRegion_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_Period_ID">
+					<subreportParameterExpression><![CDATA[$P{C_Period_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="UNS_AchievedIncentive_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_AchievedIncentive_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_BPartner_ID">
+					<subreportParameterExpression><![CDATA[$P{C_BPartner_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_Year_ID">
+					<subreportParameterExpression><![CDATA[$P{C_Year_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportSalesIncentive_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement uuid="489e33d7-3f61-49dd-8560-b79584786a1d" x="0" y="0" width="555" height="50">
+					<printWhenExpression><![CDATA[$P{isSummary} == "Y"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="C_SalesRegion_ID">
+					<subreportParameterExpression><![CDATA[$P{C_SalesRegion_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_Period_ID">
+					<subreportParameterExpression><![CDATA[$P{C_Period_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="UNS_AchievedIncentive_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_AchievedIncentive_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_BPartner_ID">
+					<subreportParameterExpression><![CDATA[$P{C_BPartner_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_Year_ID">
+					<subreportParameterExpression><![CDATA[$P{C_Year_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportSalesIncentive_Subreport2.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+</jasperReport>

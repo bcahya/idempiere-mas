@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportBalanceTrxDetailOfPartner_Subreport1" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="15eaac12-9a41-49b3-80b8-060a872878aa">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT bp.TotalOpenBalance AS TotalOpenBalance, COUNT(inv.*) AS CountOut FROM C_BPartner bp
+INNER JOIN C_Invoice inv ON inv.C_BPartner_ID = bp.C_BPartner_ID
+WHERE bp.C_BPartner_ID = $P{C_BPartner_ID} AND inv.DocStatus IN ('CO', 'CL') AND inv.IsPaid = 'N'
+GROUP BY bp.C_BPartner_ID]]>
+	</queryString>
+	<field name="totalopenbalance" class="java.math.BigDecimal"/>
+	<field name="countout" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="fcd251c5-bdb3-4d7f-b303-bad55d3ee7d3" x="0" y="0" width="555" height="20"/>
+				<textElement>
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Open Balance = " + new DecimalFormat("#,##0.00").format($F{totalopenbalance}) + " ("+ $F{countout} + " Invoices)"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+</jasperReport>

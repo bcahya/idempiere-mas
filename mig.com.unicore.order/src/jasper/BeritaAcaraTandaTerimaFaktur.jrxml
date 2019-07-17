@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BeritaAcaraTandaTerimaFaktur" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="5" isSummaryWithPageHeaderAndFooter="true" uuid="4c6f2d15-f724-42ec-a28b-0b5c81efc39b">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DocumentNo" class="java.lang.String">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     coalesce(case
+              when (lc.phone is not null) then lc.phone
+              when (lc.phone2 is not null) then lc.phone2
+              else '?' end ) AS NoTelpon,
+     coalesce(uns_employee."name",'-') AS supir,
+     coalesce(uns_armada."name",'-') AS kendaraan,
+     up."documentno" AS NoPackingList,
+     c_bpartner."name" AS NamaCustomer,
+     up."datedoc" AS TglPacking,
+     c_invoice."documentno" AS NoFak,
+     c_invoice."dateinvoiced" AS TglFak,
+     c_invoice."grandtotal" As TotFak
+FROM
+     "adempiere"."uns_packinglist_order" uns_packinglist_order
+     LEFT JOIN "adempiere"."uns_packinglist" up ON uns_packinglist_order."uns_packinglist_id" = up."uns_packinglist_id"
+     LEFT JOIN "adempiere"."c_invoice" c_invoice ON uns_packinglist_order."c_invoice_id" = c_invoice."c_invoice_id"
+     LEFT JOIN "c_bpartner" c_bpartner ON c_invoice."c_bpartner_id" = c_bpartner."c_bpartner_id"
+     LEFT JOIN "ad_user" ad_user ON c_bpartner."c_bpartner_id" = ad_user."c_bpartner_id"
+     left join "uns_shippingfreight" uns_shippingfreight on up."uns_packinglist_id" = uns_shippingfreight."uns_packinglist_id"
+     LEFT JOIN "uns_shipping" uns_shipping ON uns_shipping."uns_shipping_id"=uns_shippingfreight."uns_shipping_id"
+     LEFT JOIN "uns_employee" uns_employee ON uns_shipping."uns_employee_id" = uns_employee."uns_employee_id"
+     LEFT JOIN "uns_armada" uns_armada ON uns_shipping."uns_armada_id" = uns_armada."uns_armada_id"
+     left join "c_bpartner_location" lc on lc."c_bpartner_location_id"=c_invoice."c_bpartner_location_id"
+WHERE
+     up."documentno" = $P{DocumentNo} AND up."docstatus"='CO']]>
+	</queryString>
+	<field name="notelpon" class="java.lang.String"/>
+	<field name="supir" class="java.lang.String"/>
+	<field name="kendaraan" class="java.lang.String"/>
+	<field name="nopackinglist" class="java.lang.String"/>
+	<field name="namacustomer" class="java.lang.String"/>
+	<field name="tglpacking" class="java.sql.Timestamp"/>
+	<field name="nofak" class="java.lang.String"/>
+	<field name="tglfak" class="java.sql.Timestamp"/>
+	<field name="totfak" class="java.math.BigDecimal"/>
+	<variable name="uns_packinglist_documentno_1" class="java.lang.Integer" resetType="Page" calculation="Count">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="totfak_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{totfak}]]></variableExpression>
+	</variable>
+	<variable name="Nourut" class="java.lang.Integer" resetType="Group" resetGroup="NoPakingList" calculation="Count">
+		<variableExpression><![CDATA[new Integer("1")]]></variableExpression>
+	</variable>
+	<group name="NoPakingList" keepTogether="true">
+		<groupExpression><![CDATA[$F{nopackinglist}]]></groupExpression>
+		<groupHeader>
+			<band height="26">
+				<rectangle>
+					<reportElement x="1" y="10" width="554" height="15" uuid="cfa00a04-c6ea-4abb-82c0-9e030c7d1c76"/>
+					<graphicElement>
+						<pen lineStyle="Dotted"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement x="278" y="12" width="70" height="11" uuid="ad61d1ad-6352-4e96-9c16-59a4e2889fc7"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[NILAI FAKTUR]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="358" y="12" width="71" height="11" uuid="aea6ee18-7c51-46e9-bc47-9dc413bab7dc"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[TANDA TANGAN]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="4" y="12" width="20" height="11" uuid="edd1a204-7696-450d-8972-40fbec343a25"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[NO]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="454" y="12" width="100" height="11" uuid="ac7dfe43-6f71-414e-adba-3bc4f185d078"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[KETERANGAN ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="32" y="12" width="109" height="11" uuid="2fbfc282-8739-4805-a12e-81d66f4fd611"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[NAMA CUSTOMER]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="141" y="12" width="41" height="11" uuid="bb4791f5-bbfc-44c0-947f-b263460c7ddc"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[TANGGAL]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="182" y="12" width="36" height="11" uuid="0a75a2bd-be5a-4ff9-b77f-178da604aff1"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[FAKTUR]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="218" y="12" width="59" height="11" uuid="b000487d-c843-4073-b8d7-1a6a64bebe8c"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[TELEPON]]></text>
+				</staticText>
+				<textField evaluationTime="Report">
+					<reportElement x="527" y="0" width="34" height="10" uuid="9ccb3a09-13e4-41a5-915e-9b770067ff23"/>
+					<textElement>
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="495" y="0" width="32" height="10" uuid="96ed6a1d-709b-4b7a-9722-b5b55768f2be"/>
+					<textElement>
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Hal : "+$V{PAGE_NUMBER}+" /"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="140">
+				<line>
+					<reportElement x="0" y="0" width="555" height="1" uuid="31a6c34a-74e9-4567-9298-3ed206ed1eae"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement x="183" y="1" width="95" height="11" uuid="04119b2d-d9f3-4acc-8ec6-22af9e0fe9c0"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="7"/>
+					</textElement>
+					<text><![CDATA[TOTAL VALUE PACKING]]></text>
+				</staticText>
+				<rectangle>
+					<reportElement x="0" y="52" width="134" height="20" uuid="5c47c838-6df2-4d45-af7a-6df450cdf3a8"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="0" y="72" width="67" height="20" uuid="a1c0a672-96d0-4500-bfa8-ac2139e62573"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="67" y="72" width="67" height="20" uuid="87e9a24a-ff5c-4cc2-bb5b-94d7ef52cfa1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement x="0" y="72" width="67" height="20" uuid="c085172f-7059-493f-97fd-6c66ae8e22ce"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Adm]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="67" y="72" width="67" height="20" uuid="9f652e08-fe84-44b3-b278-9b3fc35bb906"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Supir]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="52" width="134" height="20" uuid="ec1e5109-8bd4-49e7-9426-625b9217b897"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="9"/>
+					</textElement>
+					<text><![CDATA[Berangkat]]></text>
+				</staticText>
+				<rectangle>
+					<reportElement x="0" y="92" width="67" height="35" uuid="74291ef1-d34a-47ee-aa01-658d31125c33"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="67" y="92" width="67" height="35" uuid="e2038ded-64a9-4f6d-96c7-2e3cba5bf910"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="428" y="52" width="134" height="20" uuid="0d352826-b5fb-4660-abf6-3287ac2e0c42"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="428" y="92" width="67" height="35" uuid="5536e1e6-a2b5-4206-b68b-c0719e811d5f"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="495" y="72" width="67" height="20" uuid="af229890-1c8b-40a8-83ca-97e108be030d"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="495" y="92" width="67" height="35" uuid="d3cc85f3-10dd-4e87-a347-147418c5216d"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement x="428" y="52" width="134" height="20" uuid="f1c00920-073a-4e12-8bfa-dd1a13d63467"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="9"/>
+					</textElement>
+					<text><![CDATA[Pulang]]></text>
+				</staticText>
+				<rectangle>
+					<reportElement x="428" y="72" width="67" height="20" uuid="a7c144d5-9993-4e5a-9e91-008a48228f33"/>
+					<graphicElement>
+						<pen lineStyle="Dashed" lineColor="#999999"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement x="495" y="72" width="67" height="20" uuid="5e55b456-27ee-43a3-9d67-df9b974dc6ea"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Supir]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="428" y="72" width="67" height="20" uuid="caab7313-3b80-41f0-b891-faf12b7f72b4"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="7" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Adm]]></text>
+				</staticText>
+				<textField pattern="#,##0.00">
+					<reportElement x="278" y="0" width="69" height="12" uuid="93ae120e-e7b4-4be3-8c00-8beaca4810f7"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totfak_1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="64" splitType="Stretch">
+			<printWhenExpression><![CDATA[$V{PAGE_NUMBER}.intValue() == 1? new Boolean(true) : new Boolean(false)]]></printWhenExpression>
+			<staticText>
+				<reportElement x="3" y="19" width="59" height="11" uuid="03060f08-20e2-47a5-9a99-075a7c1ffb31"/>
+				<textElement>
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[No. Packing List]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="30" width="59" height="11" uuid="4576f107-fe02-4cfb-a16b-d5bc0c86cc48"/>
+				<textElement>
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Kendaraan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="52" width="59" height="11" uuid="82f3416b-7d6a-43e4-b9fe-94af1e8042f0"/>
+				<textElement>
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="67" y="19" width="100" height="11" uuid="6227ad83-3cad-400a-abc4-5372891de1ad"/>
+				<textElement>
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nopackinglist}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="67" y="52" width="100" height="11" uuid="cf591d6a-c815-4df8-9b23-d44d0b01de40"/>
+				<textElement>
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglpacking}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="67" y="30" width="100" height="11" uuid="d8f13e69-6fe4-4e52-a9b1-2b8db8ec5d59"/>
+				<textElement>
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kendaraan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="67" y="41" width="100" height="11" uuid="093de7ad-e264-4e05-a5c7-9c09e7e6b4c2"/>
+				<textElement>
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{supir}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="3" y="41" width="59" height="11" uuid="6da1b872-6b0f-43f8-b3fd-cf376a0f847f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Supir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="19" width="5" height="11" uuid="b9f17cb2-9519-41af-b15a-f7aab0b9e4c1"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="30" width="5" height="11" uuid="b2dc4e04-7361-44a3-a555-d9e05798599a"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="41" width="5" height="11" uuid="618a91f9-7544-4fd6-ad5e-d8bce009d216"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="52" width="5" height="11" uuid="ef2101f4-a992-4fe7-8311-1c95fc7c1260"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="0" width="359" height="20" uuid="bc33fe62-3354-4b74-a6bc-641bdb9448e2"/>
+				<textElement>
+					<font fontName="Tahoma" size="10"/>
+				</textElement>
+				<text><![CDATA[Berita Acara Tanda Terima Faktur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="0" width="100" height="11" uuid="07c8e049-99e1-4187-aa00-df59cb2da125"/>
+				<textElement textAlignment="Right">
+					<font size="7" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCore Idempiere]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="32" y="0" width="110" height="11" uuid="5d250f79-a702-40a3-b2bf-8ff86efb816a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namacustomer}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="142" y="0" width="41" height="11" uuid="11544392-47a1-49e5-92d9-d2bb01694730"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglfak}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="278" y="0" width="70" height="11" uuid="024032c0-7b92-4d87-b4fb-f69631a1bc80"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totfak}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="183" y="0" width="36" height="11" uuid="a36116ae-e93d-455e-aa63-bbae9b70bc75"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nofak}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="219" y="0" width="59" height="11" uuid="6d3c29c8-6835-463f-8509-3a18502071c9"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{notelpon}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="3" y="0" width="19" height="11" uuid="f7bd0901-70e7-4e45-b3b3-46d7de279d20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Nourut}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

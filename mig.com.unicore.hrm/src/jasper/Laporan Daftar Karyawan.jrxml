@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Laporan Daftar Karyawan" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2b3fdcd0-6d41-4d5c-ac54-276f5b667b1c">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Value" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+acl.name as Company,
+emp.UNS_Employee_ID as NIK,
+emt.name as NamaKaryawan,
+rtt.value as NoMesin,
+emt.badgenumber as BudgeNumber
+
+FROM
+UNS_RegisteredAtt as rtt
+
+INNER JOIN AD_Client acl on acl.AD_Client_ID=rtt.AD_Client_ID
+INNER JOIN UNS_EmployeeAtt emt on emt.UNS_RegisteredAtt_ID=rtt.UNS_RegisteredAtt_ID
+INNER JOIN UNS_Employee emp on emp.UNS_Employee_ID=rtt.UNS_RegisteredAtt_ID
+
+where rtt.Value = $P{Value}]]>
+	</queryString>
+	<field name="company" class="java.lang.String"/>
+	<field name="nik" class="java.math.BigDecimal"/>
+	<field name="namakaryawan" class="java.lang.String"/>
+	<field name="nomesin" class="java.lang.String"/>
+	<field name="budgenumber" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<staticText>
+				<reportElement x="139" y="16" width="275" height="27" uuid="1f2d6da8-1b57-44b0-bf34-fe66b4cace04"/>
+				<textElement textAlignment="Center">
+					<font size="20"/>
+				</textElement>
+				<text><![CDATA[Laporan Daftar Karyawan]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="226" y="43" width="100" height="20" uuid="d24e1c9b-069b-4e70-88a5-1f0c8e9531d6"/>
+				<box>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{company}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="101" y="3" width="113" height="20" uuid="a479822e-cee9-43c6-bad1-a5ec0ee6e319"/>
+				<box leftPadding="0">
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{nomesin}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="65" y="3" width="36" height="20" uuid="bd6cd972-f398-4759-a30d-c4b71e773c94"/>
+				<text><![CDATA[Mesin :]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement x="101" y="2" width="100" height="20" uuid="a007f33d-22fe-4fb1-98f3-0c90e3643c6e"/>
+				<box leftPadding="4">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[nik]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="201" y="2" width="169" height="20" uuid="5c80b115-473a-416d-86dc-fbb3b8cde5e9"/>
+				<box leftPadding="4">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[namakaryawan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="370" y="2" width="109" height="20" uuid="22b249da-6355-40f5-a606-1da5eb3d040a"/>
+				<box leftPadding="4">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[budgenumber]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="2" width="36" height="20" uuid="0044d21d-776c-4a57-ac13-4aa76c51ff29"/>
+				<box leftPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="101" y="0" width="100" height="20" uuid="600ff745-8ff3-44da-8ced-3ad50c0b1f72"/>
+				<box leftPadding="4">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{nik}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="201" y="0" width="169" height="20" uuid="b08f52ef-f46e-4c3d-be8d-9e56c3238a32"/>
+				<box leftPadding="4">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{namakaryawan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="0" width="109" height="20" uuid="cb12231d-e40b-4f21-aaaa-380fb830026b"/>
+				<box leftPadding="4">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{budgenumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="65" y="0" width="36" height="20" uuid="74e86509-3d80-4091-92f8-ce72d7a205a6"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="455" y="34" width="100" height="20" uuid="e0ab9f73-bbda-42ab-948e-95fcd6df3d72"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

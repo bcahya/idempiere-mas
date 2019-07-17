@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RerpotTransferAllocationInvocieTendertype" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="87b32a3e-cdec-43c0-9141-a8e883aa94bd">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="invoicetax">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{c_invoice_id}!=null]]></conditionExpression>
+			<style forecolor="#FF0000"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT org.name,trf.documentno,trf.datedoc,trf.description,orgv.name as orginvoice,ci.documentno,bl.bpartnername,ci.dateinvoiced,rf.name as keterangan,bli.amounttrf,ci.grandtotal as netinvoice,vat.c_invoice_id,cb.value as nmbank
+ FROM UNS_BillingTrf trf
+ INNER JOIN UNS_BillingTrfValidation trfv on trfv.uns_billingtrf_id=trf.uns_billingtrf_id
+ INNER JOIN UNS_BillingTrf_Detail trfd on trfd.uns_billingtrfvalidation_id=trfv.uns_billingtrfvalidation_id
+ INNER JOIN ad_org orgv on orgv.ad_org_id=trfv.ad_org_id
+ INNER JOIN c_salesregion so on so.c_salesregion_id=orgv.c_salesregion_id
+ INNER JOIN UNS_BillingTrf_Invoice bli on trfd.uns_billingtrf_detail_id=bli.uns_billingtrf_detail_id
+ INNER JOIN c_invoice ci on ci.c_invoice_id=bli.c_invoice_id
+ INNER JOIN c_bpartner_location bl on bl.c_bpartner_location_id=ci.c_bpartner_location_id
+ INNER JOIN C_Payment cp on cp.c_payment_id=trfd.c_payment_id
+ INNER JOIN ad_ref_list rf on rf.value=cp.tendertype and rf.ad_reference_id=214
+ INNER JOIN ad_org org on org.ad_org_id=trf.ad_org_id
+ INNER JOIN C_BankAccount cb on trfv.AccountTo_ID=cb.c_bankAccount_ID
+ LEFT JOIN UNS_VATLine vat on ci.c_invoice_id=vat.c_invoice_id
+ WHERE trf.docstatus in('CO','CL') AND trf.datedoc between $P{StartDate} and $P{EndDate}
+AND CASE WHEN $P{C_SalesRegion_ID}!=0 THEN so.C_Salesregion_ID=$P{C_SalesRegion_ID} ELSE 1=1 END
+order by trf.datedoc,orgv.name,ci.documentno]]>
+	</queryString>
+	<field name="name" class="java.lang.String"/>
+	<field name="documentno" class="java.lang.String"/>
+	<field name="datedoc" class="java.sql.Timestamp"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="orginvoice" class="java.lang.String"/>
+	<field name="bpartnername" class="java.lang.String"/>
+	<field name="dateinvoiced" class="java.sql.Timestamp"/>
+	<field name="keterangan" class="java.lang.String"/>
+	<field name="amounttrf" class="java.math.BigDecimal"/>
+	<field name="netinvoice" class="java.math.BigDecimal"/>
+	<field name="c_invoice_id" class="java.math.BigDecimal"/>
+	<field name="nmbank" class="java.lang.String"/>
+	<variable name="ttltgl" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{amounttrf}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<group name="tgltransefer">
+		<groupExpression><![CDATA[$F{datedoc}]]></groupExpression>
+		<groupFooter>
+			<band height="14">
+				<textField>
+					<reportElement uuid="aec4abf8-b361-4e5b-aa59-6c7a41c64ef9" x="0" y="0" width="439" height="14"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Total Transfer Tanggal '+new SimpleDateFormat("dd/MM/yyyy").format($F{datedoc})]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="3440f157-3f79-4424-993e-67ba48c33cfa" x="416" y="0" width="69" height="14"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{ttltgl}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="27" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="e41d9808-e030-48b9-8888-0a0346865d5c" x="0" y="14" width="101" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Organization]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="92b82361-60a7-46aa-a83c-8f38b9a7b6a8" x="152" y="14" width="50" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bebb95ca-0c10-4a27-bbdb-09ede2ab0cbe" x="202" y="14" width="43" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl.Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="731f5503-9dd7-47f2-9d87-0ff6f46660c4" x="245" y="14" width="113" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="44409bf5-551c-4066-8422-a9de15850fb4" x="416" y="14" width="69" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Invoice Paid]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="aec4abf8-b361-4e5b-aa59-6c7a41c64ef9" x="0" y="0" width="555" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Periode Tanggal '+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' sampai '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="44409bf5-551c-4066-8422-a9de15850fb4" x="358" y="14" width="58" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Net Invoiced]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e41d9808-e030-48b9-8888-0a0346865d5c" x="101" y="14" width="51" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Trf Doc]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="44409bf5-551c-4066-8422-a9de15850fb4" x="485" y="14" width="70" height="13"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Bank Transfer]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement uuid="85aac27a-8e6f-423c-90bf-48f2d4e63ba7" style="invoicetax" x="0" y="0" width="101" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{orginvoice}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4f17edf3-b745-4fe4-84bc-48cce017ede0" style="invoicetax" x="152" y="0" width="50" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="8da27edd-2cee-4fbe-a0ad-fc5efc1234ae" style="invoicetax" x="202" y="0" width="43" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateinvoiced}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="2596a0bc-78e7-4bbd-82ab-df4b0ec88b35" style="invoicetax" x="245" y="0" width="113" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{bpartnername}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="cd43baeb-14f3-4b95-a7bb-7a6edef6a9d4" style="invoicetax" x="358" y="0" width="58" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{netinvoice}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="df2645a3-0a4c-48f0-a498-59531ab961fb" style="invoicetax" x="416" y="0" width="69" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{amounttrf}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4c26c5ec-f520-4c6c-837e-d7ad897d4cb2" style="invoicetax" x="101" y="0" width="51" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="30ec3b30-c209-44d2-9a9f-dbf589833ad9" style="invoicetax" x="485" y="0" width="70" height="12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmbank}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DaftarTransaksiPelanggan" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3fc53972-d9e6-49c4-a131-b698d3b9c2eb">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DocumentNo" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_Product_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateFrom" class="java.sql.Timestamp">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.sql.Timestamp">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     cus.name AS namatoko,
+     pdk.name AS nmproduk,
+     sm.documentno AS noship,
+     invoiceopen(fk.c_invoice_id, 0),
+     fk.grandtotal as gtot,
+     fk.documentno AS nofaktur,
+     fk.dateinvoiced AS tglfaktur,
+     fkl.priceactual AS harga,
+     fkl.linenetamt AS jumlah,
+     sm.movementdate AS tglkirim,
+     fkl.qtyinvoiced AS qty,
+     sat.name AS satuan,
+     now() AS tanggalskrg
+
+FROM
+     m_inout sm
+     INNER JOIN c_invoice fk ON fk.c_invoice_id=sm.c_invoice_id
+     INNER JOIN c_invoiceline fkl ON fkl.c_invoice_id=fk.c_invoice_id
+     INNER JOIN c_bpartner cus ON cus.c_bpartner_id=fk.c_bpartner_id
+     INNER JOIN m_product pdk ON pdk.m_product_id=fkl.m_product_id
+     INNER JOIN c_uom sat ON sat.c_uom_id=fkl.uomconversionl1_id
+
+WHERE
+     (fk.docstatus = 'CO' OR fk.docstatus = 'CL') AND
+     fk.c_bpartner_id = $P{C_BPartner_ID} AND
+     sm.documentno = $P{DocumentNo} AND
+     fkl.m_product_id = $P{M_Product_ID} AND
+     fk.dateinvoiced between $P{DateFrom} AND $P{DateTo}
+
+ORDER BY tglfaktur]]>
+	</queryString>
+	<field name="namatoko" class="java.lang.String"/>
+	<field name="nmproduk" class="java.lang.String"/>
+	<field name="noship" class="java.lang.String"/>
+	<field name="invoiceopen" class="java.math.BigDecimal"/>
+	<field name="gtot" class="java.math.BigDecimal"/>
+	<field name="nofaktur" class="java.lang.String"/>
+	<field name="tglfaktur" class="java.sql.Timestamp"/>
+	<field name="harga" class="java.math.BigDecimal"/>
+	<field name="jumlah" class="java.math.BigDecimal"/>
+	<field name="tglkirim" class="java.sql.Timestamp"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="satuan" class="java.lang.String"/>
+	<field name="tanggalskrg" class="java.sql.Timestamp"/>
+	<variable name="invoiceopen_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{invoiceopen}]]></variableExpression>
+	</variable>
+	<group name="Customer" minHeightToStartNewPage="2">
+		<groupExpression><![CDATA[$F{noship}]]></groupExpression>
+		<groupHeader>
+			<band height="92">
+				<staticText>
+					<reportElement x="17" y="23" width="72" height="15" uuid="e672be3f-2725-4e16-b8ae-164c47d32c67"/>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[No. Faktur]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="344" y="23" width="67" height="15" uuid="e840a9ae-8476-4667-a061-6c73a938435a"/>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[No SJ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="344" y="51" width="67" height="15" uuid="52b90346-075e-4d61-8ab3-56ca4e288331"/>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[Sisa Hutang]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="17" y="51" width="72" height="15" uuid="79aa44f2-61c1-44d4-a260-d9bfa7982916"/>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[Jumlah Faktur]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="344" y="37" width="67" height="15" uuid="962ad479-96b0-4284-b194-26edf3bd7680"/>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[Tanggal Kirim]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="17" y="37" width="72" height="15" uuid="a0c246b3-0d4c-449e-851e-f6321d5be0b4"/>
+					<box leftPadding="5" rightPadding="5"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[Tanggal Faktur]]></text>
+				</staticText>
+				<rectangle>
+					<reportElement x="0" y="75" width="555" height="16" uuid="5df9798a-1c88-4a46-9b5c-c2174e36cee0"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="5" y="76" width="270" height="15" uuid="659d1913-61c7-4afd-a873-59ff125c2714"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[Nama Barang]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="347" y="76" width="85" height="15" uuid="481f1177-5e90-4f87-bea8-0adfe048f649"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[Harga @]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="442" y="76" width="108" height="15" uuid="35230996-a95e-4b63-9760-6c17f9b160d7"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[Sub Total]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="280" y="76" width="63" height="15" uuid="cc2bd690-b84a-4a2a-b865-0aaf1af9b155"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[Jumlah Barang]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="92" y="23" width="100" height="15" uuid="2f5882b4-51a5-444c-b37b-eb96aee925d5"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nofaktur}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd MMMMM yyyy">
+					<reportElement x="92" y="37" width="100" height="15" uuid="3a5f0078-d91b-4272-94b6-72eff9d6bb96"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tglfaktur}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.-">
+					<reportElement x="414" y="51" width="100" height="15" uuid="8ba8a450-b736-40b9-af52-d2e9e13be744"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{invoiceopen}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.-">
+					<reportElement x="92" y="51" width="100" height="15" uuid="5e2820a0-677d-4465-90da-a8ed6ec70970"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{gtot}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd MMMMM yyyy">
+					<reportElement x="414" y="37" width="100" height="15" uuid="323ede4e-e18e-4381-89a6-078b5bdd383c"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tglkirim}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="414" y="23" width="100" height="15" uuid="c4e21586-ec49-454f-b257-7c487e76ea4b"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{noship}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="88" y="23" width="5" height="15" uuid="013a9fdd-6255-4327-af81-42e4716b9c65"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="88" y="51" width="5" height="15" uuid="21bee47a-dba1-4801-848c-0e85bcac7d69"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="88" y="37" width="5" height="15" uuid="e735f00f-b46f-40a4-81e7-544ec557a5f8"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="410" y="23" width="5" height="15" uuid="e33a1cf7-3710-40c5-b219-868b9dfd5a38"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="410" y="37" width="5" height="15" uuid="51102aa8-13d9-4db3-b2eb-56a22701cdf4"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="410" y="51" width="5" height="15" uuid="bdc62af3-080f-4189-85c0-0566c293a3cd"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="5" y="5" width="187" height="15" uuid="cc6dfb94-ecfa-421f-ac83-2cf648d173c9"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Tahoma" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{namatoko}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="12">
+				<line>
+					<reportElement x="1" y="10" width="555" height="1" uuid="04a28ab3-c703-402d-8a94-6d9044a98775"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="18" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="1" width="223" height="15" uuid="76e315f1-58dc-43c6-8aa0-bc0f459d4426"/>
+				<textElement>
+					<font fontName="Tahoma" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[DAFTAR TRANSAKSI PELANGGAN]]></text>
+			</staticText>
+			<textField pattern="EEEEE, dd-MMM-yyyy HH:mm:ss">
+				<reportElement x="420" y="1" width="130" height="15" uuid="b6ab5df9-ecfd-49b2-bcdb-0461a01271de"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("EEEEE, dd-MM-yyyy HH:mm:ss").format($F{tanggalskrg})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="5" y="0" width="270" height="15" uuid="4c3b30b0-2355-4e05-b380-a46654b579ce"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmproduk}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement x="280" y="0" width="22" height="15" uuid="19296a52-a81b-4cc1-9774-cb5caacc37d1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="305" y="0" width="38" height="15" uuid="0575f7bb-2adf-448f-b8d9-f1a9010da85c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{satuan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.-">
+				<reportElement x="350" y="0" width="82" height="15" uuid="3222238d-d673-4c7a-8b27-c2be2040fd14"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{harga}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.-">
+				<reportElement x="442" y="0" width="105" height="15" uuid="5466eec9-9c5d-4647-b94d-14f483872a58"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jumlah}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="18" splitType="Stretch">
+			<textField evaluationTime="Group" evaluationGroup="Customer" pattern="#,##0.-">
+				<reportElement x="449" y="-1" width="100" height="15" uuid="c92a91ba-5158-4d2e-9d05-237cecaca83d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{invoiceopen_1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="284" y="-1" width="78" height="15" uuid="e14c3f2a-67e8-4af6-8053-86a67b66aa02"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="10"/>
+				</textElement>
+				<text><![CDATA[Total Sisa Hutang]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

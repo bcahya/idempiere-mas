@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintDocumentAuditBySales" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5ba7f4d5-22d5-41ab-9726-f69326275ce5">
+	<property name="ireport.zoom" value="1.1269722013523664"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Audit_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TypeReport" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\project\\UntaCore@FLG\\com.unicore.base\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="22">
+			<subreport>
+				<reportElement uuid="5f3bf554-a9ca-4189-9d03-e20952e0fecb" x="0" y="0" width="555" height="22" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$P{TypeReport} == "RK"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="UNS_Audit_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_Audit_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PrintDocumentAuditBySales_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement uuid="98f2c1cd-31b4-47b6-b3e2-e94bf29ed1db" x="0" y="0" width="555" height="22" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$P{TypeReport} == "DT"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="UNS_Audit_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_Audit_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PrintDocumentAuditBySales_Subreport2.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PerformaVendor" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9f656db3-344b-4897-a8b3-db28beefa5e9">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select co.documentno as nopo,co.dateordered as tglpo,bpl.bpartnername,vor.nmbrg as nmbrg,mi.documentno as norec,
+mi.movementdate as tglrec,
+vor.qtypo as qtypo,vor.qtspo as qtspo,vor.qtyrec as qtyrec,vor.qtsrec as qtsrec
+from C_Order co
+left join c_bpartner bp on bp.c_bpartner_id=co.c_bpartner_id
+inner join c_bpartner_location bpl on co.c_bpartner_location_id=bpl.c_bpartner_location_id
+inner join c_doctype dt on dt.c_doctype_id=co.c_doctype_id
+inner JOIN m_inout mi on mi.c_order_id=co.c_order_id
+inner join v_povsreceipt vor on vor.c_order_id=co.c_order_id
+where co.dateordered between $P{StartDate} and $P{EndDate} AND
+dt.docbasetype='POO' and
+co.docstatus in('CO','CL') and mi.docstatus in('CO','CL')
+order by co.documentno,co.dateordered,bpl.bpartnername]]>
+	</queryString>
+	<field name="nopo" class="java.lang.String"/>
+	<field name="tglpo" class="java.sql.Timestamp"/>
+	<field name="bpartnername" class="java.lang.String"/>
+	<field name="nmbrg" class="java.lang.String"/>
+	<field name="norec" class="java.lang.String"/>
+	<field name="tglrec" class="java.sql.Timestamp"/>
+	<field name="qtypo" class="java.math.BigDecimal"/>
+	<field name="qtspo" class="java.lang.String"/>
+	<field name="qtyrec" class="java.math.BigDecimal"/>
+	<field name="qtsrec" class="java.lang.String"/>
+	<variable name="tselisih" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$F{qtypo}.subtract($F{qtyrec})]]></variableExpression>
+	</variable>
+	<variable name="persen" class="java.lang.Double">
+		<variableExpression><![CDATA[($F{qtyrec}.doubleValue() / $F{qtypo}.doubleValue()) * 100]]></variableExpression>
+	</variable>
+	<variable name="po" class="java.lang.Integer">
+		<variableExpression><![CDATA[$F{qtypo}]]></variableExpression>
+	</variable>
+	<variable name="rec" class="java.lang.Integer">
+		<variableExpression><![CDATA[$F{qtyrec}]]></variableExpression>
+	</variable>
+	<group name="vname">
+		<groupExpression><![CDATA[$F{nopo}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement x="0" y="0" width="141" height="11" uuid="e2e43e4c-1304-4fac-994f-85ede9c3581a"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{bpartnername}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="7"/>
+		</groupFooter>
+	</group>
+	<group name="nopo">
+		<groupExpression><![CDATA[$F{nopo}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement x="20" y="0" width="48" height="11" uuid="38805df1-6523-41c9-9ef4-dc2ae3487572"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nopo}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="68" y="0" width="58" height="11" uuid="21180c43-3b78-4452-a184-e743d2a76c81"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tglpo}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="129" y="0" width="47" height="11" uuid="c3823018-17fb-4330-a31b-2e555ec7b40f"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{norec}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="180" y="0" width="66" height="11" uuid="3295c24d-0e6c-499a-ae78-28c1f7b694a3"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tglrec}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="8">
+				<line>
+					<reportElement x="0" y="2" width="572" height="1" uuid="c1be632a-8d0f-4bcc-a235-31aafd6b9b6d"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="74" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="46" width="572" height="27" uuid="79f34a6a-f2dc-428b-bff7-ffee09c9b917"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="472" y="0" width="100" height="14" uuid="a94ce6e4-d506-4fc5-b751-f584b76d12fc"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="19" uuid="30fc6420-41dc-4883-b807-f34067ab22ca"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Repor Performa Vendor]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="19" width="572" height="20" uuid="f0c2e2f9-7415-43f1-8ae1-a0f47b396e7e"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Tanggal '+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' sampai '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="39" y="61" width="172" height="11" uuid="6431a61b-76d8-48d8-af72-dc52358d347e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="226" y="61" width="111" height="11" uuid="d6fa4461-fc43-41ca-b794-b61cfb5a89bf"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty PO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="61" width="111" height="11" uuid="167530ba-2bba-49b3-9bc4-d38cf01aeab3"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty Receipt]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="457" y="61" width="111" height="11" uuid="70013338-281b-4a82-98fd-b3fc5a7e06b6"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[% Penerimaan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="50" width="48" height="11" uuid="53a34427-a15a-4ad0-a287-780d4e6538d2"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.PO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="68" y="50" width="48" height="11" uuid="598bf380-0eec-4443-b16a-f5d0a8bf4826"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tg.PO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="129" y="50" width="48" height="11" uuid="5f7a3421-d1b2-4b12-94d8-d9ca9345b504"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.Receipt]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="50" width="48" height="11" uuid="bbefed9d-28cf-4522-b734-4de43b46a1dc"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl.Receipt]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="33" y="0" width="178" height="13" uuid="49dd3396-3959-441e-b215-53ab9d8798ae"/>
+				<textFieldExpression><![CDATA[$F{nmbrg}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="0" width="113" height="13" uuid="918141a0-69be-4c90-919a-f045d7f9e5bf"/>
+				<textFieldExpression><![CDATA[$F{qtsrec}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="226" y="0" width="111" height="13" uuid="ac3fa873-8327-4021-9a0f-77f19272b90b"/>
+				<textFieldExpression><![CDATA[$F{qtspo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="498" y="0" width="48" height="13" uuid="1c60be4a-ff91-496c-85ce-45ad247a4a74"/>
+				<textFieldExpression><![CDATA[$V{persen}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+</jasperReport>

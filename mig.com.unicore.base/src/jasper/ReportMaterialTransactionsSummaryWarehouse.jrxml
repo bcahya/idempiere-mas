@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportMaterialTransactionsSummaryWarehouse" language="groovy" pageWidth="595" pageHeight="842" columnWidth="585" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="83191135-207c-4d33-bf5e-27fd1de33cb9">
+	<property name="ireport.zoom" value="1.3636363636363673"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_Warehouse_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\project\\UntaCore@FLG\\com.unicore.base\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_Locator_ID" class="java.lang.Integer"/>
+	<parameter name="IncludeIntransit" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_Product_ID" class="java.lang.Integer"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<parameter name="M_Product_Category_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT Master.BeginStock, Master.ValueProduct AS ValueProduct, UOMConversionToStr(Master.IDProduct, Master.BeginStock) AS BeginStockString, UOMConversionToSTR(Master.IDProduct, Master.QtyIn) AS QtyInString, UOMConversionToSTR(Master.IDProduct, Master.QtyOut) AS QtyOutString, Master.DatePrint, Master.IDLoc, Master.IDProduct, Master.Locator, Master.Warehouse, UOMConversionToSTR(Master.IDProduct, Master.CurrentStock) AS CurrentStockString, UOMConversionToSTR(Master.IDProduct, Master.EndStock) AS EndStockString, Master.EndStock
+FROM
+(SELECT totalstockbylocator(p.M_Product_ID, loc.M_Locator_ID, DATE($P{DateFrom})) AS BeginStock, totalstockbylocator(p.M_Product_ID, loc.M_Locator_ID, DATE(now())) AS CurrentStock, totalstockbylocator(p.M_Product_ID, loc.M_Locator_ID, DATE($P{DateTo}) + 1) AS EndStock, wh.Name AS Warehouse, loc.Value AS Locator, p.Name AS Items, concat(p.value,'-',p.Name) AS ValueProduct, (SELECT COALESCE(SUM(trx.MovementQty),0) FROM M_Transaction trx WHERE trx.M_Locator_ID = loc.M_Locator_ID AND trx.M_Product_ID = p.M_Product_ID AND trx.MovementQty > 0 AND trx.MovementDate >= $P{DateFrom}::timestamp AND trx.MovementDate <= $P{DateTo}::timestamp) AS QtyIn, (SELECT COALESCE(SUM(trx.MovementQty),0) FROM M_Transaction trx WHERE trx.M_Locator_ID = loc.M_Locator_ID AND trx.M_Product_ID = p.M_Product_ID AND trx.MovementQty < 0 AND trx.MovementDate >= $P{DateFrom}::timestamp AND trx.MovementDate <= $P{DateTo}::timestamp) AS QtyOut, now() AS DatePrint, p.M_Product_ID AS IDPRoduct, loc.M_Locator_ID AS IDLoc
+
+FROM M_Warehouse wh
+
+INNER JOIN M_Locator loc ON loc.M_Warehouse_ID = wh.M_Warehouse_ID
+INNER JOIN M_StorageOnHand soh ON soh.M_Locator_ID = loc.M_Locator_ID
+INNER JOIN M_Product p ON p.M_Product_ID = soh.M_Product_ID
+
+WHERE soh.QtyOnHand <> 0 AND (CASE WHEN $P{M_Warehouse_ID} IS NOT NULL THEN wh.M_Warehouse_ID = $P{M_Warehouse_ID} ELSE 1=1 END) AND (CASE WHEN $P{IncludeIntransit} = 'N' THEN loc.IsInTransit = 'N' ELSE 1=1 END)
+AND (CASE WHEN $P{M_Product_ID} IS NOT NULL THEN p.M_Product_ID=$P{M_Product_ID} else 1=1 END)
+AND (CASE WHEN $P{C_BPartner_ID} IS NOT NULL THEN (SELECT p.M_Product_ID in(SELECT cb.M_Product_ID from  C_BPartner_Product cb Where cb.C_Bpartner_ID=$P{C_BPartner_ID})) ELSE 1=1 END)
+AND (CASE WHEN $P{M_Product_Category_ID} IS NOT NULL THEN $P{M_Product_Category_ID}=p.M_Product_Category_ID ELSE 1=1 END)
+
+GROUP BY wh.M_Warehouse_ID, loc.M_Locator_ID, p.M_Product_ID
+ORDER BY Locator, Items) AS Master]]>
+	</queryString>
+	<field name="beginstock" class="java.math.BigDecimal"/>
+	<field name="valueproduct" class="java.lang.String"/>
+	<field name="beginstockstring" class="java.lang.String"/>
+	<field name="qtyinstring" class="java.lang.String"/>
+	<field name="qtyoutstring" class="java.lang.String"/>
+	<field name="dateprint" class="java.sql.Timestamp"/>
+	<field name="idloc" class="java.math.BigDecimal"/>
+	<field name="idproduct" class="java.math.BigDecimal"/>
+	<field name="locator" class="java.lang.String"/>
+	<field name="warehouse" class="java.lang.String"/>
+	<field name="currentstockstring" class="java.lang.String"/>
+	<field name="endstockstring" class="java.lang.String"/>
+	<field name="endstock" class="java.math.BigDecimal"/>
+	<variable name="nomor" class="java.lang.Integer" resetType="Group" resetGroup="Locator" calculation="Count">
+		<variableExpression><![CDATA[$V{nomor} == null ? 1 : $V{nomor} + 1]]></variableExpression>
+	</variable>
+	<group name="whs">
+		<groupExpression><![CDATA[$F{warehouse}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement uuid="102f2f34-32df-46cc-982c-1e491eb7c1b9" x="0" y="0" width="555" height="17"/>
+					<textElement/>
+					<textFieldExpression><![CDATA["#Warehouse:: " + $F{warehouse}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="Locator" keepTogether="true">
+		<groupExpression><![CDATA[$F{locator}]]></groupExpression>
+		<groupHeader>
+			<band height="37">
+				<line>
+					<reportElement uuid="e7520324-de0b-4c70-8b91-a7c50f480e54" x="0" y="16" width="555" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement uuid="ae4e7040-9720-45e8-ab22-083d51488cfb" x="0" y="35" width="555" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement uuid="6d897ab9-f3eb-4d99-b775-d79f1d89e42c" x="489" y="15" width="82" height="20"/>
+					<box leftPadding="1" rightPadding="1">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Current]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="93ec62e6-974c-4916-b3e0-5facb259f9a4" x="128" y="17" width="95" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new SimpleDateFormat("dd-MM-yyyy").format($P{DateFrom})]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="6d897ab9-f3eb-4d99-b775-d79f1d89e42c" x="19" y="17" width="109" height="20"/>
+					<box leftPadding="1" rightPadding="1">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Product]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="9ed0ee19-d18d-4439-a42e-98472951722a" x="414" y="15" width="75" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new SimpleDateFormat("dd-MM-yyyy").format($P{DateTo})]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="6d897ab9-f3eb-4d99-b775-d79f1d89e42c" x="0" y="17" width="19" height="20"/>
+					<box leftPadding="1" rightPadding="1">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="6d897ab9-f3eb-4d99-b775-d79f1d89e42c" x="315" y="15" width="87" height="20"/>
+					<box leftPadding="1" rightPadding="1">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Out (-)]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="6d897ab9-f3eb-4d99-b775-d79f1d89e42c" x="223" y="17" width="92" height="20"/>
+					<box leftPadding="1" rightPadding="1">
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[In (+)]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="102f2f34-32df-46cc-982c-1e491eb7c1b9" x="0" y="0" width="571" height="17"/>
+					<textElement/>
+					<textFieldExpression><![CDATA["#Locator:: " + $F{locator}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="15"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="45" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="39cedcf2-e978-40df-833c-4c8e56ea8623" x="0" y="1" width="555" height="24"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORT MATERIAL TRANSACTION (SUMMARY WAREHOUSE)]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="efc648ff-ca25-4da0-9e92-8de5362612dc" x="19" y="1" width="70" height="15"/>
+				<textElement verticalAlignment="Top">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateprint}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="5ccb1f1d-125b-494e-9c23-4a68182c8710" x="0" y="25" width="555" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd-MM-yyyy").format($P{DateFrom})
++ " - " + new SimpleDateFormat("dd-MM-yyyy").format($P{DateTo})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField pattern="###0">
+				<reportElement uuid="5b23ca4d-2189-43cb-a9d5-3165169c2341" x="315" y="0" width="87" height="20" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qtyoutstring}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="c7e68d10-1189-47be-98c1-f974a8304eb6" x="0" y="19" width="555" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement uuid="8d50b5f0-ffc6-4427-8fca-9d3885e2e41c" x="0" y="0" width="19" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{nomor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a618fa68-c166-43c2-8173-31ea688d7381" x="19" y="0" width="109" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{valueproduct}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement uuid="5b23ca4d-2189-43cb-a9d5-3165169c2341" x="128" y="0" width="95" height="20" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{beginstockstring}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement uuid="5b23ca4d-2189-43cb-a9d5-3165169c2341" x="489" y="0" width="82" height="20" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{currentstockstring}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement uuid="5b23ca4d-2189-43cb-a9d5-3165169c2341" x="223" y="0" width="92" height="20" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qtyinstring}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement uuid="5b23ca4d-2189-43cb-a9d5-3165169c2341" x="402" y="0" width="87" height="20" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{endstockstring}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20">
+			<textField>
+				<reportElement uuid="c3d1d38a-4bbd-4d8f-8ea0-3f1d7b534de6" x="435" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="4cf34f5d-fff5-450b-adf6-c9ea73a5def0" x="515" y="0" width="40" height="20"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

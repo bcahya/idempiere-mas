@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportAnalisaECAOPerSalesman" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="998" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="f5493889-1440-4498-b261-cb6102e414e4">
+	<property name="ireport.zoom" value="1.502629601803156"/>
+	<property name="ireport.x" value="684"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<parameter name="SalesRep_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT DATA.depo,data.rayon,data.prinsiple as prinsiple,data.nama_barang as nama_barang,data.salesman as salesman,sum(data.a_call) as a_call, sum(data.e_call) as e_call,
+coalesce(sum(data.tdus),0) as tdus,coalesce(sum(data.tpack),0) as tpack,coalesce(sum(data.tpcs),0) as tpcs,sum(data.ttlline)/1000 as ttline,
+coalesce(sum(data.rdus),0) as rdus,coalesce(sum(data.rpack),0) as rpack,coalesce(sum(data.rpcs),0) as rpcs,sum(rttline) as rttline,data.jmltoko
+FROM(
+SELECT sr.value as depo,coalesce(ry.name,'NOT DEFIND') as rayon,
+bpp.value as prinsiple,mp.name as nama_barang,sa.name2 as salesman,
+count(distinct cbl.c_bpartner_id) as a_call,
+count(mp.m_product_id) as e_call,
+satuandus(mp.m_product_id,sum(coalesce(cl.qtyinvoiced,0))) as tdus,
+satuanpack(mp.m_product_id,sum(coalesce(cl.qtyinvoiced,0))) as tpack,
+satuanpcs(mp.m_product_id,sum(coalesce(cl.qtyinvoiced,0))) as tpcs,
+sum(cl.linenetamt) as ttlline,
+0 as rdus,0 as rpack,0 as rpcs,0 as rttline,c_rayon(ry.uns_rayon_id) as jmltoko,ci.salesrep_id as salesrep_id
+from c_invoice ci
+inner join c_invoiceline cl on cl.c_invoice_id=ci.c_invoice_id
+inner join ad_user sa on ci.salesrep_id=sa.ad_user_id
+inner join m_product mp on cl.m_product_id=mp.m_product_id
+inner join c_bpartner_location cbl on ci.c_bpartner_location_id=cbl.c_bpartner_location_id
+inner join ad_org org on ci.ad_org_id=org.ad_org_id
+inner join c_salesregion sr on org.c_salesregion_id=sr.c_salesregion_id
+left  join uns_rayon ry on cbl.uns_rayon_id=ry.uns_rayon_id
+left join C_BPartner_Product mpp on mp.m_product_id=mpp.m_product_id
+left join c_bpartner bpp on mpp.c_bpartner_id=bpp.c_bpartner_id
+where ci.docstatus in('CO','CL')
+and ci.c_doctype_id IN ( SELECT c_doctype.c_doctype_id FROM c_doctype WHERE c_doctype.docbasetype = 'ARI')
+and case when $P{C_BPartner_ID}!=0 then bpp.C_bpartner_id=$P{C_BPartner_ID} else 1=1 end
+and ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+and Case When $P{SalesRep_ID}!=0 Then ci.salesrep_id=$P{SalesRep_ID} else 1=1 end
+and ci.c_invoice_id not in(select cvr.c_invoice_id from UNS_Cvs_Rpt cvr WHERE cvr.docstatus in('CO','CL') and cvr.c_invoice_id is not null)
+group by sr.value,coalesce(ry.name,'NOT DEFIND'),bpp.value,mp.name,sa.name2,mp.m_product_id,ry.uns_rayon_id,ci.salesrep_id
+---ini canvas cc
+union all
+SELECT sr.value as depo,'CANVAS RAYON' as rayon,
+bpp.value as prinsiple,mp.name as nama_barang,sa.name2 as salesman,
+count(distinct cs.UNS_CvsCustomer_ID) as a_call,
+count(mp.m_product_id) as e_call,0 as tdus,0 as tpack,0 as pcs,0 as ttlline,
+0 as rdus,0 as rpack,0 as rpcs,0 as rttline,0 as jmltoko,ci.salesrep_id as salesrep_id
+from c_invoice ci
+inner join ad_user sa on ci.salesrep_id=sa.ad_user_id
+inner join UNS_Cvs_Rpt cr on cr.c_invoice_id=ci.c_invoice_id
+inner join UNS_Cvs_RptCustomer cs on cr.uns_cvs_rpt_id=cs.uns_cvs_rpt_id
+inner join UNS_Cvs_RptProduct cp on cs.uns_cvs_rptcustomer_id=cp.uns_cvs_rptcustomer_id
+inner join m_product mp on cp.m_product_id=mp.m_product_id
+inner join ad_org org on ci.ad_org_id=org.ad_org_id
+inner join c_salesregion sr on org.c_salesregion_id=sr.c_salesregion_id
+left join C_BPartner_Product mpp on mp.m_product_id=mpp.m_product_id
+left join c_bpartner bpp on mpp.c_bpartner_id=bpp.c_bpartner_id
+where ci.docstatus in('CO','CL')
+and ci.c_doctype_id IN ( SELECT c_doctype.c_doctype_id FROM c_doctype WHERE c_doctype.docbasetype = 'ARI')
+and case when $P{C_BPartner_ID}!=0 then bpp.C_bpartner_id=$P{C_BPartner_ID} else 1=1 end
+and ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+and Case When $P{SalesRep_ID}!=0 Then ci.salesrep_id=$P{SalesRep_ID} else 1=1 end
+and ci.c_invoice_id in(select cvr.c_invoice_id from UNS_Cvs_Rpt cvr WHERE cvr.docstatus in('CO','CL') and cvr.c_invoice_id is not null)
+group by sr.value,bpp.value,mp.name,sa.name2,mp.m_product_id,ci.salesrep_id
+union all
+--ini total invoice canvas
+SELECT sr.value as depo,'CANVAS RAYON' as rayon,
+bpp.value as prinsiple,mp.name as nama_barang,sa.name2 as salesman,
+0 as a_call,0 as e_call,
+satuandus(mp.m_product_id,sum(coalesce(cl.qtyinvoiced,0))) as tdus,
+satuanpack(mp.m_product_id,sum(coalesce(cl.qtyinvoiced,0))) as tpack,
+satuanpcs(mp.m_product_id,sum(coalesce(cl.qtyinvoiced,0))) as tpcs,
+sum(cl.linenetamt) as ttlline,0 as rdus,0 as rpack,0 as rpcs,0 as rttline,0 as jmltoko,ci.salesrep_id as salesrep_id
+from c_invoice ci
+inner join c_invoiceline cl on cl.c_invoice_id=ci.c_invoice_id
+inner join ad_user sa on ci.salesrep_id=sa.ad_user_id
+inner join m_product mp on cl.m_product_id=mp.m_product_id
+inner join c_bpartner_location cbl on ci.c_bpartner_location_id=cbl.c_bpartner_location_id
+inner join ad_org org on ci.ad_org_id=org.ad_org_id
+inner join c_salesregion sr on org.c_salesregion_id=sr.c_salesregion_id
+left  join uns_rayon ry on cbl.uns_rayon_id=ry.uns_rayon_id
+left join C_BPartner_Product mpp on mp.m_product_id=mpp.m_product_id
+left join c_bpartner bpp on mpp.c_bpartner_id=bpp.c_bpartner_id
+where ci.docstatus in('CO','CL')
+and ci.c_doctype_id IN ( SELECT c_doctype.c_doctype_id FROM c_doctype WHERE c_doctype.docbasetype = 'ARI')
+and case when $P{C_BPartner_ID}!=0 then bpp.C_bpartner_id=$P{C_BPartner_ID} else 1=1 end
+and ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+and Case When $P{SalesRep_ID}!=0 Then ci.salesrep_id=$P{SalesRep_ID} else 1=1 end
+and ci.c_invoice_id in(select cvr.c_invoice_id from UNS_Cvs_Rpt cvr WHERE cvr.docstatus in('CO','CL') and cvr.c_invoice_id is not null)
+group by sr.value,bpp.value,mp.name,sa.name2,mp.m_product_id,ci.salesrep_id
+union all
+SELECT sr.value as depo,coalesce(ry.name,'NOT DEFIND') as rayon,
+bpp.value as prinsiple,mp.name as nama_barang,sa.name2 as salesman,
+0 as a_call,0 as e_call,
+0 as tdus,0 as tpack,0 as tpcs,0 as ttlline,
+satuandus(mp.m_product_id,sum(coalesce(cl.qtyinvoiced,0))) as rdus,
+satuanpack(mp.m_product_id,sum(coalesce(cl.qtyinvoiced,0))) as rpack,
+satuanpcs(mp.m_product_id,sum(coalesce(cl.qtyinvoiced,0))) as rpcs,
+sum(cl.linenetamt) as rtlline,0 as jmltoko,ci.salesrep_id as salesrep_id
+from c_invoice ci
+inner join c_invoiceline cl on cl.c_invoice_id=ci.c_invoice_id
+inner join ad_user sa on ci.salesrep_id=sa.ad_user_id
+inner join m_product mp on cl.m_product_id=mp.m_product_id
+inner join c_bpartner_location cbl on ci.c_bpartner_location_id=cbl.c_bpartner_location_id
+inner join ad_org org on ci.ad_org_id=org.ad_org_id
+inner join c_salesregion sr on org.c_salesregion_id=sr.c_salesregion_id
+left  join uns_rayon ry on cbl.uns_rayon_id=ry.uns_rayon_id
+left join C_BPartner_Product mpp on mp.m_product_id=mpp.m_product_id
+left join c_bpartner bpp on mpp.c_bpartner_id=bpp.c_bpartner_id
+where ci.docstatus in('CO','CL')
+and ci.c_doctype_id IN ( SELECT c_doctype.c_doctype_id FROM c_doctype WHERE c_doctype.docbasetype = 'ARC')
+and case when $P{C_BPartner_ID}!=0 then bpp.C_bpartner_id=$P{C_BPartner_ID} else 1=1 end
+and ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+and Case When $P{SalesRep_ID}!=0 Then ci.salesrep_id=$P{SalesRep_ID} else 1=1 end
+group by sr.value,coalesce(ry.name,'NOT DEFIND'),bpp.value,mp.name,sa.name2,mp.m_product_id,ci.salesrep_id) DATA
+left join ad_user auser on auser.ad_user_id=$P{AD_User_ID}
+group by DATA.depo,data.rayon,data.prinsiple,data.nama_barang,data.salesman,data.salesrep_id,data.jmltoko
+order by data.depo,data.rayon,data.salesman,data.prinsiple]]>
+	</queryString>
+	<field name="depo" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="prinsiple" class="java.lang.String"/>
+	<field name="nama_barang" class="java.lang.String"/>
+	<field name="salesman" class="java.lang.String"/>
+	<field name="a_call" class="java.math.BigDecimal"/>
+	<field name="e_call" class="java.math.BigDecimal"/>
+	<field name="tdus" class="java.math.BigDecimal"/>
+	<field name="tpack" class="java.math.BigDecimal"/>
+	<field name="tpcs" class="java.math.BigDecimal"/>
+	<field name="ttline" class="java.math.BigDecimal"/>
+	<field name="rdus" class="java.math.BigDecimal"/>
+	<field name="rpack" class="java.math.BigDecimal"/>
+	<field name="rpcs" class="java.math.BigDecimal"/>
+	<field name="rttline" class="java.math.BigDecimal"/>
+	<field name="jmltoko" class="java.math.BigDecimal"/>
+	<group name="Sales">
+		<groupExpression><![CDATA[$F{salesman}]]></groupExpression>
+	</group>
+	<group name="Prinsiple">
+		<groupExpression><![CDATA[$F{prinsiple}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="42">
+			<staticText>
+				<reportElement uuid="f6db141b-b4af-4059-a4c8-424e6ab2b9a3" x="1" y="0" width="997" height="16"/>
+				<textElement textAlignment="Center">
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Analisa Efektif Call / Aktif Otlet Per Salesman]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bbdaca8c-6fd5-40d6-b71d-61d3ef32dd0d" x="354" y="31" width="100" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Salesman]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="929313f4-00d3-4011-be7b-6279ae0be459" x="610" y="31" width="36" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[EC    /]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0c9ddabd-483b-4243-bc0b-6197c92445e2" x="944" y="31" width="54" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Value Return]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="af871d4f-b01f-4040-af69-296818ba2daa" x="776" y="31" width="66" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Value Penjualan]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="61d255a7-dac2-494a-a32b-de309c43e88b" x="0" y="16" width="998" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode :  "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+" s/d "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="e76f9272-3685-45b1-b4d8-fa34514ae984" x="646" y="31" width="37" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[AO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ff60d356-1d51-4248-a411-d61a3b9c55c4" x="683" y="31" width="93" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty Penjualan Persatuan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="409f002f-ad5f-4309-abe5-b38f255d7db1" x="0" y="31" width="38" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Justified">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Depo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="77be22bd-5400-41f2-ba23-2d57e0f1772f" x="38" y="31" width="133" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Justified">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Prinsiple]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="453e1f68-7beb-4ddb-8943-9a1acc6ccc6d" x="454" y="31" width="156" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Justified">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="96521c12-5274-4d8f-a3be-74109572838b" x="172" y="31" width="141" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Justified">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Rayon]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b6974a82-ceb2-45ac-816f-b40b511a8e82" x="842" y="31" width="102" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty Return Persatuan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="66286241-3a42-4659-871e-d8446c08e0e6" x="313" y="31" width="41" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jml Toko]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement uuid="02fe96c6-29a9-4bd9-815a-ae13d03999d5" x="1" y="0" width="38" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{depo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4f386fda-663e-49b6-bae6-7d94c678179f" x="39" y="0" width="133" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prinsiple}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="863fb197-e9c2-430b-878f-5cee6dddf350" x="172" y="0" width="141" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="85f690ac-0b68-47d1-b70b-c2bcb71f98fe" x="354" y="0" width="100" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{salesman}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e0247316-216b-43f1-ba77-3129722542bd" x="454" y="0" width="156" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_barang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="bf2e0b00-27fe-4ac9-9acd-4564aa770700" x="610" y="0" width="36" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{e_call}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="3667066e-7d9a-4257-a0aa-dfd58cb3b9b3" x="683" y="0" width="32" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tdus}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="07839e3e-fea5-4eb8-843d-6f35a75f1df2" x="715" y="0" width="29" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tpack}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="f31534d2-f66b-485e-8515-24d4daae1d17" x="744" y="0" width="32" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tpcs}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="dbd05c92-7d07-49a5-bf1e-3c50d063536a" x="776" y="0" width="66" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ttline}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="8f7a3586-d5c8-406a-bfe5-de4a6171d919" x="842" y="0" width="34" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rdus}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="47228da6-ed82-4f41-9262-f201bec4683d" x="876" y="0" width="34" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rdus}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="423e796b-5ab0-4fe4-a411-0cd1260b5001" x="910" y="0" width="34" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rpcs}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="eb90e2da-995e-480a-b3ab-2be6c6212eaf" x="944" y="0" width="54" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rttline}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="6d862e75-37eb-44f4-94ba-6982dd3547bf" x="646" y="0" width="37" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{a_call}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="3cf5e724-3e72-4efa-b3c9-2bed62f8f23b" x="313" y="0" width="41" height="11"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jmltoko}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

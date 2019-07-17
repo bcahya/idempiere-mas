@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportPenjualanPerSalesmanDetail" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" uuid="94241c49-9cf8-429b-8d66-203b870c5754">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="342"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select cp.name as namacust,au.name as sales,mp.name as namabarang,cbl.name rayon,sum(cl.qtyentered) as qty,sum(cl.linenetamt) as tfak,
+uom.name as Satuan1,now() as tglskrg,u.name as nama
+from m_product mp
+left join c_invoiceline cl on  mp.m_product_id=cl.m_product_id
+left join c_invoice ci on ci.c_invoice_id=cl.c_invoice_id
+left join c_bpartner cp on cp.c_bpartner_id=ci.c_bpartner_id
+left join ad_user au on au.ad_user_id=ci.salesrep_id
+left join c_bpartner_location cbl on ci.c_bpartner_location_id=cbl.c_bpartner_location_id
+left join c_uom uom on uom.c_uom_id=mp.c_uom_id
+left join ad_user u on u."ad_user_id" = $P{AD_User_ID}
+where ci.dateinvoiced>=$P{StartDate} and ci.dateinvoiced<=$P{EndDate}
+group by cp.name,au.name,mp.name,cbl.name,uom.name,u.name]]>
+	</queryString>
+	<field name="namacust" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="namabarang" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="tfak" class="java.math.BigDecimal"/>
+	<field name="satuan1" class="java.lang.String"/>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="nama" class="java.lang.String"/>
+	<group name="Salesman">
+		<groupExpression><![CDATA[$F{sales}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField>
+					<reportElement x="0" y="0" width="120" height="12" uuid="11fda01f-9666-4ff0-8eaf-b82fa3372032"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{sales}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="NamaCustomer">
+		<groupExpression><![CDATA[$F{namacust}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement x="120" y="0" width="124" height="16" uuid="277217fd-e0fe-4a76-b443-125d220fe802"/>
+					<textFieldExpression><![CDATA[$F{namacust}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="244" y="0" width="122" height="16" uuid="3335965f-331f-419c-be9c-c1057f77e900"/>
+					<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="652" y="0" width="100" height="14" uuid="eb414c2b-18de-486d-afa6-528557dbe6f2"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[IdempiereUntaSoft]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="244" height="14" uuid="077129c5-104d-456e-9842-e7c28e155b68"/>
+				<text><![CDATA[Print Penjualan Per Salesman Per Rayon]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="14" width="244" height="20" uuid="20a45f1e-394e-49ef-82c0-afd9b43b39b0"/>
+				<textFieldExpression><![CDATA['Periode :'+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' s/d '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="41" width="100" height="20" uuid="50935781-4f26-4e6f-981a-0b400514f347"/>
+				<text><![CDATA[Nama Salesman]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="41" width="100" height="20" uuid="2a81a383-23d4-4e9a-8683-34f6d5fb658a"/>
+				<text><![CDATA[Nama Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="244" y="41" width="71" height="20" uuid="e9e9293c-1714-4ab7-8884-a15e84b6883b"/>
+				<text><![CDATA[Nama Rayon]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="315" y="41" width="100" height="20" uuid="f6f86d5d-1bbe-474c-a69f-6c4a04f57c6c"/>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="503" y="41" width="45" height="20" uuid="d056462f-b827-4f58-a69a-eef236a5e1f1"/>
+				<text><![CDATA[Qty]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="632" y="41" width="100" height="20" uuid="149c5848-3a6f-4823-b7da-80e8913af2ce"/>
+				<text><![CDATA[Total Rupiah]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement x="503" y="0" width="45" height="11" uuid="ac9bc3b9-9312-4659-8bfb-7415f73e4b96"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="561" y="0" width="62" height="11" uuid="a20353ff-5bd8-458d-abe5-c1785745c9b0"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{satuan1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="632" y="0" width="100" height="11" uuid="e19bb6dd-8228-45a4-8e3a-9b6f3b762c07"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tfak}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="315" y="0" width="177" height="11" uuid="85355b8f-05ca-463b-b958-a7755e73e225"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namabarang}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="12" width="432" height="1" uuid="1bcec9ba-2bdc-48c5-9c93-837511d2297f"/>
+			</line>
+			<textField>
+				<reportElement x="432" y="8" width="100" height="11" uuid="05fff3a2-e7a5-4e8b-b966-723884d67683"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Print Date '+
+new SimpleDateFormat('dd/MM/yyyy').format($F{tglskrg})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="552" y="8" width="100" height="11" uuid="4bf7ed93-6000-464b-97a2-0bcf3745ad04"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Print By : '+$F{nama}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

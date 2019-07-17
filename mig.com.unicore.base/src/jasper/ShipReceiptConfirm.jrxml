@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ShipReceiptConfirm" language="groovy" pageWidth="612" pageHeight="396" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ceb3872b-3abf-4e95-9898-f40d37147d9d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="M_InOutConfirm_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() as tglsekarang,mic.documentno Documentno,mic.created as Tglbuat,mic.description as description,
+ mi.documentno as Docmatrial,mi.movementdate as tglmatrial,
+ co.documentno as DocOrder,co.dateordered as tglorder,
+ cb.name as nmvendor,ad.name as user
+ from M_InOutConfirm mic
+ inner join m_inout mi on mi.m_inout_id=mic.m_inout_id
+ left join c_order co on co.c_order_id=mi.c_order_id
+ inner join c_bpartner cb on cb.c_bpartner_id=mi.c_bpartner_id
+ left join ad_user ad on ad.ad_user_id=$P{AD_User_ID}
+ where  mic.docstatus in('CO','CL')
+ and mic.M_InOutConfirm_ID=$P{M_InOutConfirm_ID}]]>
+	</queryString>
+	<field name="tglsekarang" class="java.sql.Timestamp"/>
+	<field name="documentno" class="java.lang.String"/>
+	<field name="tglbuat" class="java.sql.Timestamp"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="docmatrial" class="java.lang.String"/>
+	<field name="tglmatrial" class="java.sql.Timestamp"/>
+	<field name="docorder" class="java.lang.String"/>
+	<field name="tglorder" class="java.sql.Timestamp"/>
+	<field name="nmvendor" class="java.lang.String"/>
+	<field name="user" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="49" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="17" width="572" height="30" uuid="9a4f4b58-8786-4f47-a20e-6b861e840aea"/>
+				<textElement>
+					<font size="22"/>
+				</textElement>
+				<text><![CDATA[Validation]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="244" y="0" width="328" height="17" uuid="ccc73a74-ac79-4ee7-80fa-af56c86b1f86"/>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Print Date "+new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format($F{tglsekarang})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="114" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="3" width="572" height="22" uuid="e8fee499-ab89-4b3d-abf9-b1f342a665cc"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Description  :  "+$F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="25" width="320" height="20" uuid="4995740f-9c55-4712-a14b-426bb75b98b1"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NoDocument  : "+$F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="375" y="25" width="197" height="20" uuid="ae8bdf11-e53f-4d34-b44d-24cfdba14ab8"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Tgl.Document : " +new SimpleDateFormat("dd/MM/yyyy").format($F{tglbuat})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="48" width="572" height="20" uuid="750688c6-63f7-4d6d-872f-093838a6bc8e"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NoDocument PO  : "+$F{docorder}+"  Tgl. Document : "+new SimpleDateFormat("dd/MM/yyyy").format($F{tglorder})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="71" width="572" height="20" uuid="33966af2-4bdc-4982-988f-41564f16e855"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NoDocument MR  : "+$F{docmatrial}+"  Tgl. Document : "+new SimpleDateFormat("dd/MM/yyyy").format($F{tglmatrial})]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<columnFooter>
+		<band height="82" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="55" width="114" height="20" uuid="8e912b57-b343-4b71-aba7-4b9615cdfd7d"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[(Admin Penerimaan)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="406" y="55" width="155" height="20" uuid="efb07a10-c377-4880-ab37-e55d705d633a"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[(Mengetahui Kepala Gudang)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="35" width="114" height="20" uuid="1fd0c89a-bd6f-42ec-b9c2-108a9226f7b1"/>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{user}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+</jasperReport>

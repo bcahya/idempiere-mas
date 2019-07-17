@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DaftarSJBelumReturn" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a44a67c7-22ac-4287-a223-07021335523e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select
+sr.Name AS Region,
+co.documentno AS NoOrder,
+pl.documentno AS NoPL,
+pr.documentno AS NoPLRT,
+io.documentno AS NoSJ,
+plc.documentno AS NoPLRTC,
+pl.datedoc AS TglKrm,
+bp.name AS NmToko,
+usr.Name AS User,
+bpl.Name AS Location,
+pl.Name AS NamePL,
+iv.DocumentNo AS NoFk
+
+FROM
+UNS_PL_Return pr
+
+inner join uns_packinglist pl on pl.uns_packinglist_id=pr.uns_packinglist_id
+inner join UNS_PackingList_Order plo on plo.uns_packinglist_id=pl.uns_packinglist_id
+left outer join uns_pl_confirm plc on plc.uns_pl_return_id=pr.uns_pl_return_id
+inner join m_inout io on plo.m_inout_id=io.m_inout_id
+inner join c_bpartner bp on bp.c_bpartner_id=io.c_bpartner_id
+INNER join c_invoice iv on iv.c_invoice_id=io.c_invoice_id
+inner join ad_org org on org.ad_org_id=pr.ad_org_id
+inner join c_order co on co.c_order_id=plo.c_order_id
+INNER JOIN C_BPartner_Location bpl ON bpl.C_BPartner_Location_ID = co.C_BPartner_Location_ID
+INNER JOIN AD_User usr ON usr.AD_User_ID = pl.CreatedBy
+INNER JOIN C_SalesRegion sr ON sr.C_SalesRegion_ID = org.C_SalesRegion_ID
+
+where pr.docstatus not in ('CO','CL','VO', 'RE') and sr.C_SalesRegion_ID=$P{C_SalesRegion_ID}
+
+order by pl.datedoc, pl.documentno, co.DocumentNo]]>
+	</queryString>
+	<field name="region" class="java.lang.String"/>
+	<field name="noorder" class="java.lang.String"/>
+	<field name="nopl" class="java.lang.String"/>
+	<field name="noplrt" class="java.lang.String"/>
+	<field name="nosj" class="java.lang.String"/>
+	<field name="noplrtc" class="java.lang.String"/>
+	<field name="tglkrm" class="java.sql.Timestamp"/>
+	<field name="nmtoko" class="java.lang.String"/>
+	<field name="user" class="java.lang.String"/>
+	<field name="location" class="java.lang.String"/>
+	<field name="namepl" class="java.lang.String"/>
+	<field name="nofk" class="java.lang.String"/>
+	<group name="PL" keepTogether="true">
+		<groupExpression><![CDATA[$F{nopl}]]></groupExpression>
+		<groupHeader>
+			<band height="51">
+				<textField>
+					<reportElement isPrintRepeatedValues="false" x="0" y="0" width="753" height="34" uuid="0feda857-34aa-4b2c-8601-adcf4eda8e1e"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA["#Packing List :: " + $F{nopl} + " #Tanggal :: " + new SimpleDateFormat("dd-MM-yyyy").format($F{tglkrm}) + " #Packing List Return :: " + $F{noplrt} +
+"\n#Nama :: " + $F{namepl}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="148" y="34" width="80" height="17" uuid="e2235178-404f-4c9b-943c-ef5f9e4e625a"/>
+					<box>
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[No. Surat Jalan]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="228" y="34" width="199" height="17" uuid="b03b11ed-0a04-4d1c-ad78-68c51d721f21"/>
+					<box>
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Toko]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="71" y="34" width="77" height="17" uuid="e2235178-404f-4c9b-943c-ef5f9e4e625a"/>
+					<box>
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[No. Faktur]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="34" width="71" height="17" uuid="e2235178-404f-4c9b-943c-ef5f9e4e625a"/>
+					<box>
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[No. Order]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="427" y="34" width="326" height="17" uuid="b03b11ed-0a04-4d1c-ad78-68c51d721f21"/>
+					<box>
+						<pen lineWidth="0.0"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Alamat]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="34" width="752" height="1" uuid="a898ad44-6f68-4e1c-961d-2510943e3420"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement x="1" y="0" width="752" height="1" uuid="a898ad44-6f68-4e1c-961d-2510943e3420"/>
+					<graphicElement>
+						<pen lineStyle="Solid"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<line>
+					<reportElement x="1" y="0" width="752" height="1" uuid="a898ad44-6f68-4e1c-961d-2510943e3420"/>
+					<graphicElement>
+						<pen lineStyle="Solid"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="43" splitType="Stretch">
+			<staticText>
+				<reportElement x="-1" y="0" width="752" height="25" uuid="3dd9dbef-d50e-4443-893b-808d96d2d022"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DAFTAR SURAT JALAN BELUM RETURN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="650" y="0" width="100" height="13" uuid="bac2d2ca-74b3-4cab-b3f1-32f00f1728a4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreERP]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="25" width="752" height="18" uuid="31633860-3152-48f7-8c4f-ce1f035ef43f"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{region}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="16">
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="0" y="0" width="71" height="16" uuid="5f420600-359f-4592-b1f2-02756297edcb"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{noorder}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="148" y="0" width="80" height="16" uuid="55fcbfa1-7cd3-48f9-9be9-68bdef9cbb22"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nosj}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="228" y="0" width="199" height="16" uuid="ac2b2d2d-6abc-4159-aedd-569eb749d27d"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmtoko}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="427" y="0" width="326" height="16" uuid="0c4fd785-cb6e-4f1d-ab1c-014f8aad5049"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{location}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="71" y="0" width="77" height="16" uuid="fb72a636-42ee-4812-afb1-f5b63c7784f8"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nofk}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

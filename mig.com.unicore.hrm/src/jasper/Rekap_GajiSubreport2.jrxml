@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Rekap_GajiSubreport2" language="groovy" columnCount="31" pageWidth="463" pageHeight="105" orientation="Landscape" columnWidth="14" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="67680c36-4ce4-4202-9e5f-925dc640f5b8">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Employee_ID" class="java.math.BigDecimal"/>
+	<parameter name="C_Period_ID" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT
+dp.presencedate AS tgl,
+dp.daytype AS Jns,
+e.hourperday AS Norm,
+dp.overtime AS Lemb,
+dp.ld1 AS LD1,
+dp.ld2 AS LD2,
+dp.ld3 AS LD3
+FROM UNS_Employee e
+INNER JOIN AD_Org org ON e.AD_Org_ID = org.AD_Org_ID
+INNER JOIN C_BPartner bp ON e.C_BPartner_ID = bp.C_BPartner_ID
+INNER JOIN C_Job job ON e.C_Job_ID = job.C_Job_ID
+INNER JOIN UNS_YearlyPresenceSummary Yearly ON e.UNS_Employee_ID = Yearly.UNS_Employee_ID
+INNER JOIN UNS_MonthlyPresenceSummary Monthly ON Yearly.UNS_YearlyPresenceSummary_ID = Monthly.UNS_YearlyPresenceSummary_ID
+INNER JOIN UNS_DailyPresence dp ON Monthly.UNS_MonthlyPresenceSummary_ID = dp.UNS_MonthlyPresenceSummary_ID
+INNER JOIN UNS_Payroll_Employee pe ON e.UNS_Employee_ID = pe.UNS_Employee_ID
+INNER JOIN C_Period period ON pe.C_Period_ID = period.C_Period_ID
+WHERE e.UNS_Employee_ID = $P{UNS_Employee_ID} AND period.c_period_id = $P{C_Period_ID} AND Monthly.C_Period_ID = $P{C_Period_ID}
+order by dp.UNS_DailyPresence_ID]]>
+	</queryString>
+	<field name="tgl" class="java.sql.Timestamp"/>
+	<field name="jns" class="java.lang.String"/>
+	<field name="norm" class="java.math.BigDecimal"/>
+	<field name="lemb" class="java.math.BigDecimal"/>
+	<field name="ld1" class="java.math.BigDecimal"/>
+	<field name="ld2" class="java.math.BigDecimal"/>
+	<field name="ld3" class="java.math.BigDecimal"/>
+	<detail>
+		<band height="105" splitType="Stretch">
+			<textField pattern="dd-MMM" isBlankWhenNull="true">
+				<reportElement uuid="35854061-008a-4810-af87-93b97938f15f" x="0" y="0" width="14" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgl}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="8629810c-44c0-40dd-889e-24cb1fc7c50e" x="0" y="15" width="14" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jns}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="fb4142b7-8f07-4562-9b67-0f5f085e6fba" x="0" y="30" width="14" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{norm}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="74af6452-4f98-48ad-b8b2-a2dc5056fe0e" x="0" y="75" width="14" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ld2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="e633895f-b2ec-4c86-830a-b6de51cf2c1a" x="0" y="45" width="14" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{lemb}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="4793161d-59ae-46f7-8e43-1abcef8017e4" x="0" y="90" width="14" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ld3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="547b6540-2166-44e9-99d0-b84b924e2de9" x="0" y="60" width="14" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ld1}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

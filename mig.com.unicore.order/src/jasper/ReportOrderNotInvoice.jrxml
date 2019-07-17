@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportOrderNotInvoice" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bbbc4292-e35c-4508-9986-21799b2ff71c">
+	<property name="ireport.zoom" value="1.3310000000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EndDate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT data.region as Region,data.rayon, sum(data.kubik) as KUBIK,sum(data.ttlline)/1000 as VALUE,
+SUM((case when data.dus is null then 0 else data.DUS end)) AS DUS,
+SUM((case when data.pack is null then 0 else data.pack end)) AS PACK,
+SUM((case when data.pcs is null then 0 else data.pcs end)) AS PCS
+FROM(
+SELECT UPPER(sr.Name) AS Region,rf.Name AS Status,ry.Name AS Rayon,mp.volume*ol.QtyOrdered as kubik,
+case when ol.C_Tax_ID=1000002 then ol.linenetamt*1.1 else ol.linenetamt end as ttlline,
+o.grandtotal,satuandus(ol.m_product_id, ol.qtyordered) as dus,
+satuanpack(ol.m_product_id, ol.qtyordered) as pack,
+satuanpcs(ol.m_product_id, ol.qtyordered) as pcs
+FROM C_Order o
+INNER JOIN AD_Org org ON org.AD_Org_ID = o.AD_Org_ID
+INNER JOIN C_BPartner_Location bpl ON bpl.C_BPartner_Location_ID = o.Bill_Location_ID
+INNER JOIN C_OrderLine ol ON ol.C_Order_ID = o.C_Order_ID
+INNER JOIN M_Product mp ON mp.M_Product_ID = ol.M_Product_ID
+INNER JOIN C_DocType dt ON dt.C_DocType_ID = o.C_DocType_ID
+INNER JOIN C_SalesRegion sr ON sr.C_SalesRegion_ID = org.C_SalesRegion_ID
+INNER JOIN AD_Ref_List rf ON rf.Value = o.DocStatus AND rf.AD_Reference_ID = 131
+INNER JOIN UNS_Rayon ry ON ry.UNS_Rayon_ID = bpl.UNS_Rayon_ID
+WHERE sr.C_SalesRegion_ID = 1000000 AND dt.DocSubTypeSO IN ('PR', 'SO', 'OC')
+--and o.documentno='215566'
+AND (CASE WHEN o.processed = 'Y' THEN o.DocStatus IN ('CO', 'CL')
+WHEN o.processed = 'N' THEN o.DocStatus NOT IN ('CO', 'CL', 'VO', 'RE') ELSE o.DocStatus NOT IN ('VO', 'RE') END)
+AND o.IsSOTrx = 'Y' AND (o.DateOrdered BETWEEN $P{StartDate} AND $P{EndDate}) AND QtyPacked = 0 AND ol.QtyDelivered < ol.QtyOrdered
+ORDER BY o.DateOrdered, bpl.BPartnerName, mp.Name) AS data
+GROUP BY data.RAYON,data.region]]>
+	</queryString>
+	<field name="region" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="kubik" class="java.math.BigDecimal"/>
+	<field name="value" class="java.math.BigDecimal"/>
+	<field name="dus" class="java.math.BigDecimal"/>
+	<field name="pack" class="java.math.BigDecimal"/>
+	<field name="pcs" class="java.math.BigDecimal"/>
+	<variable name="Tkubik" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{kubik}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="tvalue" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{value}]]></variableExpression>
+	</variable>
+	<variable name="Tdus" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{dus}]]></variableExpression>
+	</variable>
+	<variable name="Tpack" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{pack}]]></variableExpression>
+	</variable>
+	<variable name="Tpcs" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{pcs}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="81">
+			<textField>
+				<reportElement uuid="c8868b00-a5fa-49bd-8db3-1afe5d7f0ff1" x="0" y="0" width="555" height="15"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{region}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="7f363432-fd77-4025-ab7a-19c977993b92" x="0" y="15" width="555" height="15"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sales Order Not Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="edf4be43-ae9a-41a0-a0ec-fddec622057b" x="0" y="61" width="214" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[R   a   y   o   n ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7676ea37-7a83-4b09-8af5-39c6a8128474" x="214" y="61" width="100" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Kubik]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a9d25b99-46e2-45a8-b2a4-4d7f381d3741" x="314" y="61" width="100" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dcee518b-e02f-45be-9df9-a2c2287db9f3" x="414" y="61" width="141" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Volume : Dus/Pack/Pcs]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="44c6ea54-3f7f-443a-ae8a-0bf4f2ee0f4c" x="0" y="30" width="555" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Periode : "+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+" - "+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement uuid="4e3e7c69-a6bb-43de-a948-b32b9e6bb97b" x="0" y="0" width="214" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="41396346-e00b-46ba-b8fa-68e4aedc011f" x="214" y="0" width="100" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{kubik}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="1e460c35-fbbb-4702-ba6d-1cf8e44bb674" x="314" y="0" width="100" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{value}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="36e26a42-1252-4191-a73d-83a661f03470" x="414" y="0" width="42" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{dus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d11dc171-aaef-474e-9404-f15c7bf65c84" x="456" y="0" width="49" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{pack}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="6e082d96-14d2-4dbf-8086-49367eb8233f" x="505" y="0" width="50" height="16"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{pcs}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="20">
+			<textField pattern="#,##0.00">
+				<reportElement uuid="3e3e2ebb-ae62-4b1a-9a7d-cdc526336e87" x="214" y="0" width="100" height="15"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{Tkubik}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="56cd2fcf-deb2-4f3f-b9d3-05b4296b5958" x="314" y="0" width="100" height="15"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{tvalue}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="a61f0294-fb68-40f1-b89e-605442e7da5a" x="0" y="0" width="214" height="15"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement uuid="410cfe9f-add7-46c3-9be7-48b72102141b" x="414" y="0" width="42" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{Tdus}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="8dadfb58-2a68-4438-8317-0b816a288d98" x="456" y="0" width="49" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{Tpack}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="92f69b0b-e7d8-4d3a-b754-fc6b3d762d24" x="505" y="0" width="50" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{Tpcs}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

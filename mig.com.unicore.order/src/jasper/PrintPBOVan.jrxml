@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintPBOVan" language="groovy" pageWidth="612" pageHeight="396" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8c14f4d4-d206-4a2e-812d-6c67c126f89e">
+	<property name="ireport.zoom" value="1.652892561983471"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="M_Movement_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT
+     uomconversiontostr(m_movementline."m_product_id",m_movementline."movementqty") as qty,
+     m_movement."documentno" AS documentno,
+     m_movement."movementdate" AS tanggal,
+     m_movement."description" AS catatan,
+     m_movement."salesrep_id" AS idsales,
+     m_product."name" AS namaproduct,
+     m_product."value" AS idproduct,
+     loc."value" AS loc,
+     locto."value" AS locto,
+     ad_user."name" AS sales,
+ad_user1."name" AS dibuatoleh
+FROM
+     "adempiere"."m_movement" m_movement INNER JOIN "adempiere"."m_movementline" m_movementline ON m_movement."m_movement_id" = m_movementline."m_movement_id"
+     INNER JOIN "adempiere"."m_product" m_product ON m_movementline."m_product_id" = m_product."m_product_id"
+     INNER JOIN "adempiere"."m_locator" m_locator ON m_movementline."m_locator_id" = m_locator."m_locator_id"
+INNER JOIN "adempiere"."ad_user" ad_user ON m_movement."salesrep_id" = ad_user."ad_user_id"
+INNER JOIN "adempiere"."ad_user" ad_user1 ON ad_user1."ad_user_id"=$P{AD_User_ID}
+     LEFT JOIN "adempiere"."c_uom" cu1 ON m_product."uomconversionl1_id"= cu1."c_uom_id"
+     LEFT JOIN "adempiere"."c_uom" cu2 ON m_product."uomconversionl2_id"= cu2."c_uom_id"
+     LEFT JOIN "adempiere"."c_uom" cu3 ON m_product."uomconversionl3_id"= cu3."c_uom_id"
+     LEFT JOIN "adempiere"."c_uom" cu4 ON m_product."uomconversionl4_id"= cu4."c_uom_id"
+LEFT JOIN "adempiere"."m_locator" loc ON loc."m_locator_id"=m_movementline."m_locator_id"
+LEFT JOIN "adempiere"."m_locator" locto ON locto."m_locator_id"=m_movementline."m_locatorto_id"
+WHERE
+     m_movement."m_movement_id" = $P{M_Movement_ID}]]>
+	</queryString>
+	<field name="qty" class="java.lang.String"/>
+	<field name="documentno" class="java.lang.String"/>
+	<field name="tanggal" class="java.sql.Timestamp"/>
+	<field name="catatan" class="java.lang.String"/>
+	<field name="idsales" class="java.math.BigDecimal"/>
+	<field name="namaproduct" class="java.lang.String"/>
+	<field name="idproduct" class="java.lang.String"/>
+	<field name="loc" class="java.lang.String"/>
+	<field name="locto" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="dibuatoleh" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="98" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="316" height="20" uuid="ed6ab2b7-43e6-4741-8047-c4ec26956a13"/>
+				<textElement>
+					<font fontName="Tahoma" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[PENGAMBILAN BARANG OLEH VAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="28" width="100" height="20" uuid="eaca1e6d-69bc-4d2c-8146-e27046862b6e"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[Nomor Mutasi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="40" width="100" height="20" uuid="42773979-49c9-4b61-9962-fb3b2d5f3d40"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[Dari Gudang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="53" width="100" height="20" uuid="81377f27-bc98-4834-bd92-ee4acb376974"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[Ke Gudang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="65" width="100" height="20" uuid="36fc6dcd-432f-4c70-8eee-d0b01ada4c2d"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[Catatan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="335" y="30" width="85" height="20" uuid="d78304ef-b5ee-4dcb-b469-50d9cf5f6c12"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="335" y="46" width="85" height="20" uuid="0ef7ec13-5de8-4ea1-ae79-d7dd6a8847cb"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[Salesman]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="99" y="28" width="100" height="20" uuid="0828aa87-ec12-48ee-a580-10e327caa221"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " +$F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="419" y="30" width="152" height="20" uuid="8acf5b73-54c4-40b7-a008-623a83ee07cf"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + new SimpleDateFormat("EEEEE, dd-MM-YYYY").format($F{tanggal})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="99" y="65" width="473" height="33" uuid="260e637d-d87e-448e-a065-6f1394c12bcb"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{catatan} == null ? ": " : ": " + $F{catatan}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="99" y="40" width="217" height="20" uuid="f994cebc-9911-4db3-8127-00bd414ce51d"/>
+				<textFieldExpression><![CDATA[": " +$F{loc}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="99" y="53" width="217" height="20" uuid="9a79ae0a-66a7-4eb9-8fd9-3af21ff2d387"/>
+				<textFieldExpression><![CDATA[": " +$F{locto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="419" y="46" width="151" height="20" uuid="15155b79-c9f5-48ad-b103-17ed6dcbf137"/>
+				<textFieldExpression><![CDATA[": " +$F{sales}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="28" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="2" width="572" height="1" uuid="0f379ad7-4c5c-45d9-a18f-f59dd45f64ec"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Dashed" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="-2" y="27" width="572" height="1" uuid="99a8a71a-4d19-41ff-90b7-ac357d917cb2"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Dashed" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="3" width="23" height="25" uuid="ad056a7f-3846-4d74-9979-12d43ff9624b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="22" y="3" width="77" height="25" uuid="fa93f4b3-ae67-446e-863d-a4fabd420dc4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[KODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="98" y="3" width="228" height="25" uuid="c6142aad-f0bd-4b13-85a7-c1bcf7e7e933"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[NAMA BARANG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="325" y="3" width="162" height="25" uuid="9af862f7-55d6-40d0-a44d-30b9b98226d3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[JUMLAH BARANG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="487" y="3" width="85" height="25" uuid="be5bbff8-5d5f-451c-a060-4cde29d1b6d6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[KETERANGAN]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="23" height="13" uuid="3f91b281-d055-4c22-88b5-18d65177c2cb"/>
+				<box>
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="0" width="216" height="13" uuid="4c23823d-0e53-42d7-a6f5-a2b045d2a914"/>
+				<box>
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namaproduct}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="22" y="0" width="77" height="13" uuid="5eadf2bc-eac7-46ce-866c-156ee0718f5f"/>
+				<box>
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{idproduct}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="326" y="0" width="161" height="13" uuid="73365185-8c37-4bd5-ba0e-66fafffaa8de"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="99" splitType="Stretch">
+			<staticText>
+				<reportElement x="245" y="79" width="119" height="20" uuid="8db56aab-542e-45a4-80ce-eade76d6660b"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Diterima Oleh]]></text>
+			</staticText>
+			<line>
+				<reportElement x="244" y="76" width="120" height="1" uuid="e137f558-9bf4-448d-92a9-e2224b68ec1c"/>
+				<graphicElement>
+					<pen lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="79" width="120" height="20" uuid="55420c64-a934-424c-88f4-beda2e58cb71"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Tanda Tangan Otoritas]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="77" width="121" height="1" uuid="501a7082-42d2-4981-96ac-a25bb96ff599"/>
+				<graphicElement>
+					<pen lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="572" height="1" uuid="210ebed3-8b90-4314-be26-21806f5fdc04"/>
+				<graphicElement>
+					<pen lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="470" y="76" width="100" height="20" uuid="3d3abea6-a5d6-41a3-b7f7-612768e57e1e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{dibuatoleh}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

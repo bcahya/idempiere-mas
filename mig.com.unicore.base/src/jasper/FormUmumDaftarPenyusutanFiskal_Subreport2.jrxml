@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FormUmumDaftarPenyusutanFiskal_Subreport2" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="4e9001b6-6e8e-4c43-8cf9-0b042e0d36fb">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="A_Asset_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EndDate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT COALESCE(SUM(Exp.Expense),0) AS komersial,
+COALESCE(SUM(Exp.Expense_F),0) AS fiskal
+
+FROM A_Depreciation_Exp Exp
+INNER JOIN A_Asset A ON A.A_Asset_ID=Exp.A_Asset_ID
+INNER JOIN A_Depreciation_Workfile DW ON DW.A_Asset_ID=A.A_Asset_ID
+
+WHERE A.A_Asset_ID=$P{A_Asset_ID} AND EXTRACT (YEAR FROM $P{EndDate} ::Timestamp) = EXTRACT (YEAR FROM Exp.DateAcct) AND Exp.DateAcct <= $P{EndDate} ::Timestamp AND Exp.Processed='Y'
+]]>
+	</queryString>
+	<field name="komersial" class="java.math.BigDecimal"/>
+	<field name="fiskal" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement x="0" y="0" width="95" height="15" uuid="d0020d99-561d-4110-aa4b-78c2e7717e25"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{komersial}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="95" y="0" width="95" height="15" uuid="6e3b8f3d-5894-4d6a-9787-8fdb3714f87f"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fiskal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

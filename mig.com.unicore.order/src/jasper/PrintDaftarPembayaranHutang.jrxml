@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DaftarPembayaran Hutang" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0409fae6-6d5a-477e-ac2b-c935962548e7">
+	<property name="ireport.zoom" value="0.8264462809917354"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_Payment_ID" class="java.lang.Integer">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Tanggal" class="java.util.Date" isForPrompting="false"/>
+	<parameter name="DocumentNo" class="java.lang.String" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[select py.documentno as No_Bukti, py.dateacct as Tanggal,bp.name,inv.c_invoice_id as no_faktur, inv.dateinvoiced as tgl_faktur,inv.grandtotal as faktur , invoiceopen(inv.c_invoice_id,null) as sisa, inv.grandtotal - invoiceopen(inv.c_invoice_id,null) as bayar, now() as tgl_print  from c_allocationline acl join c_payment py on (acl.c_payment_id = py.c_payment_id) join c_invoice inv on (acl.c_invoice_id = inv.c_invoice_id) join c_bpartner bp on (inv.c_bpartner_id = bp.c_bpartner_id) join c_doctype dt on (py.c_doctype_id = dt.c_doctype_id ) where inv.c_invoice_id = acl.c_invoice_id and bp.isvendor = 'Y' AND dt.name = 'AP Payment' and py.docstatus = 'CO' and py.C_Payment_ID = $P{C_Payment_ID}]]>
+	</queryString>
+	<field name="no_bukti" class="java.lang.String"/>
+	<field name="tanggal" class="java.sql.Timestamp"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="no_faktur" class="java.math.BigDecimal"/>
+	<field name="tgl_faktur" class="java.sql.Timestamp"/>
+	<field name="faktur" class="java.math.BigDecimal"/>
+	<field name="sisa" class="java.math.BigDecimal"/>
+	<field name="bayar" class="java.math.BigDecimal"/>
+	<field name="tgl_print" class="java.sql.Timestamp"/>
+	<variable name="No" class="java.lang.Integer" incrementType="Report">
+		<variableExpression><![CDATA[$V{No} == null ? 1 : $V{No} + 1]]></variableExpression>
+	</variable>
+	<variable name="faktur_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{faktur}]]></variableExpression>
+	</variable>
+	<variable name="sisa_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{sisa}]]></variableExpression>
+	</variable>
+	<variable name="bayar_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{bayar}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="53" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="c3144444-19c8-45f1-b1ff-3435414725b1" x="2" y="0" width="226" height="30"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Arial" size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[DAFTAR PEMBAYARAN HUTANG]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="84" splitType="Stretch">
+			<line>
+				<reportElement uuid="348b0afe-c947-4d71-8adb-430f25c4e853" x="0" y="0" width="1" height="84"/>
+			</line>
+			<line>
+				<reportElement uuid="7a1e677f-2b07-4d81-91a7-181481f67fb6" x="248" y="40" width="307" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="f473eb37-f655-46bf-b2b9-ee880d1bcbaa" x="248" y="0" width="1" height="84"/>
+			</line>
+			<line>
+				<reportElement uuid="0f68a703-b4ef-41c2-b68d-cf01ba312b51" x="0" y="0" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="b262f1b7-8b5a-469d-83de-786f238f5399" x="2" y="83" width="553" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="f473eb37-f655-46bf-b2b9-ee880d1bcbaa" x="402" y="1" width="1" height="39"/>
+			</line>
+			<line>
+				<reportElement uuid="7a1e677f-2b07-4d81-91a7-181481f67fb6" x="2" y="19" width="554" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="dd120a69-55b8-464c-99e2-4e9da09f2380" x="249" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No. Bukti]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="7a1e677f-2b07-4d81-91a7-181481f67fb6" x="2" y="78" width="554" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="0ee55eeb-9c72-4c74-ba9c-bc9ff9b4a25a" x="417" y="1" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2ffab925-1c18-4a95-aa35-7159d109c92c" x="2" y="1" width="100" height="20"/>
+				<textElement textAlignment="Justified" verticalAlignment="Top">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[SUPPLIER]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="4f1ded7b-1afb-443d-9b34-8109b7a7f672" x="417" y="21" width="126" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{tanggal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8b8bbbde-56a7-4c2e-af9c-9a3c691c8fff" x="265" y="21" width="96" height="20"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{no_bukti}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="785cc80f-743f-4d41-b0a0-d09a13b49892" x="15" y="41" width="223" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="348b0afe-c947-4d71-8adb-430f25c4e853" x="556" y="0" width="1" height="84"/>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="29a09bea-be04-4c5f-b974-1aebaed83d21" x="3" y="6" width="28" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8e863867-f5cd-4e52-9308-cdef6012b351" x="43" y="6" width="59" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No. Faktur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b84409f7-c614-4566-8afd-3e6c5f1837de" x="119" y="5" width="59" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TGL_JT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="afd21248-4a16-42da-bd62-3ba0bfa4fcb5" x="200" y="5" width="71" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[FAKTUR Rp.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cb661bc6-ab41-414b-bd2a-62894cc3587f" x="287" y="5" width="71" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SISA Rp.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9e479ce1-f16e-401f-bcf3-e03e32477a5f" x="374" y="4" width="71" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[BAYAR Rp.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2cc09efe-3fcb-4182-8d35-f40ad2bf0dde" x="470" y="3" width="71" height="20"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[KET.]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="08e75300-7f2f-4912-a3b0-ca73a2fa6d70" x="35" y="5" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="110" y="5" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="189" y="4" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="279" y="4" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="366" y="5" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="459" y="5" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="556" y="6" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="1" y="6" width="1" height="21"/>
+			</line>
+			<line>
+				<reportElement uuid="4ccf1786-d951-4d11-a45d-1aa2a9adf9eb" x="3" y="27" width="550" height="1"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="41" splitType="Stretch">
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="1" y="5" width="1" height="35"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="33" y="5" width="1" height="35"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="110" y="5" width="1" height="35"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="188" y="5" width="1" height="35"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="279" y="5" width="1" height="35"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="367" y="5" width="1" height="35"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="461" y="5" width="1" height="35"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="555" y="5" width="1" height="35"/>
+			</line>
+			<textField>
+				<reportElement uuid="228d5b0c-4db1-43b5-970f-5fca18849fcc" x="43" y="7" width="59" height="20"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{no_faktur}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="24e2af15-8de0-40dc-9629-45a809af69a3" x="121" y="7" width="63" height="20"/>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{tgl_faktur}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="50b8e053-5a7f-4daf-a0d8-ee45cd6e7a9e" x="196" y="9" width="81" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{faktur}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="8a12f9ef-1f67-449f-92ff-bdf27c9f4410" x="287" y="7" width="79" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{sisa}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="caed3482-93c9-4144-ad80-0c025271caf2" x="374" y="7" width="85" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{bayar}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="35cae26a-2a92-4aae-a749-721ae46dbd17" x="9" y="9" width="21" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$V{No}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8b8bbbde-56a7-4c2e-af9c-9a3c691c8fff" x="472" y="9" width="76" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{no_bukti}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="63" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="84f8006e-6e71-48cc-920a-7c384e40bc38" x="15" y="10" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[TOTAL :]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="032ba6f5-6953-4791-a2ea-2e3d95596bb9" x="191" y="10" width="91" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{faktur_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="79492795-0d28-4f99-b767-aecb4198363b" x="283" y="10" width="87" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sisa_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="7666296b-d62b-45c5-95c9-f13b12e5fa5c" x="374" y="10" width="85" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{bayar_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="7654d6c3-2a94-4be3-9cbd-427592eeb253" x="482" y="43" width="63" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{tgl_print}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="461" y="3" width="1" height="30"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="368" y="3" width="1" height="30"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="280" y="3" width="1" height="30"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="187" y="3" width="1" height="30"/>
+			</line>
+			<line>
+				<reportElement uuid="3ee41a43-2a07-4087-8715-163116f8f873" x="3" y="33" width="552" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="554" y="0" width="1" height="30"/>
+			</line>
+			<line>
+				<reportElement uuid="e031549d-314b-4b60-b375-dd17a9db5746" x="1" y="3" width="1" height="30"/>
+			</line>
+			<line>
+				<reportElement uuid="4ccf1786-d951-4d11-a45d-1aa2a9adf9eb" x="5" y="5" width="550" height="1"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

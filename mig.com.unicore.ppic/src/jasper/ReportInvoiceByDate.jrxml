@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportInvoice" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="26f4b4b2-af97-4235-aaf8-c83a83b40449">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT ao.name AS Departement,
+ci.dateinvoiced,
+cb.name AS Customer,
+ci.documentno AS NoInvoice,
+ci.grandtotal AS PriceTotal,
+arl.name as Payrule,
+now() AS DatePrint,
+mi.documentno AS SuratJalan,
+cbl.name AS CustomerLocation,
+ao.name AS organization
+
+from c_invoice ci
+
+INNER JOIN ad_ref_List arl ON arl.value = ci.paymentrule
+INNER JOIN M_InOut mi ON mi.C_Invoice_ID=ci.C_invoice_ID
+INNER JOIN ad_reference ar ON ar.ad_reference_id = arl.ad_reference_Id
+INNER JOIN ad_org ao ON ao.ad_org_id = ci.ad_org_id
+INNER JOIN c_bpartner cb ON cb.c_bpartner_id = ci.c_bpartner_id
+INNER JOIN C_BPartner_Location cbl ON cbl.C_BPartner_Location_ID=ci.C_BPartner_Location_ID
+inner join c_invoiceline cil ON cil.c_invoice_id = ci.c_invoice_id
+LEFT join m_product mp ON mp.m_product_id = cil.m_product_id
+LEFT join c_charge cc ON cc.c_charge_id = cil.c_charge_id
+INNER JOIN c_uom cu ON cu.c_uom_id = cil.c_uom_id
+LEFT JOIN c_paymentallocate cpa ON cpa.c_invoice_id = ci.c_invoice_id
+
+WHERE ci.docstatus = 'CO' AND ar.name = '_Payment Rule' AND arl.ad_reference_id = 195 AND ci.issotrx = 'Y'
+AND
+(CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN ci.dateinvoiced >= $P{DateFrom}::timestamp AND ci.dateinvoiced <= $P{DateTo}::timestamp WHEN $P{DateTo}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN ci.dateinvoiced >= $P{DateFrom}::timestamp WHEN $P{DateTo}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN ci.dateinvoiced <= $P{DateTo}::timestamp ELSE 1=1 END)
+AND
+(CASE WHEN $P{C_BPartner_ID} IS NOT NULL THEN ci.C_BPartner_ID=$P{C_BPartner_ID} ELSE 1=1 END)
+AND
+(CASE WHEN $P{AD_Org_ID} IS NOT NULL THEN ci.AD_Org_ID=$P{AD_Org_ID} ELSE 1=1 END)
+
+GROUP BY ao.name,ci.dateinvoiced,cb.name,ci.documentno,ci.grandtotal,arl.name,mi.documentno,cbl.name
+
+ORDER BY ao.name,date(ci.dateinvoiced),ci.documentno,cb.name]]>
+	</queryString>
+	<field name="departement" class="java.lang.String"/>
+	<field name="dateinvoiced" class="java.sql.Timestamp"/>
+	<field name="customer" class="java.lang.String"/>
+	<field name="noinvoice" class="java.lang.String"/>
+	<field name="pricetotal" class="java.math.BigDecimal"/>
+	<field name="payrule" class="java.lang.String"/>
+	<field name="dateprint" class="java.sql.Timestamp"/>
+	<field name="suratjalan" class="java.lang.String"/>
+	<field name="customerlocation" class="java.lang.String"/>
+	<field name="organization" class="java.lang.String"/>
+	<group name="Organization">
+		<groupExpression><![CDATA[$F{organization}]]></groupExpression>
+		<groupHeader>
+			<band height="21">
+				<staticText>
+					<reportElement x="1" y="1" width="82" height="20" uuid="dbccab1d-2e00-44e6-99c8-e9bd88faf05e"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Organization]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="101" y="1" width="454" height="20" uuid="b86bb17e-aef1-4524-acd5-4facf8a272f4"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{organization}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="83" y="1" width="18" height="20" uuid="7a70c9b4-f76d-4fd4-aa96-f24d74210c4c"/>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="true" isItalic="false" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="Date">
+		<groupExpression><![CDATA[$F{dateinvoiced}]]></groupExpression>
+		<groupHeader>
+			<band height="40">
+				<staticText>
+					<reportElement x="0" y="0" width="83" height="20" uuid="747b6842-168b-44c8-8768-f8680385b253"/>
+					<box leftPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8" isBold="true" isItalic="false" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[Date Invoice]]></text>
+				</staticText>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="101" y="0" width="454" height="20" uuid="a54c78a4-805b-43ab-9ace-0b10048ce08d"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8" isBold="true" isItalic="true" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{dateinvoiced}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="83" y="0" width="18" height="20" uuid="81980a22-cbce-483c-8c53-0b4f4708c46e"/>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="true" isItalic="false" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1" y="20" width="83" height="20" uuid="4c66cc13-1034-4d36-b3f9-f1e48a5d8753"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[No Invoice]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="463" y="20" width="92" height="20" uuid="af096378-f63c-4675-bbce-cecf214d3f70"/>
+					<box rightPadding="5">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Total]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="84" y="20" width="96" height="20" uuid="c41acb4f-8b47-4eae-bdce-3d2b689305a8"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[No Shipment]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="180" y="20" width="135" height="20" uuid="5dc41af9-654d-48bc-b4ce-b0f5e4a664fb"/>
+					<box leftPadding="5" rightPadding="0">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Customer]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="315" y="20" width="148" height="20" uuid="55347165-725b-4a0c-b967-b2f3771f618f"/>
+					<box leftPadding="5" rightPadding="0">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Address]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="26"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<textField>
+				<reportElement x="101" y="60" width="454" height="20" uuid="6116c003-816c-4cde-9ffc-41fbc7ca04c4"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true" isItalic="false" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+new SimpleDateFormat("dd/MM/yyyy").format($P{DateFrom})+" - "+new SimpleDateFormat("dd/MM/yyyy").format($P{DateTo})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="60" width="83" height="20" uuid="0ab32fd6-a58e-4d01-bfdc-047bec5ee05a"/>
+				<box leftPadding="3">
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true" isItalic="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Range Date Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="83" y="60" width="18" height="20" uuid="db5b6968-508a-438b-a6c3-73484b2fd08c"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true" isItalic="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="493" y="0" width="62" height="20" uuid="ff893b70-64da-4917-af49-765a55c94666"/>
+				<box leftPadding="1"/>
+				<textElement textAlignment="Right">
+					<font size="6" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreERP]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="47" y="0" width="100" height="20" uuid="16171640-e127-40bb-bffd-8a6fa2973b96"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateprint}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="50" width="554" height="1" uuid="cfd014da-0e1e-4f46-af9a-db88f9bd785c"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="20" width="555" height="30" uuid="3df685fe-6a38-4f56-9d2b-80774512379b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[REPORT DETAIL INVOICE BY DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="36" height="20" uuid="f759d80b-4092-4f52-9ef1-7428d9c14872"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Date Print]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="36" y="0" width="11" height="20" uuid="667f82a7-6dd9-48fa-9921-d2de41e1f5ae"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true" isItalic="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="83" height="20" uuid="af2d944c-cb69-4971-8407-a3c173486fca"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{noinvoice}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="84" y="0" width="96" height="20" uuid="6fe2b4d1-109b-4029-a9ce-3bd8fa8f6b7e"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{suratjalan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="0" width="135" height="20" uuid="e05614fb-98e9-43a8-a8a6-2f3d79a67d62"/>
+				<box leftPadding="3">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{customer}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="315" y="0" width="148" height="20" uuid="909e758c-3f06-414b-b59c-0442dbb3543b"/>
+				<box leftPadding="3">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{customerlocation}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="463" y="0" width="92" height="20" uuid="955d13b4-1c90-48da-bca2-d240322fbba5"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pricetotal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="28" splitType="Stretch">
+			<textField>
+				<reportElement x="435" y="8" width="80" height="20" uuid="c6b19a93-2588-4953-951d-daf9f3493f95"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="515" y="8" width="40" height="20" uuid="ebf021b5-1dd3-41da-acd9-e7736b01a81c"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="3" width="554" height="1" uuid="db6f0d87-a932-4f2c-93b3-bca30f7ea7f4"/>
+			</line>
+		</band>
+	</columnFooter>
+	<summary>
+		<band height="21" splitType="Stretch"/>
+	</summary>
+</jasperReport>

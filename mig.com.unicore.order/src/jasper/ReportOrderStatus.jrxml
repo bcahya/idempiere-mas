@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportOrderStatus" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bbbc4292-e35c-4508-9986-21799b2ff71c">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Processed" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT *, UOMConversionToSTR(ProductID, QtyOrder) AS QtyOrderString, UOMConversionToSTR(ProductID, QtyPacked) AS QtyPackedString, UOMConversionToSTR(ProductID, QtyDeliv) AS QtyDelivString FROM (SELECT mp.M_Product_ID AS ProductID, org.Name, o.DocumentNo AS Order, o.DateOrdered, bpl.BPartnerName, mp.Name AS Product, ol.QtyOrdered AS QtyOrder, getqtypackingcomplete(ol.C_OrderLine_ID) AS QtyPacked, ol.QtyDelivered AS QtyDeliv, UPPER(sr.Name) AS Region, rf.Name AS Status, ry.Name AS Rayon FROM C_Order o
+
+INNER JOIN AD_Org org ON org.AD_Org_ID = o.AD_Org_ID
+INNER JOIN C_BPartner_Location bpl ON bpl.C_BPartner_Location_ID = o.Bill_Location_ID
+INNER JOIN C_OrderLine ol ON ol.C_Order_ID = o.C_Order_ID
+INNER JOIN M_Product mp ON mp.M_Product_ID = ol.M_Product_ID
+INNER JOIN C_DocType dt ON dt.C_DocType_ID = o.C_DocType_ID
+INNER JOIN C_SalesRegion sr ON sr.C_SalesRegion_ID = org.C_SalesRegion_ID
+INNER JOIN AD_Ref_List rf ON rf.Value = o.DocStatus AND rf.AD_Reference_ID = 131
+INNER JOIN UNS_Rayon ry ON ry.UNS_Rayon_ID = bpl.UNS_Rayon_ID
+
+WHERE sr.C_SalesRegion_ID = $P{C_SalesRegion_ID} AND dt.DocSubTypeSO IN ('PR', 'SO', 'OC') AND (CASE WHEN $P{Processed} = 'Y' THEN o.DocStatus IN ('CO', 'CL') WHEN $P{Processed} = 'N' THEN o.DocStatus NOT IN ('CO', 'CL', 'VO', 'RE') ELSE o.DocStatus NOT IN ('VO', 'RE') END) AND o.IsSOTrx = 'Y' AND (o.DateOrdered BETWEEN $P{DateFrom} AND $P{DateTo}) AND QtyPacked = 0 AND ol.QtyDelivered < ol.QtyOrdered
+
+ORDER BY o.DateOrdered, bpl.BPartnerName, mp.Name) AS Master]]>
+	</queryString>
+	<field name="productid" class="java.math.BigDecimal"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="order" class="java.lang.String"/>
+	<field name="dateordered" class="java.sql.Timestamp"/>
+	<field name="bpartnername" class="java.lang.String"/>
+	<field name="product" class="java.lang.String"/>
+	<field name="qtyorder" class="java.math.BigDecimal"/>
+	<field name="qtypacked" class="java.math.BigDecimal"/>
+	<field name="qtydeliv" class="java.math.BigDecimal"/>
+	<field name="region" class="java.lang.String"/>
+	<field name="status" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="qtyorderstring" class="java.lang.String"/>
+	<field name="qtypackedstring" class="java.lang.String"/>
+	<field name="qtydelivstring" class="java.lang.String"/>
+	<group name="date" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{dateordered}]]></groupExpression>
+		<groupHeader>
+			<band height="50">
+				<textField pattern="dd/MM/yyyy">
+					<reportElement uuid="dba084b3-640d-4087-b76c-64a443599e6d" x="0" y="20" width="555" height="15"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{dateordered}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="30f6ecaf-9ca0-4273-b937-69d0dc06a3e3" x="40" y="35" width="281" height="15"/>
+					<textElement/>
+					<text><![CDATA[Product]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="7f363432-fd77-4025-ab7a-19c977993b92" x="321" y="35" width="78" height="15"/>
+					<textElement/>
+					<text><![CDATA[Order]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="dcfc25c4-48aa-47c4-aaae-292a72f9dd06" x="399" y="35" width="78" height="15"/>
+					<textElement/>
+					<text><![CDATA[Packed]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="a6f5fc51-cc36-4633-a1e0-892481521a65" x="477" y="35" width="78" height="15"/>
+					<textElement/>
+					<text><![CDATA[Delivery]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="c8868b00-a5fa-49bd-8db3-1afe5d7f0ff1" x="0" y="0" width="555" height="20"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{region}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement uuid="3f7a93e9-2759-443c-b906-f83cb797d703" x="0" y="49" width="555" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.25" lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="order">
+		<groupExpression><![CDATA[$F{order}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField>
+					<reportElement uuid="7d6f1284-7459-42b5-be29-f884c6e35f18" x="0" y="0" width="555" height="15"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{order} + " - " + $F{bpartnername} + " - " + $F{rayon} + " - " + $F{status}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="6"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="a5bb911f-c114-42de-bfe5-c6616a8c0df0" x="40" y="0" width="281" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{product}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="26b63101-aadb-4629-a221-8624a6dd8567" x="321" y="0" width="78" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qtyorderstring}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="baa0cac2-8bef-46fa-9fb2-af7c7694be9d" x="399" y="0" width="78" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qtypackedstring}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c00dc9bb-4615-47b2-b7dd-fbd5deeec1f7" x="477" y="0" width="78" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qtydelivstring}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="77cf97f9-cfa5-483d-9fea-a804d606ec2e" x="0" y="14" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

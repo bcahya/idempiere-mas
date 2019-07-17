@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportExpedisi" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55196244-9b25-4e7f-b62c-cb7170163f19">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select exp.documentno as nofak,bp.value as nama_customer,exp.totalamt as ttlamt,expd.description as descp,expd.itemdescription as item,expd.tonase as tonase,
+expd.weight as wight,expd.volume as volume
+from uns_expedition exp
+left join uns_expeditiondetail expd on exp.uns_expedition_id=expd.uns_expedition_id
+left join c_bpartner bp on bp.c_bpartner_id=exp.c_bpartner_id ]]>
+	</queryString>
+	<field name="nofak" class="java.lang.String"/>
+	<field name="nama_customer" class="java.lang.String"/>
+	<field name="ttlamt" class="java.math.BigDecimal"/>
+	<field name="descp" class="java.lang.String"/>
+	<field name="item" class="java.lang.String"/>
+	<field name="tonase" class="java.math.BigDecimal"/>
+	<field name="wight" class="java.math.BigDecimal"/>
+	<field name="volume" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

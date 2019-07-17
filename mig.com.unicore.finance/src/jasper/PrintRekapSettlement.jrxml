@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintRekapSettlement" language="groovy" pageWidth="595" pageHeight="842" columnWidth="565" leftMargin="10" rightMargin="20" topMargin="10" bottomMargin="5" uuid="a83a49e2-57be-4438-a424-2925fd592975">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<parameter name="AD_Org_ID" class="java.lang.Integer"/>
+	<parameter name="C_BankAccount_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[
+select data.org,data.tgltrx,data.nmbpartner,data.nmsettlement,data.nm_charge,sum(data.rpcharge) rpcharge
+from (
+ select org.name as org,crcf.dateconfirm as tgltrx,bp.name as nmbpartner,cr.name as nmsettlement,cg.name as nm_charge,cd.amountconfirmed as rpcharge
+ from UNS_Charge_RS cr
+ left join uns_charge_detail cd on cd.uns_charge_rs_id=cr.uns_charge_rs_id
+ left join c_charge cg on cg.c_charge_id=cd.c_charge_id
+ left join c_bpartner bp on bp.c_bpartner_id=cr.c_bpartner_id
+ left join UNS_Charge_Confirmation crcf on crcf.uns_charge_rs_id=cr.uns_charge_rs_id
+ left join ad_org org on org.ad_org_id=cr.ad_org_id
+left join c_bankstatement bs on bs.c_bankstatement_id = crcf.c_bankstatement_id
+left join c_bankaccount ba on ba.c_bankaccount_id = bs.c_bankaccount_id 
+where cr.docstatus IN ('CO', 'CL') and crcf.dateconfirm>=$P{StartDate} and crcf.dateconfirm<=$P{EndDate} and
+case when $P{C_BPartner_ID} is not null then bp.c_bpartner_id=$P{C_BPartner_ID} else 1=1 end and
+case when $P{AD_Org_ID} is not null then cr.AD_Org_ID=$P{AD_Org_ID} else 1=1 end
+AND CASE WHEN $P{C_BankAccount_ID} IS NOT NULL THEN ba.C_BankAccount_ID = $P{C_BankAccount_ID} ELSE 1=1 END
+union all 
+ select org.name as org,cc.dateconfirm as tgltrx,cb.name as nmbpartner,cc.name as nmsttlement,cg.name as nm_charge,cd.amountconfirmed  as rpcharge
+ from UNS_Charge_Confirmation cc 
+ left join UNS_Charge_Detail cd on cd.uns_charge_confirmation_id=cc.uns_charge_confirmation_id 
+ left join c_bankstatement st on st.c_bankstatement_id=cc.c_bankstatement_id
+ left join c_charge cg on cd.c_charge_id=cg.c_charge_id
+ left join ad_org org on org.ad_org_id=cc.ad_org_id
+ inner join uns_shipping sh on sh.uns_shipping_id=cc.uns_shipping_id
+ inner join c_bpartner cb on cb.c_bpartner_id=sh.c_bpartner_id
+where cc.docstatus IN ('CO', 'CL') and cc.dateconfirm>=$P{StartDate} and cc.dateconfirm<=$P{EndDate} and
+case when $P{C_BPartner_ID} is not null then cb.c_bpartner_id=$P{C_BPartner_ID} else 1=1 end and
+case when $P{AD_Org_ID} is not null then cc.AD_Org_ID=$P{AD_Org_ID} else 1=1 end
+AND CASE WHEN $P{C_BankAccount_ID} IS NOT NULL THEN st.C_BankAccount_ID = $P{C_BankAccount_ID} ELSE 1=1 END
+) data
+group by data.org,data.tgltrx,data.nmbpartner,data.nmsettlement,data.nm_charge
+ORDER BY data.org,data.nmbpartner]]>
+	</queryString>
+	<field name="org" class="java.lang.String"/>
+	<field name="tgltrx" class="java.sql.Timestamp"/>
+	<field name="nmbpartner" class="java.lang.String"/>
+	<field name="nmsettlement" class="java.lang.String"/>
+	<field name="nm_charge" class="java.lang.String"/>
+	<field name="rpcharge" class="java.math.BigDecimal"/>
+	<variable name="no" class="java.lang.Integer" incrementType="Group" incrementGroup="mmsalesman" calculation="Count">
+		<variableExpression><![CDATA[new Integer("0")]]></variableExpression>
+		<initialValueExpression><![CDATA[new Integer("0")]]></initialValueExpression>
+	</variable>
+	<variable name="ttsales" class="java.math.BigDecimal" resetType="Group" resetGroup="mmsalesman" calculation="Sum">
+		<variableExpression><![CDATA[$F{rpcharge}]]></variableExpression>
+	</variable>
+	<variable name="ttlAll" class="java.math.BigDecimal" resetType="Group" resetGroup="org" calculation="Sum">
+		<variableExpression><![CDATA[$F{rpcharge}]]></variableExpression>
+	</variable>
+	<variable name="variable1" class="java.math.BigDecimal" incrementType="Report" calculation="Sum"/>
+	<group name="org">
+		<groupExpression><![CDATA[$F{org}]]></groupExpression>
+		<groupHeader>
+			<band height="18">
+				<textField>
+					<reportElement x="0" y="0" width="207" height="16" uuid="396dc735-f13c-4a7e-9ac1-115a32193203"/>
+					<textElement>
+						<font size="12" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="13">
+				<textField pattern="#,##0.00">
+					<reportElement x="444" y="0" width="100" height="12" uuid="f9502b46-c41c-4b1b-b830-437465c449ab"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{ttlAll}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="344" y="0" width="100" height="12" uuid="a35c829e-74c0-4b91-956d-6f93bd92420c"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Grand Total]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="mmsalesman">
+		<groupExpression><![CDATA[$F{nmbpartner}]]></groupExpression>
+		<groupHeader>
+			<band height="11">
+				<textField>
+					<reportElement x="29" y="0" width="100" height="11" uuid="f13d2eb7-17f1-44f9-843c-0d470bb6e5a3"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmbpartner}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="134" y="0" width="89" height="11" uuid="dadd24bb-0b0a-40c0-9760-f963832fb1d0"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmsettlement}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="27" height="11" uuid="b561b560-fe8e-4da1-bde8-1063d8fa8272"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{no}+1]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="13">
+				<textField>
+					<reportElement x="223" y="0" width="213" height="11" uuid="177b852c-3dcc-441d-b534-21473c87216d"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Jumlah :'+$F{nmbpartner}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="444" y="0" width="100" height="11" uuid="cdf8b5ec-e7c1-4e15-b3c2-b49f718aced5"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{ttsales}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="58" splitType="Stretch">
+			<rectangle>
+				<reportElement x="1" y="38" width="554" height="15" uuid="273d50fa-d616-4371-b7df-d7c99bd969db"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="455" y="0" width="100" height="20" uuid="266c6416-4fd6-4083-97a1-207396a2c5dd"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="20" uuid="799f1a8e-0995-40b8-9776-8cb69b9d1d77"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Rekap Settlement]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="20" width="555" height="20" uuid="aec4abf8-b361-4e5b-aa59-6c7a41c64ef9"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA['Periode Tanggal '+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' sampai '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="40" width="23" height="11" uuid="1aa680e5-8114-45d8-aa1d-d53594b30de3"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="29" y="40" width="100" height="11" uuid="a5aef1b1-ce18-4eb0-96f6-b40d8ace499f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Salesman / Supir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="134" y="40" width="89" height="11" uuid="bae40c83-ef80-4d05-ac83-6582c664975c"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Keterangan Settlement]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="291" y="40" width="183" height="11" uuid="f915189f-34b4-47fb-870a-711fb2830321"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Uraian Settlement]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="474" y="40" width="70" height="11" uuid="0d695f68-e17c-4a38-9ff8-aca1c8046a6b"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jumlah]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="229" y="40" width="56" height="11" uuid="672fc197-53f5-40ad-b25a-5db3ce5b493d"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="291" y="1" width="183" height="11" uuid="57f5e04f-ad9b-44d5-8d05-47689e512f4e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nm_charge}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="474" y="0" width="70" height="11" uuid="77fddb40-cdba-41f9-b54d-2f6ac23539e6"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rpcharge}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="229" y="0" width="56" height="11" uuid="a3d0c473-924c-462f-9e18-edffb4232fdb"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgltrx}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="50"/>
+	</pageFooter>
+</jasperReport>

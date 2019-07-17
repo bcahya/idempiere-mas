@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-03-30T16:40:48 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportLaporanProduksiTMG_Subreport2" pageWidth="752" pageHeight="572" orientation="Landscape" columnWidth="752" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e338a6d9-178e-4712-9bd8-a52f27feb8aa">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="primary_id" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT
+pr.name as produk3,
+pd.movementqty as mqtyb,
+uom.uomsymbol as uom
+
+FROM uns_production_detail pd
+INNER JOIN m_product pr on pr.m_product_id=pd.m_product_id
+INNER JOIN c_uom uom on pr.c_uom_id=uom.c_uom_id
+
+WHERE pd.isendproduct='N' AND pd.PrimaryOutput_ID=$P{primary_id}]]>
+	</queryString>
+	<field name="produk3" class="java.lang.String"/>
+	<field name="mqtyb" class="java.math.BigDecimal"/>
+	<field name="uom" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="222" height="15" uuid="d17dedea-78f0-44b8-947e-b7974ef317ba"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{produk3}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="233" y="0" width="39" height="15" uuid="38fd1e29-3d0b-4643-b4c1-10989a12b1cd"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+					<paragraph lineSpacing="Fixed"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{mqtyb}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="281" y="0" width="53" height="15" uuid="01d9ca08-ea55-426e-a8f4-a90efd75f071"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+					<paragraph lineSpacing="Fixed"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{uom}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

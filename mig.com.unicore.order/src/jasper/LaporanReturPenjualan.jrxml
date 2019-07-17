@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LaporanReturPenjualan" language="groovy" pageWidth="792" pageHeight="1224" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ecdf064d-98c9-407f-9622-5f54787c3e93">
+	<property name="ireport.zoom" value="1.6105100000000008"/>
+	<property name="ireport.x" value="461"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[SELECT
+     ROUND(coalesce(c_invoiceline."uomqtyenteredl1",'0'),0) AS qty1,
+     ROUND(coalesce(c_invoiceline."uomqtyenteredl2",'0'),0) AS qty2,
+     ROUND(coalesce(c_invoiceline."uomqtyenteredl3",'0'),0) AS qty3,
+     ROUND(coalesce(c_invoiceline."uomqtyenteredl4",'0'),0) AS qty4,
+     ROUND(coalesce(c_invoiceline."uomqtybonusesl1",'0'),0) AS qtyb1,
+     ROUND(coalesce(c_invoiceline."uomqtybonusesl2",'0'),0) AS qtyb2,
+     ROUND(coalesce(c_invoiceline."uomqtybonusesl3",'0'),0) AS qtyb3,
+     ROUND(coalesce(c_invoiceline."uomqtybonusesl4",'0'),0) AS qtyb4,
+     case when(c_invoiceline."isproductbonuses"='Y')then c_invoiceline."priceactual" ELSE 0 end AS Diskonbrg,
+     ( SELECT "c_uom"."name" FROM "c_uom" WHERE c_uom_id = c_invoiceline."uomconversionl1_id" ) as Satuan1,
+     ( SELECT "c_uom"."name" FROM "c_uom" WHERE c_uom_id = c_invoiceline."uomconversionl2_id" ) as satuan2,
+     ( SELECT "c_uom"."name" FROM "c_uom" WHERE c_uom_id = c_invoiceline."uomconversionl3_id" ) as satuan3,
+     ( SELECT "c_uom"."name" FROM "c_uom" WHERE c_uom_id = c_invoiceline."uomconversionl4_id" ) as satuan4,
+     ( SELECT "c_uom"."name" FROM "c_uom" WHERE c_uom_id = c_invoiceline."uomconversionl1_id" ) as Satuanb1,
+     ( SELECT "c_uom"."name" FROM "c_uom" WHERE c_uom_id = c_invoiceline."uomconversionl2_id" ) as satuanb2,
+     ( SELECT "c_uom"."name" FROM "c_uom" WHERE c_uom_id = c_invoiceline."uomconversionl3_id" ) as satuanb3,
+     ( SELECT "c_uom"."name" FROM "c_uom" WHERE c_uom_id = c_invoiceline."uomconversionl4_id" ) as satuanb4,
+     ( SELECT "ad_user"."name" FROM "ad_user" where ad_user_id=c_invoice."updatedby") as user,
+     c_invoice."grandtotal" as Gtot,
+     c_invoice."adddiscountamt" as DisFak,
+     c_invoice."documentno" AS NoFaktur,
+     c_invoice."dateinvoiced" AS TglFaktur,
+     c_bpartner."name" AS NamaSupplier,
+     c_invoiceline."priceactual" AS Pricelist,
+     c_invoiceline."linenetamt" AS jumlah,
+     c_invoiceline."discountamt" AS Discount,
+     m_product."value" AS KodeProduk,
+     m_product."name" AS NmProduk,
+     c_invoicetax."taxamt" AS ppn,
+     ad_user."name" AS NamaSales,
+     c_bpartner_location."name" AS Alamat,
+     ad_org."name" AS org,
+     c_invoice."description" As Catatan,
+     c_invoice.dateinvoiced +interval '1 days' *(select "c_paymentterm"."netdays" from "c_paymentterm" where c_paymentterm_id=c_invoice."c_paymentterm_id") as TglJtempo,
+     getterbilangrupiah(c_invoice."grandtotal") as terbilang
+FROM
+     "adempiere"."c_bpartner" c_bpartner
+     left JOIN "adempiere"."c_invoice" c_invoice ON c_bpartner."c_bpartner_id" = c_invoice."c_bpartner_id"
+     left JOIN "adempiere"."c_invoiceline" c_invoiceline ON c_invoice."c_invoice_id" = c_invoiceline."c_invoice_id"
+     left JOIN "adempiere"."c_invoicetax" c_invoicetax ON c_invoice."c_invoice_id" = c_invoicetax."c_invoice_id"
+     left JOIN "adempiere"."m_product" m_product ON c_invoiceline."m_product_id" = m_product."m_product_id"
+     left JOIN "adempiere"."ad_user" ad_user ON c_invoice."salesrep_id" = ad_user."ad_user_id"
+     left join "adempiere"."c_bpartner_location" c_bpartner_location  on c_invoice."c_bpartner_id"=c_bpartner_location."c_bpartner_id"
+     left JOIN "adempiere"."ad_org" ad_org on c_invoice."ad_org_id" = ad_org."ad_org_id"
+WHERE (c_invoice.c_doctype_id IN ( SELECT c_doctype.c_doctype_id FROM c_doctype WHERE c_doctype.docbasetype = 'ARC'))
+and c_bpartner."isvendor"='N'
+and c_invoice."dateinvoiced">=$P{StartDate} and c_invoice."dateinvoiced"<=$P{EndDate}]]>
+	</queryString>
+	<field name="qty1" class="java.math.BigDecimal"/>
+	<field name="qty2" class="java.math.BigDecimal"/>
+	<field name="qty3" class="java.math.BigDecimal"/>
+	<field name="qty4" class="java.math.BigDecimal"/>
+	<field name="qtyb1" class="java.math.BigDecimal"/>
+	<field name="qtyb2" class="java.math.BigDecimal"/>
+	<field name="qtyb3" class="java.math.BigDecimal"/>
+	<field name="qtyb4" class="java.math.BigDecimal"/>
+	<field name="diskonbrg" class="java.math.BigDecimal"/>
+	<field name="satuan1" class="java.lang.String"/>
+	<field name="satuan2" class="java.lang.String"/>
+	<field name="satuan3" class="java.lang.String"/>
+	<field name="satuan4" class="java.lang.String"/>
+	<field name="satuanb1" class="java.lang.String"/>
+	<field name="satuanb2" class="java.lang.String"/>
+	<field name="satuanb3" class="java.lang.String"/>
+	<field name="satuanb4" class="java.lang.String"/>
+	<field name="user" class="java.lang.String"/>
+	<field name="gtot" class="java.math.BigDecimal"/>
+	<field name="disfak" class="java.math.BigDecimal"/>
+	<field name="nofaktur" class="java.lang.String"/>
+	<field name="tglfaktur" class="java.sql.Timestamp"/>
+	<field name="namasupplier" class="java.lang.String"/>
+	<field name="pricelist" class="java.math.BigDecimal"/>
+	<field name="jumlah" class="java.math.BigDecimal"/>
+	<field name="discount" class="java.math.BigDecimal"/>
+	<field name="kodeproduk" class="java.lang.String"/>
+	<field name="nmproduk" class="java.lang.String"/>
+	<field name="ppn" class="java.math.BigDecimal"/>
+	<field name="namasales" class="java.lang.String"/>
+	<field name="alamat" class="java.lang.String"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="catatan" class="java.lang.String"/>
+	<field name="tgljtempo" class="java.sql.Timestamp"/>
+	<field name="terbilang" class="java.lang.String"/>
+	<variable name="qty11" class="java.lang.String">
+		<variableExpression><![CDATA[$F{qty1} == 0 ? "  " : $F{qty1}+"  "+$F{satuan1}]]></variableExpression>
+	</variable>
+	<variable name="qty22" class="java.lang.String">
+		<variableExpression><![CDATA[$F{qty2} == 0 ? " " :$F{qty2}+" "+$F{satuan2}]]></variableExpression>
+	</variable>
+	<variable name="qty33" class="java.lang.String">
+		<variableExpression><![CDATA[$F{qty3} == 0 ? " " : $F{qty3}+" "+$F{satuan3}]]></variableExpression>
+	</variable>
+	<variable name="qty44" class="java.lang.String">
+		<variableExpression><![CDATA[$F{qty4} == 0 ? " " : $F{qty4}+" "+$F{satuan4}]]></variableExpression>
+	</variable>
+	<variable name="qqt" class="java.lang.String">
+		<variableExpression><![CDATA[$V{qty11}+" "+$V{qty22}+" "+$V{qty33}+" "+$V{qty44}]]></variableExpression>
+	</variable>
+	<variable name="qtyb11" class="java.lang.String">
+		<variableExpression><![CDATA[$F{qtyb1}==0 ? " " :$F{qtyb1}+" "+$F{satuanb1}]]></variableExpression>
+	</variable>
+	<variable name="qtyb22" class="java.lang.String">
+		<variableExpression><![CDATA[$F{qtyb2}==0 ? " " :$F{qtyb2}+" "+$F{satuanb2}]]></variableExpression>
+	</variable>
+	<variable name="qtyb33" class="java.lang.String">
+		<variableExpression><![CDATA[$F{qtyb3}==0 ? " " :$F{qtyb3}+" "+$F{satuanb3}]]></variableExpression>
+	</variable>
+	<variable name="qtyb44" class="java.lang.String">
+		<variableExpression><![CDATA[$F{qtyb4}==0 ? " " :$F{qtyb4}+" "+$F{satuanb4}]]></variableExpression>
+	</variable>
+	<variable name="bqqt" class="java.lang.String">
+		<variableExpression><![CDATA[$V{qtyb11}+$V{qtyb22}+$V{qtyb33}+$V{qtyb44}]]></variableExpression>
+	</variable>
+	<variable name="Subtot" class="java.lang.String">
+		<variableExpression><![CDATA[new DecimalFormat("###,###,###.00").format($F{jumlah}-$F{discount})]]></variableExpression>
+	</variable>
+	<group name="Nofaktur">
+		<groupExpression><![CDATA[$F{nofaktur}+$F{namasupplier}]]></groupExpression>
+		<groupHeader>
+			<band height="28">
+				<staticText>
+					<reportElement x="0" y="13" width="72" height="13" uuid="80d2f66d-2b73-4583-8525-bfb168204971"/>
+					<textElement>
+						<font size="8" isItalic="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Barang #:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="0" y="0" width="86" height="13" uuid="ad8dc346-c099-4fc8-a8a3-d91e2556915b"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nofaktur}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="86" y="0" width="59" height="13" uuid="afff8b8a-7f46-4de9-9bce-2429b6ae20ee"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tglfaktur}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="376" y="0" width="56" height="13" uuid="656553b4-cdc8-4078-8da0-3f5ad8b8fc3c"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tgljtempo}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="260" y="0" width="100" height="13" uuid="0e39a564-707a-40e4-aeed-c661e2bf7bca"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{namasupplier}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="145" y="0" width="115" height="13" uuid="24d91d37-c82a-4ff7-81f4-1ae3e3ca40b4"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="212" y="13" width="220" height="13" uuid="320d6ad6-84dc-4dd2-a4af-365146a455f2"/>
+					<textElement textAlignment="Center">
+						<font size="8" isItalic="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Qty Penerimaan dan Bonus ]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="443" y="0" width="297" height="13" uuid="57246bdb-017f-4aeb-bc69-250928946ccf"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{catatan}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="443" y="13" width="100" height="13" uuid="ab0b901c-70fd-4f45-842e-538d82cb8698"/>
+					<textElement textAlignment="Center">
+						<font size="8" isItalic="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Harga]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="583" y="13" width="68" height="13" uuid="2aebb69c-bab8-4b08-8457-430716f6298f"/>
+					<textElement textAlignment="Center">
+						<font size="8" isItalic="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Discount]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="664" y="13" width="76" height="13" uuid="ec307bb4-b8b4-44ea-bcd1-67c627a30620"/>
+					<textElement textAlignment="Center">
+						<font size="8" isItalic="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Jumlah]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="65">
+				<line>
+					<reportElement x="0" y="54" width="740" height="1" uuid="badaf4f4-cc69-4dc4-94c4-5f93338fea81"/>
+					<graphicElement>
+						<pen lineStyle="Dotted"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement x="610" y="2" width="130" height="1" uuid="1a77d778-66eb-4b03-87a6-6785c7d787a5"/>
+					<graphicElement>
+						<pen lineStyle="Dotted"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement x="583" y="3" width="68" height="12" uuid="01fd5244-f513-4466-b691-5a1b6349fe61"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Bruto]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="583" y="15" width="68" height="11" uuid="94dd5958-4e2f-43d2-a5f5-9c3665052503"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Discount]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="583" y="26" width="68" height="12" uuid="2e8eccd8-7970-4d5a-a7f8-bd67ae9318a2"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[PPN 10%]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="583" y="38" width="68" height="12" uuid="38a82a33-ab2d-4007-a755-182e80de1295"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Netto]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="652" y="3" width="0" height="12" uuid="8ef762ca-c3ff-48e9-a861-ca03cc9b21e4"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="652" y="15" width="0" height="12" uuid="f14c4702-d30a-44c2-8df7-34efc5cd4f43"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="652" y="27" width="0" height="12" uuid="58eaa39e-2b25-4ba1-bfeb-53f9a08622aa"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="652" y="38" width="0" height="12" uuid="0ae634f8-6a2f-4720-af17-5098fb430052"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<textField pattern="#,##0.00">
+					<reportElement x="664" y="3" width="76" height="12" uuid="71674e16-38c3-4585-8196-3c79e0f34bdd"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{jumlah}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="664" y="15" width="76" height="11" uuid="7138f617-3620-485f-96fe-f88ca327e528"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{disfak}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="664" y="26" width="76" height="12" uuid="d4be0550-b8da-4e96-bef0-a019b97ee46c"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ppn}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="664" y="39" width="76" height="11" uuid="81a0f72d-bbf8-4aa9-b1e0-867834e36243"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{gtot}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="54" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="36" width="740" height="15" uuid="a6b0df77-ab7e-4161-8e14-4990210d3c0e"/>
+				<graphicElement>
+					<pen lineStyle="Dotted"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="145" height="14" uuid="28978beb-aea8-4e2b-ab7b-461f193147d3"/>
+				<text><![CDATA[R E T U R   P E N J U A L A N]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="14" width="43" height="15" uuid="73e69b02-33bb-4a62-903f-cc8889853f39"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal :]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="43" y="14" width="43" height="15" uuid="6adfae4b-50bd-4347-a58b-69c5fce87df6"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{StartDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="87" y="14" width="13" height="15" uuid="6fd803a8-aa6f-48a7-8d5d-d1777fe28e06"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[s/d]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="100" y="14" width="60" height="15" uuid="77268890-5c29-4e67-85fb-ebac6c853121"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{EndDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="651" y="0" width="75" height="14" uuid="7ad8f423-e9a7-4878-9009-c9f3a11ea567"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[UntaCore Idempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="37" width="57" height="13" uuid="4be73710-23f2-4f49-a2d1-0ec391be9082"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Retur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="86" y="37" width="59" height="13" uuid="cc7490a4-ae5b-456e-baf0-b912e859efa3"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="145" y="37" width="115" height="13" uuid="619bc83d-5852-44fe-a8a5-0b1a5fcd8b68"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Organisasi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="260" y="37" width="116" height="13" uuid="6f3dd53d-4e4c-4494-93e2-9fcd920591db"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="376" y="37" width="56" height="13" uuid="8309ec99-cd89-4884-bbb3-1d6a04135fdf"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jth. Tempo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="443" y="37" width="100" height="13" uuid="074554f7-73d0-460c-91f8-4b1e473180af"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement x="4" y="0" width="39" height="12" uuid="ea1a86bd-5821-4dce-912a-599a42690af2"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kodeproduk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="43" y="0" width="166" height="12" uuid="4e260de7-8908-4fc1-820c-9c37b8055ccf"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmproduk}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="212" y="0" width="100" height="12" uuid="4ca4e444-a64b-45e9-bf6b-a6128839a314"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{qqt}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="312" y="0" width="120" height="12" uuid="a15e092e-3a9a-4281-a1f4-478acfdcc015"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{bqqt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="443" y="0" width="84" height="12" uuid="883de0d0-7cdd-4d42-9f44-6818f475c25b"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pricelist}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="527" y="0" width="100" height="12" uuid="ae45f558-7a6f-4b9b-a55d-6eb5de982bab"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="651" y="0" width="89" height="12" uuid="e642616f-fec6-4b0c-bfdc-bb7c0681fc16"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Subtot}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

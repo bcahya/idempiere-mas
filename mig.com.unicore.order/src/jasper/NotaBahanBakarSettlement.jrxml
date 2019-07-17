@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="NotaBahanBakarSettlement" pageWidth="611" pageHeight="395" columnWidth="571" leftMargin="20" rightMargin="20" topMargin="5" bottomMargin="20" uuid="666e56d3-846e-4e0b-9561-4fb456cc4a68">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="192.168.1.212:5432/UniCoreFLG@RealTime-SebelumRevisiDivis"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Charge_RS_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+	cr.DocumentNo as NoRS,
+	org.name as orgname,
+	COALESCE(org.description,'') as description,
+	location.address1 as address,
+	cr.datetrx as datedoc,
+	bp.name as partnername,
+	bploc.name as partnerloc,
+	cd.vouchercode as vouchernumber,
+	drv.Name as driver,
+	cd.liters as liters,
+	cd.description as desc,
+	cd.vehicleno as carnumber
+from uns_charge_RS cr
+inner join ad_org org on org.ad_org_id = cr.ad_org_id
+inner join ad_orginfo orginfo on orginfo.ad_org_id = cr.ad_org_id
+inner join uns_charge_detail cd on cd.uns_charge_rs_id = cr.uns_charge_rs_id
+inner join c_bpartner drv on drv.c_bpartner_id = cr.c_bpartner_id
+left join c_bpartner bp on bp.c_bpartner_id = cd.c_bpartner_id
+left join c_bpartner_location bploc on bploc.c_bpartner_id = cd.c_bpartner_id
+left join c_location location on location.c_location_id = orginfo.c_location_id
+WHERE cd.isfuel = 'Y' and cr.docstatus in('IP', 'CO', 'CL') and cr.uns_charge_rs_id = $P{UNS_Charge_RS_ID}]]>
+	</queryString>
+	<field name="nors" class="java.lang.String"/>
+	<field name="orgname" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="datedoc" class="java.sql.Timestamp"/>
+	<field name="partnername" class="java.lang.String"/>
+	<field name="partnerloc" class="java.lang.String"/>
+	<field name="vouchernumber" class="java.lang.String"/>
+	<field name="driver" class="java.lang.String"/>
+	<field name="liters" class="java.math.BigDecimal"/>
+	<field name="desc" class="java.lang.String"/>
+	<field name="carnumber" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="355" splitType="Stretch">
+			<textField>
+				<reportElement uuid="a9c5bbb4-fbef-4ed9-8eb8-9895c2b231e2" x="120" y="106" width="435" height="19"/>
+				<box leftPadding="0"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":  " + $F{carnumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="ad46444f-b813-4879-90e7-37ad25219875" x="110" y="328" width="340" height="26"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[NOTA INI TIDAK DIPERJUAL BELIKAN ATAU DITUKAR DENGAN UANG DAN TIDAK BERLAKU UNTUK NOMOR POLISI LAIN!]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8415a4bd-9e3c-4da5-ad9a-c61f9853af85" x="320" y="302" width="160" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[(                            )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="36381918-2a3d-4b40-b10c-229c4c5d12c8" x="81" y="247" width="159" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Sopir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fe8536fb-01f3-4701-9c46-1a30d0c3e31d" x="320" y="248" width="160" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Cap & TTD Pengirim]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="72b63441-a2e9-4ea5-9114-0f84e7ecde44" x="11" y="0" width="253" height="35"/>
+				<box topPadding="5" leftPadding="5"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="20"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{orgname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="356c5cb8-1bf9-402a-80bf-bac66dc111d9" x="12" y="30" width="545" height="19"/>
+				<box leftPadding="5"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="d3d43306-6db2-414b-a45f-eb33a1635189" x="12" y="57" width="543" height="29"/>
+				<textElement textAlignment="Center">
+					<font size="20" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Nota Bahan Bakar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8a3274bd-dede-4045-95bc-d0d2017e4671" x="13" y="90" width="97" height="19"/>
+				<textElement markup="none">
+					<font size="12"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Nomor]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="759f1515-394a-4543-9e7c-c1ebd84d0b23" x="120" y="88" width="437" height="19"/>
+				<box leftPadding="0"/>
+				<textElement>
+					<font size="12" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":  " + $F{vouchernumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c252a83a-1690-4dca-8c50-fd5c77ec4542" x="13" y="127" width="98" height="18"/>
+				<textElement markup="none">
+					<font size="12"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Nama Sopir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5d8747ca-bc22-43df-9780-6dfdb52c22f7" x="13" y="109" width="98" height="18"/>
+				<textElement markup="none">
+					<font size="12"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[No. Polisi]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="b3015eb2-9ff8-468a-afd2-8dbbd8f38169" x="120" y="124" width="435" height="21"/>
+				<box leftPadding="0"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":  "+ $F{driver}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="1e44167e-30a7-47aa-9018-a8ba061f5156" x="13" y="145" width="98" height="19"/>
+				<textElement markup="none">
+					<font size="12"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Jumlah Liter]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="8e431159-4e83-4aa0-9fd3-83ae634a907f" x="17" y="201" width="535" height="23"/>
+				<box topPadding="4" leftPadding="5"/>
+				<textElement textAlignment="Center">
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{partnername} + " - " + $F{partnerloc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d0c023ac-0237-49b5-9597-d20133893138" x="120" y="144" width="435" height="19"/>
+				<box leftPadding="0"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":  " + NumberFormat.getInstance().format($F{liters}) + "  Liter"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="1667a3e8-92cd-456f-9cc6-f5a6307145eb" x="81" y="302" width="159" height="19"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["( " + $F{driver} + " )"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7e505521-fb8e-4c26-92de-72d6d56e1e0c" x="279" y="226" width="248" height="19"/>
+				<box leftPadding="3" rightPadding="5"/>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[", " + new SimpleDateFormat("dd-MM-yyyy").format($F{datedoc})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="1b6853aa-8699-403a-814e-d497f37a2704" x="13" y="180" width="98" height="22"/>
+				<textElement markup="none">
+					<font size="12"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Tujuan]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="1692d89d-79aa-4746-9aa0-1544f326e3d2" x="120" y="180" width="435" height="21"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $F{desc}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b991fc4f-1a34-41af-a7bb-720877870667" x="264" y="0" width="293" height="35"/>
+				<box topPadding="5" leftPadding="5"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="20" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{partnername}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="356c5cb8-1bf9-402a-80bf-bac66dc111d9" x="480" y="335" width="91" height="19"/>
+				<box leftPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA["No : " + $F{nors}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

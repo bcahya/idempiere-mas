@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportSalesIncentive_Subreport1" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="5cdf1f51-953f-41fc-a1d0-ed429008de00">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_AchievedIncentive_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_Year_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_Period_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT y.FiscalYear AS Year, bpt.Name AS Sales, p.Name AS Period, bp.StartDate AS Start, bp.EndDate AS End, l.DocumentNo AS DocNo, l.DateTrx AS TransactionDate, rl.Name AS SourceType, us.Name2 AS SalesRep, l.AmountBase AS BaseAmt, l.Amount AS Amount
+
+FROM UNS_AchievedIncentive ai
+
+INNER JOIN C_Year y ON y.C_Year_ID = ai.C_Year_ID
+INNER JOIN C_BPartner bpt ON bpt.C_BPartner_ID = ai.C_BPartner_ID
+INNER JOIN UNS_AcvIncentiveByPeriod bp ON bp.UNS_AchievedIncentive_ID = ai.UNS_AchievedIncentive_ID
+INNER JOIN C_Period p ON p.C_Period_ID = bp.C_Period_ID
+INNER JOIN UNS_AchievedIncentive_Line l ON l.UNS_AcvIncentiveByPeriod_ID = bp.UNS_AcvIncentiveByPeriod_ID
+INNER JOIN AD_User us ON us.AD_User_ID = l.SalesRep_ID
+INNER JOIN AD_Reference r ON r.Name = '_UNS_SourceType_Incentive'
+INNER JOIN AD_Ref_List rl ON r.AD_Reference_ID = rl.AD_Reference_ID AND rl.Value = l.SourceType
+
+WHERE (CASE WHEN $P{UNS_AchievedIncentive_ID} IS NOT NULL THEN ai.UNS_AchievedIncentive_ID = $P{UNS_AchievedIncentive_ID} ELSE 1=1 END) AND (CASE WHEN $P{C_Year_ID} IS NOT NULL THEN y.C_Year_ID = $P{C_Year_ID} ELSE 1=1 END) AND (CASE WHEN $P{C_Period_ID} IS NOT NULL THEN p.C_Period_ID = $P{C_Period_ID} ELSE 1=1 END) AND (CASE WHEN $P{C_SalesRegion_ID} IS NOT NULL THEN us.AD_Org_ID IN (SELECT org.AD_Org_ID FROM AD_Org org WHERE org.C_SalesRegion_ID = $P{C_SalesRegion_ID}) ELSE 1=1 END) AND (CASE WHEN $P{C_BPartner_ID} IS NOT NULL THEN bpt.C_BPartner_ID = $P{C_BPartner_ID} ELSE 1=1 END)
+
+ORDER BY year, sales, period, transactiondate, sourcetype]]>
+	</queryString>
+	<field name="year" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="period" class="java.lang.String"/>
+	<field name="start" class="java.sql.Timestamp"/>
+	<field name="end" class="java.sql.Timestamp"/>
+	<field name="docno" class="java.lang.String"/>
+	<field name="transactiondate" class="java.sql.Timestamp"/>
+	<field name="sourcetype" class="java.lang.String"/>
+	<field name="salesrep" class="java.lang.String"/>
+	<field name="baseamt" class="java.math.BigDecimal"/>
+	<field name="amount" class="java.math.BigDecimal"/>
+	<variable name="IncentiveByPeriod" class="java.math.BigDecimal" resetType="Group" resetGroup="Period" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+	</variable>
+	<variable name="IncentiveBySales" class="java.math.BigDecimal" resetType="Group" resetGroup="BPartner" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+	</variable>
+	<variable name="number" class="java.lang.Integer" resetType="Group" resetGroup="Period" calculation="Count">
+		<variableExpression><![CDATA[$V{number} == null ? 1 : $V{number} + 1]]></variableExpression>
+	</variable>
+	<group name="BPartner" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{sales}]]></groupExpression>
+		<groupHeader>
+			<band height="30">
+				<rectangle>
+					<reportElement uuid="1f3f9e7e-4f6a-4135-bf27-a287685a98fc" x="0" y="15" width="555" height="15"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed"/>
+					</graphicElement>
+				</rectangle>
+				<textField>
+					<reportElement uuid="28dbb892-7d23-4e49-a181-084f81dbecbf" x="0" y="0" width="455" height="15"/>
+					<box leftPadding="2" rightPadding="2"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[$F{sales}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="b9733e7d-9df8-42f6-95af-2d85ceef59af" x="22" y="15" width="72" height="15"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.0" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Document]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="c33bf878-b57e-4487-821b-ea2a3352b2ea" x="94" y="15" width="58" height="15"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.0" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="2c629eb7-2684-4377-953b-67140cb7b2ea" x="152" y="15" width="88" height="15"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.0" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Type]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="25e54723-20e0-4e5b-811b-57dc88744dde" x="363" y="15" width="92" height="15"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.0" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Base Amount]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="146bcda4-3480-49b9-b0b1-cd44cab66176" x="455" y="15" width="100" height="15"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.0" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Incentive]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="25e54723-20e0-4e5b-811b-57dc88744dde" x="240" y="15" width="123" height="15"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.0" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Sales]]></text>
+				</staticText>
+				<textField evaluationTime="Group" evaluationGroup="BPartner" pattern="#,##0.00">
+					<reportElement uuid="f7d851cf-8a43-4a4c-9417-421348e4371e" x="455" y="0" width="100" height="15"/>
+					<box leftPadding="2" rightPadding="2"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{IncentiveBySales}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="b9733e7d-9df8-42f6-95af-2d85ceef59af" x="0" y="15" width="22" height="15"/>
+					<box leftPadding="2" rightPadding="2">
+						<pen lineWidth="0.0" lineStyle="Dashed"/>
+						<topPen lineWidth="0.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[No.]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="19"/>
+		</groupFooter>
+	</group>
+	<group name="Period">
+		<groupExpression><![CDATA[$F{period}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField>
+					<reportElement uuid="58668454-1708-4323-ad7d-9670f220d42e" x="0" y="0" width="455" height="15"/>
+					<box leftPadding="2" rightPadding="2">
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement/>
+					<textFieldExpression><![CDATA[$F{period} + " (" +
+new SimpleDateFormat("dd-MM-yyyy").format($F{start})
++ " - " +
+new SimpleDateFormat("dd-MM-yyyy").format($F{end})
++ ")"]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Period" pattern="#,##0.00">
+					<reportElement uuid="f7d851cf-8a43-4a4c-9417-421348e4371e" x="455" y="0" width="100" height="15"/>
+					<box leftPadding="2" rightPadding="2">
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{IncentiveByPeriod}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="10"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="28" splitType="Stretch">
+			<textField>
+				<reportElement uuid="3a4e11d6-d3bb-4200-a9e6-2fdadfa3ba54" x="0" y="0" width="555" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["SALES INCENTIVE - " + $F{year}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c192bc9a-9ed7-4f21-baf4-881d449fee8d" x="455" y="0" width="100" height="20"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaERP System]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement uuid="902614f1-ac25-4fb2-b96d-2e983771e487" x="22" y="0" width="72" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{docno}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="82716e98-99be-4eab-a059-0420331ff4df" x="94" y="0" width="58" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{transactiondate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="06555730-c0c4-4980-9328-103081aa2925" x="152" y="0" width="88" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sourcetype}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="bdc2c0e2-965e-4d49-8d03-5046f33677ef" x="240" y="0" width="123" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{salesrep}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="11f85f83-7c67-404c-8870-99b0d8413e5f" x="363" y="0" width="92" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{baseamt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="f7d851cf-8a43-4a4c-9417-421348e4371e" x="455" y="0" width="100" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="902614f1-ac25-4fb2-b96d-2e983771e487" x="0" y="0" width="22" height="15"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{number}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

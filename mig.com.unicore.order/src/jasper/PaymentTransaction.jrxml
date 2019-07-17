@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PaymentTransaction" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7fe5c2d8-aef2-486a-a246-6dd7d1b10ba8">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+bp.name AS customer,
+fk.documentno AS nofk,
+fk.dateinvoiced AS tglfk,
+fk.grandtotal AS totalfk,
+al.amount AS ygdibayar,
+al.overunderamt AS sisa,
+alh.datetrx AS tgltrx
+
+FROM
+c_bpartner bp
+INNER JOIN c_invoice fk ON fk.c_bpartner_id=bp.c_bpartner_id
+INNER JOIN c_allocationline al ON al.c_invoice_id=fk.c_invoice_id
+INNER JOIN c_allocationhdr alh ON alh.c_allocationhdr_id=al.c_allocationhdr_id
+
+WHERE
+bp.c_bpartner_id = $P{C_BPartner_ID} AND
+fk.docstatus = 'CO'
+
+ORDER BY tglfk, tgltrx]]>
+	</queryString>
+	<field name="customer" class="java.lang.String"/>
+	<field name="nofk" class="java.lang.String"/>
+	<field name="tglfk" class="java.sql.Timestamp"/>
+	<field name="totalfk" class="java.math.BigDecimal"/>
+	<field name="ygdibayar" class="java.math.BigDecimal"/>
+	<field name="sisa" class="java.math.BigDecimal"/>
+	<field name="tgltrx" class="java.sql.Timestamp"/>
+	<group name="Faktur">
+		<groupExpression><![CDATA[$F{nofk}]]></groupExpression>
+		<groupHeader>
+			<band height="65">
+				<textField pattern="dd MMMMM yyyy">
+					<reportElement x="440" y="12" width="100" height="20" uuid="73990970-018a-4e31-a3c2-c05ea7b6814e"/>
+					<textFieldExpression><![CDATA[$F{tglfk}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="361" y="12" width="80" height="20" uuid="fd38cc09-1456-48b7-a735-7bcb33c08ed6"/>
+					<text><![CDATA[Tanggal Faktur  :]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="59" y="0" width="100" height="20" uuid="df3caea7-b7d6-4ad5-81d8-d0a1c65a8dc1"/>
+					<textFieldExpression><![CDATA[$F{nofk}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="60" height="20" uuid="734f81d1-24ba-4489-b692-0c94c0154c4a"/>
+					<text><![CDATA[No Faktur    :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="20" width="60" height="20" uuid="78a5247b-54a9-419e-a182-1f3fd69583a4"/>
+					<text><![CDATA[Nilai Faktur :]]></text>
+				</staticText>
+				<textField pattern="#,##0.-">
+					<reportElement x="59" y="20" width="100" height="20" uuid="18a11f51-6da6-427f-bbb0-6b1e6a565c9d"/>
+					<textFieldExpression><![CDATA[$F{totalfk}]]></textFieldExpression>
+				</textField>
+				<rectangle>
+					<reportElement x="1" y="44" width="555" height="20" uuid="4928bf51-cc1e-43ae-92bb-46a30f2653d0"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="248" y="44" width="100" height="20" uuid="a23f9e13-51e2-4a4e-b3e4-cfba41e65b11"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Yang Dibayar]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="387" y="44" width="153" height="20" uuid="ee98a14b-0df9-4e44-9563-ebdda757d306"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Sisa]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="19" y="44" width="155" height="20" uuid="a4c91122-70f7-42bc-bb83-2c9e67c23a9e"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Tanggal Transaksi]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="14">
+				<line>
+					<reportElement x="2" y="0" width="554" height="1" uuid="767a122b-63c2-4344-a413-dc9f845b1300"/>
+					<graphicElement>
+						<pen lineStyle="Double"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="78" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="555" height="20" uuid="bf968620-190b-40a7-8750-dc68f4ed0e77"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[PAYMENT TRANSACTION]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="15" y="48" width="186" height="20" uuid="b56091cc-2b78-4be4-8ce3-79e6443a4385"/>
+				<textElement>
+					<font size="11" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{customer}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="#,##0.-">
+				<reportElement x="426" y="0" width="100" height="15" uuid="de7c6b3e-be13-425d-bc55-4b6d0b591b91"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{sisa}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.-">
+				<reportElement x="257" y="0" width="100" height="15" uuid="2367218b-7c79-4941-b5dd-fe2e69631093"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{ygdibayar}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yy">
+				<reportElement x="74" y="0" width="100" height="15" uuid="831936d1-9abc-47db-8992-82b62e03dc26"/>
+				<textFieldExpression><![CDATA[$F{tgltrx}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

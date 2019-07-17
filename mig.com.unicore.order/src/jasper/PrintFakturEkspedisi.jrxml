@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.1.final using JasperReports Library version 6.1.1  -->
+<!-- 2016-01-19T22:33:01 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintFakturEkspedisi" language="groovy" pageWidth="612" pageHeight="396" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="99694f46-7a8b-4f82-a011-c349d1f31352">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="AD_User_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_Invoice_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+ao.name as org,
+ci.documentno AS nofk,
+cb.name AS customer,
+ci.dateacct AS tglfk,
+cc.name as charge,
+cil.linenetamt AS jumlah,
+cil.description AS description,
+cbl.name AS lokasi,
+now() AS tglskrg,
+au.name AS operator,
+getterbilangrupiah(cil.linenetamt) AS terbilang
+
+from c_invoice ci
+
+INNER JOIN ad_org ao ON ao.ad_org_id = ci.ad_org_id
+INNER JOIN c_bpartner cb ON cb.c_bpartner_id = ci.c_bpartner_id
+INNER JOIN c_invoiceline cil ON cil.c_invoice_id = ci.c_invoice_id
+INNER JOIN c_charge cc ON cc.c_charge_id = cil.c_charge_id
+LEFT JOIN c_bpartner_location cbl ON cbl.c_bpartner_id = cb.c_bpartner_id
+INNER JOIN ad_user au on au.ad_user_id = $P{AD_User_ID}
+
+where ci.docstatus in ('CO', 'CL') and ci.c_invoice_id = $P{C_Invoice_ID}]]>
+	</queryString>
+	<field name="org" class="java.lang.String"/>
+	<field name="nofk" class="java.lang.String"/>
+	<field name="customer" class="java.lang.String"/>
+	<field name="tglfk" class="java.sql.Timestamp"/>
+	<field name="charge" class="java.lang.String"/>
+	<field name="jumlah" class="java.math.BigDecimal"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="lokasi" class="java.lang.String"/>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="operator" class="java.lang.String"/>
+	<field name="terbilang" class="java.lang.String"/>
+	<variable name="jumlah_1" class="java.math.BigDecimal" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{jumlah}]]></variableExpression>
+	</variable>
+	<variable name="Total" class="java.lang.String">
+		<variableExpression><![CDATA[$V{jumlah_1}]]></variableExpression>
+	</variable>
+	<group name="Faktur" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{nofk}]]></groupExpression>
+		<groupHeader>
+			<band height="90">
+				<textField>
+					<reportElement x="0" y="0" width="572" height="17" uuid="830952b8-bc2c-4615-9379-ef8f5da36285"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="401" y="21" width="68" height="12" uuid="dea8d3b9-b1f7-44bc-ae8c-e9cffa56b6d8"/>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Kepada Yth.,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="17" width="100" height="12" uuid="a9939427-c89b-4795-b9c5-533a6b7523fc"/>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[No. Faktur]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="99" y="17" width="100" height="12" uuid="a29610f0-ca95-4116-b37a-f6b95f3ddb92"/>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[": " +$F{nofk}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd MMMMM yyyy">
+					<reportElement x="99" y="29" width="100" height="12" uuid="6b0e8f91-276a-4037-bb3b-981478298d08"/>
+					<textElement verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[": " + new SimpleDateFormat("dd-MM-yyyy").format($F{tglfk})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="401" y="32" width="100" height="12" uuid="0451afdc-cf61-43ef-8645-a30a6cff2b6f"/>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{customer}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="401" y="43" width="161" height="30" uuid="2ee8ec6a-10a6-4ed8-8cb1-fa6a088f5587"/>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{lokasi}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="107" y="75" width="64" height="15" uuid="5f5c265c-b5ab-493d-95e2-11d70ab28c03"/>
+					<textElement verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Keterangan]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="486" y="75" width="80" height="15" uuid="8def8a10-2a87-428e-a2b7-0531ec730a5a"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Total]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="6" y="75" width="100" height="15" uuid="e3d76751-50b7-436e-b7ba-de7f7886961d"/>
+					<textElement verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Biaya]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="75" width="571" height="1" uuid="a65cd990-b7f5-425d-8bf3-69edf4a27eeb"/>
+				</line>
+				<line>
+					<reportElement x="0" y="89" width="571" height="1" uuid="9d5fa8cf-79cf-4066-961e-8dd26fb46e40"/>
+				</line>
+				<staticText>
+					<reportElement x="0" y="29" width="100" height="12" uuid="a9939427-c89b-4795-b9c5-533a6b7523fc"/>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+					<text><![CDATA[Tanggal]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="474" y="0" width="98" height="13" uuid="6fb0bfcf-3aa1-4121-bb6f-8424b348dc61"/>
+					<textElement textAlignment="Right">
+						<font size="7" isItalic="true"/>
+					</textElement>
+					<text><![CDATA[UntaSoft Idempiere]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="106" y="-1" width="380" height="12" uuid="0567bae3-0228-4198-bb3b-32df82f30ea3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="6" y="0" width="93" height="12" uuid="6dbabcf8-22ee-4333-b211-6b5edec7bd34"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{charge}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.-">
+				<reportElement x="486" y="0" width="80" height="12" uuid="d0da9fff-53eb-4382-9a21-012797bd2bbf"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jumlah}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="112" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="-1" width="571" height="1" uuid="9d23f3cd-a099-4587-a202-939eb5714a49"/>
+			</line>
+			<staticText>
+				<reportElement x="427" y="5" width="46" height="12" uuid="5eb0508e-6205-4974-b985-7b31bab42532"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Total :]]></text>
+			</staticText>
+			<textField pattern="#,##0.-">
+				<reportElement x="472" y="5" width="90" height="12" uuid="2682ec6a-1057-4f34-ba94-56884445b791"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{jumlah_1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="7" y="24" width="339" height="15" uuid="df09369d-7afa-42a5-8c73-c2aaa128a21a"/>
+				<textElement>
+					<font size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{terbilang} + " rupiah"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="445" y="35" width="61" height="12" uuid="7b4ae2b6-412b-4245-9cb9-75d7087df76f"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Hormat kami,]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy HH:mm:ss">
+				<reportElement x="408" y="77" width="126" height="24" uuid="11cfc352-8cef-4f97-b9a5-19e5febfd478"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{operator} + "\n" + new SimpleDateFormat("dd/MM/yyyy").format($F{tglskrg})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="9" y="53" width="100" height="12" forecolor="#333333" uuid="ad25ac64-7765-4dbc-a9c1-e08c82b47952"/>
+				<textElement>
+					<font size="9" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Note:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="9" y="65" width="325" height="24" forecolor="#333333" uuid="066d7c2c-2adb-4773-931b-736c11e15d39"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1. Pembayaran dengan chueqe/giro dianggap lunas apabila sudah dapat diuangkan]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+</jasperReport>

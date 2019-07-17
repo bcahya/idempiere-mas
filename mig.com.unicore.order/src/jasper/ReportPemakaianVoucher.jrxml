@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportVoucherPenyebrangan" language="groovy" pageWidth="612" pageHeight="792" columnWidth="592" leftMargin="10" rightMargin="10" topMargin="20" bottomMargin="20" uuid="c2c9c1e5-8a2d-4087-aa6c-63e15fafe0fb">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IsFuel" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select master.kddokumen, master.org, master.docnosp, master.docnosps, master.datesp, master.datesps, master.charge, master.voucher, master.descr, COALESCE (master.armada,'-'), master.bpartner, master.vcode, master.fuel, master.sptujuan, master.spstujuan,master.armada,
+master.liter as liter, master.driver, master.chargetype, master.orgid from
+
+(SELECT sps.DocumentNo AS DocNosps, sp.DocumentNo AS docnosp, org.name as org, 'SH' AS KdDokumen, cd.isfuel AS IsFuel,
+sp.datedoc as datesp,
+sps.datedoc as datesps,
+c.name as charge,
+v.name as voucher,
+coalesce(sp.description,sp.name) as descr,
+armada.name as armada,
+bpt.name as bpartner,
+cd.vouchercode as vcode,
+f.name as fuel,
+(CASE WHEN sps.UseCity = 'Y' THEN CONCAT(city.name,' - ' ,cit.name) ELSE ry.Name END) as sptujuan,
+(CASE WHEN sps.UseCity = 'Y' THEN CONCAT(cit.name,' - ', citty.name) ELSE ryn.Name END) as spstujuan,
+cd.liters as liter,
+sp.driver AS driver,
+cd.chargetype AS chargetype,
+org.AD_Org_ID AS orgid,
+1 AS unit
+FROM UNS_Shipping sps
+
+
+INNER JOIN AD_Org org ON org.AD_Org_ID=sps.AD_Org_ID
+LEFT JOIN UNS_Shipping sp ON sp.UNS_Shipping_Reff_ID=sps.UNS_Shipping_ID
+LEFT JOIN UNS_Charge_Detail cd ON cd.UNS_Shipping_ID=sps.UNS_Shipping_ID
+LEFT JOIN C_BPartner bpt ON bpt.C_BPartner_ID=cd.C_BPartner_ID
+LEFT JOIN UNS_Fuel f ON f.UNS_Fuel_ID=cd.UNS_Fuel_ID
+LEFT JOIN C_City city ON city.C_City_ID=sp.Origin_ID
+LEFT JOIN C_City cit ON cit.C_City_ID=sps.Origin_ID
+LEFT JOIN UNS_Rayon ry ON ry.UNS_Rayon_ID = sps.UNS_Rayon_ID
+LEFT JOIN UNS_Rayon ryn ON ryn.UNS_Rayon_ID = sp.UNS_Rayon_ID
+LEFT JOIN C_City cty ON cty.C_City_ID=sp.Destination_ID
+LEFT JOIN C_City citty ON citty.C_City_ID=sps.Destination_ID
+LEFT JOIN UNS_Voucher v ON v.UNS_Voucher_ID=cd.UNS_Voucher_ID
+LEFT JOIN C_Charge c ON c.C_Charge_ID=cd.C_Charge_ID
+LEFT JOIN UNS_Armada armada on armada.uns_armada_id=sp.uns_armada_id
+
+WHERE sps.Status = 'DV' AND CASE WHEN sp.UNS_Shipping_ID > 0 THEN sp.Status = 'RS' ELSE 1=1 END AND cd.Chargetype='VC' AND sps.docstatus not in ('VO','RE') AND CASE WHEN sp.UNS_Shipping_ID > 0 THEN sp.docstatus not in ('VO','RE') ELSE 1=1 END AND (CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN sps.DateDoc >= $P{DateFrom}::timestamp AND sps.DateDoc <= $P{DateTo}::timestamp WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN sps.DateDoc >= $P{DateFrom}::timestamp AND sps.datedoc <= now() ::timestamp  WHEN $P{DateFrom}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN sps.DateDoc <= $P{DateTo}::timestamp ELSE 1=1 END) AND (CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN sps.DateDoc >= $P{DateFrom}::timestamp AND sps.DateDoc <= $P{DateTo}::timestamp WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN sps.DateDoc >= $P{DateFrom}::timestamp AND sps.datedoc <= now() ::timestamp  WHEN $P{DateFrom}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN sps.DateDoc <= $P{DateTo}::timestamp ELSE 1=1 END) AND Case When $P{AD_Org_ID} IS NOT NULL THEN $P{AD_Org_ID}=sps.AD_Org_ID ELSE 1=1 END
+
+UNION ALL
+
+SELECT crs.documentno AS DocNosps, crs.documentno AS DocNosp, org.name as org , 'CR' AS kdDokumen, cd.isfuel AS IsFuel,
+crs.datetrx AS datesp,
+crs.datetrx AS datesps,
+c.name AS Charge,
+v.Name AS voucher,
+crs.Description AS descr,
+cd.vehicleno AS Armada,
+bpt.name AS bpartner,
+cd.vouchercode as vcode,
+f.name AS fuel,
+cd.description as sptujuan,
+cd.description as spstujuan,
+cd.liters as liter,
+dri.name AS driver,
+cd.chargetype AS chargetype,
+org.AD_Org_ID AS orgid,
+1 as unit
+From UNS_Charge_rs crs
+
+INNER JOIN C_BPartner dri ON dri.C_Bpartner_ID=crs.C_Bpartner_ID
+INNER JOIN AD_Org org ON org.AD_Org_ID=crs.AD_Org_ID
+LEFT JOIN UNS_Charge_Detail cd ON crs.UNS_Charge_RS_ID=cd.UNS_Charge_RS_ID
+LEFT JOIN C_Charge c ON c.C_Charge_ID=cd.C_Charge_ID
+INNER JOIN C_BPartner bpt ON bpt.C_Bpartner_ID=cd.C_Bpartner_ID
+LEFT JOIN UNS_Voucher v ON v.UNS_Voucher_ID=cd.UNS_Voucher_ID
+INNER JOIN UNS_fuel f ON f.UNS_Fuel_ID=cd.UNS_Fuel_ID
+
+WHERE cd.UNS_Shipping_ID is null AND (CASE WHEN $P{IsFuel} is not null THEN cd.isfuel=$P{IsFuel} ELSE 1=1 END) AND cd.Chargetype='VC'
+
+) AS Master
+
+WHERE CASE WHEN $P{IsFuel} is not null AND $P{IsFuel} <> '' THEN master.isfuel=$P{IsFuel} ELSE 1=1 END AND master.Chargetype='VC' AND (CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN master.Datesp >= $P{DateFrom}::timestamp AND master.Datesp <= $P{DateTo}::timestamp WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN master.Datesp >= $P{DateFrom}::timestamp AND master.datesp <= now() ::timestamp  WHEN $P{DateFrom}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN master.Datesp <= $P{DateTo}::timestamp ELSE 1=1 END)
+AND Case When $P{AD_Org_ID} IS NOT NULL THEN $P{AD_Org_ID}=master.orgid ELSE 1=1 END
+AND (CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN master.Datesps >= $P{DateFrom}::timestamp AND master.Datesps <= $P{DateTo}::timestamp WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN master.Datesps >= $P{DateFrom}::timestamp AND master.datesps <= now() ::timestamp  WHEN $P{DateFrom}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN master.Datesps <= $P{DateTo}::timestamp ELSE 1=1 END)
+
+order by Armada,datesp]]>
+	</queryString>
+	<field name="kddokumen" class="java.lang.String"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="docnosp" class="java.lang.String"/>
+	<field name="docnosps" class="java.lang.String"/>
+	<field name="datesp" class="java.sql.Timestamp"/>
+	<field name="datesps" class="java.sql.Timestamp"/>
+	<field name="charge" class="java.lang.String"/>
+	<field name="voucher" class="java.lang.String"/>
+	<field name="descr" class="java.lang.String"/>
+	<field name="coalesce" class="java.lang.String"/>
+	<field name="bpartner" class="java.lang.String"/>
+	<field name="vcode" class="java.lang.String"/>
+	<field name="fuel" class="java.lang.String"/>
+	<field name="sptujuan" class="java.lang.String"/>
+	<field name="spstujuan" class="java.lang.String"/>
+	<field name="armada" class="java.lang.String"/>
+	<field name="liter" class="java.math.BigDecimal"/>
+	<field name="driver" class="java.lang.String"/>
+	<field name="chargetype" class="java.lang.String"/>
+	<field name="orgid" class="java.math.BigDecimal"/>
+	<variable name="Number" class="java.lang.Integer" resetType="Group" resetGroup="Charge" calculation="Count">
+		<variableExpression><![CDATA[$V{Number} == null ? 1 : $V{Number}+1]]></variableExpression>
+	</variable>
+	<variable name="liter_1" class="java.math.BigDecimal" resetType="Group" resetGroup="Charge" calculation="Sum">
+		<variableExpression><![CDATA[$F{liter}]]></variableExpression>
+	</variable>
+	<variable name="Liter/unit" class="java.math.BigDecimal" resetType="Group" resetGroup="Charge" calculation="Sum">
+		<variableExpression><![CDATA[$F{liter} ==0 ? 1 : $F{liter}]]></variableExpression>
+	</variable>
+	<group name="Charge" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{charge}]]></groupExpression>
+		<groupHeader>
+			<band height="53">
+				<staticText>
+					<reportElement x="24" y="23" width="55" height="30" uuid="3ed96a10-68bf-4865-a104-07757f22389c"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Shipping No.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="79" y="23" width="59" height="30" uuid="025394ad-ad18-4ddf-89b8-50365a4ddb76"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Date ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="137" y="23" width="62" height="30" uuid="b9cd25e9-147b-4125-979a-4ed55c3e679b"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Voucher]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="199" y="23" width="73" height="30" uuid="6a20cb7d-c8e6-4252-bb1f-a0a1bd2df44e"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Business Partner]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="353" y="23" width="70" height="30" uuid="2fb13a25-0bb1-4623-a3ed-0c87d52cc127"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Armada]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="423" y="23" width="63" height="30" uuid="a64b8e94-bca5-4ee3-a8d5-dbb4cca0a4ce"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Voucher Code]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="23" y="4" width="416" height="20" uuid="e07416c7-7a4d-4a3c-bdcf-946121e1db3c"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{charge}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="538" y="23" width="54" height="30" uuid="d7ad1118-ec70-4af6-823b-991a1a90b0ab"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Liter / Unit]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="23" width="24" height="30" uuid="8dbd9956-c453-484d-854c-5c78415328dc"/>
+					<box leftPadding="3" rightPadding="3">
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[No]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="272" y="23" width="81" height="30" uuid="fc84a3c5-2d22-4773-a0ed-e07733ffedd7"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[TUJUAN]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="486" y="23" width="52" height="30" uuid="386406f5-3477-44c0-a211-b9322bf0efcb"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{fuel} == null ? ' ' : "fuel"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<textField pattern="#,##0.0">
+					<reportElement x="498" y="0" width="94" height="20" uuid="4b66184a-32e8-41d1-8d48-024cb5bf7e7e"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Liter/unit}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="19" width="592" height="1" uuid="93da7acd-65c9-49a8-a490-4ac4140e112d"/>
+					<graphicElement>
+						<pen lineWidth="0.5" lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement x="398" y="0" width="88" height="20" uuid="3096e1d1-6e3c-4ff0-a0f1-7cfb6c2a6ff7"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Jumlah]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="592" height="20" uuid="3ce2d698-35b7-446c-8048-4202b5fd30f7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{AD_Org_ID} == null  ? "All Organization" : $F{org}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="20" width="131" height="20" uuid="7072f156-1635-4caf-b6a4-2940075937b4"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Daftar pemakaian Voucher  :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="131" y="20" width="436" height="20" uuid="a32dbbd4-2c17-4a60-b45f-f7e8febcd6ae"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{DateFrom} == null && $P{DateTo} == null ? "All Times":
+$P{DateFrom} != null && $P{DateTo} == null ? new SimpleDateFormat("dd-MM-yyyy").format$P{DateFrom} +"- Today":
+$P{DateFrom} != null && $P{DateTo} != null ? new SimpleDateFormat("dd-MM-yyyy").format$P{DateFrom}+ " - " +new SimpleDateFormat("dd-MM-yyyy").format$P{DateTo}:
+$P{DateFrom} == null && $P{DateTo} != null ? "Until " +new SimpleDateFormat("dd-MM-yyyy").format$P{DateTo}: ""]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="41" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="138" y="0" width="61" height="40" uuid="6418f53e-ef50-4c9d-ae82-777f0252b407"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{voucher}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="423" y="0" width="63" height="40" uuid="38c1a18a-6878-4f27-9961-c7610832c115"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vcode}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="486" y="0" width="52" height="40" uuid="4497e3dc-bd77-45ff-9b9c-db1b838de692"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fuel}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="24" y="0" width="55" height="20" uuid="cc2d8032-8f71-44d3-b65f-7c90bd9be7f3"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kddokumen}+' '+$F{docnosps}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="79" y="18" width="59" height="22" uuid="6934ceb4-78d4-448b-ba23-4e9d66f4171f"/>
+				<box leftPadding="3" rightPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{datesp}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="24" height="40" uuid="474d13b1-6667-4892-a31c-90000938f352"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Number}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="272" y="19" width="81" height="21" uuid="328851bb-224a-4960-a387-ebf993485c1a"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{spstujuan}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="272" y="0" width="81" height="21" uuid="005d71cb-39bd-4123-a0a2-f0de78e10d62"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sptujuan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="353" y="19" width="70" height="21" uuid="1a920d27-de02-4942-a5ad-a456e5c84a7b"/>
+				<box>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Top">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{driver}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="199" y="0" width="73" height="40" isPrintWhenDetailOverflows="true" uuid="bc31077c-1994-425c-8d29-f146fdfa61fe"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{bpartner}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="24" y="21" width="55" height="19" uuid="457157f9-5427-4581-9ff7-fcf37baeb951"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kddokumen}+' '+$F{docnosp}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="79" y="0" width="59" height="20" uuid="e7ceee95-78f4-4543-b8ec-b0cc54ca59fe"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{datesps}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="353" y="0" width="70" height="21" uuid="1a920d27-de02-4942-a5ad-a456e5c84a7b"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{armada}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.0">
+				<reportElement x="538" y="0" width="54" height="40" uuid="cc2c1891-904b-4ec4-aec0-4d55159fcb19"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{liter}==0 ? 1 :$F{liter}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="32" splitType="Stretch">
+			<textField>
+				<reportElement x="472" y="12" width="80" height="20" uuid="05acf6a8-c8bf-47ba-86e7-0bea072a91ff"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="552" y="12" width="40" height="20" uuid="28500c9f-60a5-4f3c-8f35-35f9571b636a"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

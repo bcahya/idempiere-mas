@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportPurchasingContrac" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ad7deaad-a5f1-4866-a9e2-8c6707629df5">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="789"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Documentno" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select con.documentno as nocontrack,con.daterequired as tglkontrak,con.description as keterangan,cb.name as namavendor,cl.qty as qtykontrak,co.documentno as nopo,co.dateordered as tglorder,uomconversiontostr(mp.m_product_id,col.qtyordered) as qtyorder,mp.name as nmproduct,cl.qty-cl.qtyordered as sisa
+ from M_Requisition con
+ inner join M_RequisitionLine cl on con.m_requisition_id=cl.m_requisition_id
+ inner join c_orderline col on cl.m_requisitionline_id=col.m_requisitionline_id
+ inner join m_product mp on col.m_product_id=mp.m_product_id
+ inner join c_order co on col.c_order_id=co.c_order_id
+ left join c_bpartner cb on cl.c_bpartner_id=cb.c_bpartner_id
+ where con.docstatus in('CO','CL') and con.documentno=$P{Documentno}]]>
+	</queryString>
+	<field name="nocontrack" class="java.lang.String"/>
+	<field name="tglkontrak" class="java.sql.Timestamp"/>
+	<field name="keterangan" class="java.lang.String"/>
+	<field name="namavendor" class="java.lang.String"/>
+	<field name="qtykontrak" class="java.math.BigDecimal"/>
+	<field name="nopo" class="java.lang.String"/>
+	<field name="tglorder" class="java.sql.Timestamp"/>
+	<field name="qtyorder" class="java.lang.String"/>
+	<field name="nmproduct" class="java.lang.String"/>
+	<field name="sisa" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="27" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="f849f265-9407-4778-8f65-da632c0cbbaa" x="0" y="0" width="172" height="14"/>
+				<textElement/>
+				<text><![CDATA[Realisasi Purchasing Contract]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c689b973-b760-44bb-b39d-f4afd6b29465" x="0" y="15" width="72" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No Kontrak]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="12788843-d706-4624-85d1-890b391f9fce" x="138" y="15" width="55" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No PO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ca2ac6c3-081b-4d56-aa2a-f43b8f65b3d5" x="192" y="15" width="53" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Order]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="98108d3d-d153-4bcc-b527-8aef83195b53" x="245" y="15" width="107" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80ed5e95-d602-43df-9669-da2597312d0f" x="476" y="16" width="79" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty Order]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80ed5e95-d602-43df-9669-da2597312d0f" x="360" y="15" width="53" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty Contrak]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c689b973-b760-44bb-b39d-f4afd6b29465" x="73" y="14" width="64" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Kontrak]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80ed5e95-d602-43df-9669-da2597312d0f" x="413" y="15" width="53" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sisa]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement uuid="b634265a-c64b-4da6-84b3-b99b7a8b5cf0" x="0" y="0" width="72" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nocontrack}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b92b3f5d-a168-4ca9-92ad-7d1f1da0e326" x="137" y="0" width="197" height="13"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="980f5d2e-15ea-4f47-96ad-3edd1d4bd91b" x="352" y="0" width="61" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qtykontrak}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="2f9534a5-d7b9-446a-97a3-16ae7fa2af08" x="73" y="1" width="65" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglkontrak}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="e2d1b338-b09c-413a-b63d-1e7aea61cfd9" x="413" y="0" width="53" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sisa}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement uuid="11212de0-e301-456f-b047-212f71b5fdfe" x="137" y="0" width="55" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nopo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="fccefd33-4c47-41e6-b5a6-3fca50e08518" x="192" y="0" width="53" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglorder}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="221a8baa-9581-4221-abc6-adbd4586a3a0" x="245" y="0" width="184" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmproduct}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d03de622-603c-40a4-b8da-4fd791c4a7d6" x="476" y="0" width="79" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qtyorder}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

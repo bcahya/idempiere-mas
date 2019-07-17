@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintPO_Subreport1" language="groovy" pageWidth="612" pageHeight="792" columnWidth="582" leftMargin="10" rightMargin="20" topMargin="10" bottomMargin="20" uuid="16b7955e-b261-4cd0-84c9-cb6f12acdada">
+	<property name="ireport.zoom" value="1.2100000000000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="C_Order_ID" class="java.lang.Integer"/>
+	<parameter name="Pejabat" class="java.lang.String"/>
+	<parameter name="Jabatan" class="java.lang.String"/>
+	<parameter name="JenisPO" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ShowPrice" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<variable name="no" class="java.lang.String" calculation="Count">
+		<variableExpression><![CDATA[new Integer('1')]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="110" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="582" height="110" uuid="a94a76d4-ceea-4483-a4c6-0070d12343dd">
+					<printWhenExpression><![CDATA[$P{JenisPO}=="MAS"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="Jabatan">
+					<subreportParameterExpression><![CDATA[$P{Jabatan}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_Order_ID">
+					<subreportParameterExpression><![CDATA[$P{C_Order_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_User_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_User_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ShowPrice">
+					<subreportParameterExpression><![CDATA[$P{ShowPrice}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="JenisPO">
+					<subreportParameterExpression><![CDATA[$P{JenisPO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Pejabat">
+					<subreportParameterExpression><![CDATA[$P{Pejabat}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PrintPO_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="0" y="0" width="582" height="110" uuid="533d690d-b4eb-44a0-8aca-97471c113405">
+					<printWhenExpression><![CDATA[$P{JenisPO}=="FL"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="Jabatan">
+					<subreportParameterExpression><![CDATA[$P{Jabatan}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_Order_ID">
+					<subreportParameterExpression><![CDATA[$P{C_Order_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_User_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_User_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ShowPrice">
+					<subreportParameterExpression><![CDATA[$P{ShowPrice}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="JenisPO">
+					<subreportParameterExpression><![CDATA[$P{JenisPO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Pejabat">
+					<subreportParameterExpression><![CDATA[$P{Pejabat}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PrintPO_Subreport2.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="0" y="0" width="582" height="110" uuid="13198411-1a5e-4d96-ba4f-30921be335e1">
+					<printWhenExpression><![CDATA[$P{JenisPO}=="SR"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="Jabatan">
+					<subreportParameterExpression><![CDATA[$P{Jabatan}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_Order_ID">
+					<subreportParameterExpression><![CDATA[$P{C_Order_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_User_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_User_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ShowPrice">
+					<subreportParameterExpression><![CDATA[$P{ShowPrice}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="JenisPO">
+					<subreportParameterExpression><![CDATA[$P{JenisPO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Pejabat">
+					<subreportParameterExpression><![CDATA[$P{Pejabat}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PrintPO_Subreport3.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

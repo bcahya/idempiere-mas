@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportJobSpecExpedition" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bc7222fd-95bb-4a1a-8b8c-26cd0fd089bd">
+	<property name="ireport.zoom" value="1.3310000000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="DocStatusInv" mode="Transparent" forecolor="#000000" backcolor="#FF3333" fill="Solid" hAlign="Left" fontSize="8">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{invoicestatus}=="CO" | $F{invoicestatus}=="CL"]]></conditionExpression>
+			<style forecolor="#000000" backcolor="#FFFFFF">
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{invoicestatus}!="CO" | $F{invoicestatus}!="CL"]]></conditionExpression>
+			<style forecolor="#FF0000" backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
+	<style name="DocStatusShipp" mode="Transparent" forecolor="#000000" backcolor="#FF3333" fill="Solid" hAlign="Left" fontSize="8">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{settlementstatus}=="CO" | $F{settlementstatus}=="CL"]]></conditionExpression>
+			<style forecolor="#000000" backcolor="#FFFFFF">
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{settlementstatus}==""]]></conditionExpression>
+			<style forecolor="#33FF00" backcolor="#FFFFFF">
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{settlementstatus}!="CO" && $F{settlementstatus}!="CL"]]></conditionExpression>
+			<style forecolor="#3333FF" backcolor="#FFFFFF"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{shippingstatus}!="CO" && $F{shippingstatus}!="CL"]]></conditionExpression>
+			<style forecolor="#FF0000" backcolor="#FFFFFF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\project\\UntaCore@FLG\\com.unicore.order\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="IsSOTrx" class="java.lang.String"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<detail>
+		<band splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="0" uuid="22406c0f-762f-4984-9ea4-846552eb6992">
+					<printWhenExpression><![CDATA[$P{IsSOTrx} == "Y"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="EndDate">
+					<subreportParameterExpression><![CDATA[$P{EndDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="StartDate">
+					<subreportParameterExpression><![CDATA[$P{StartDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_BPartner_ID">
+					<subreportParameterExpression><![CDATA[$P{C_BPartner_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportJobSpecExpedition_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="0" uuid="45bf3573-b3f8-4276-b1c7-601e4d811191">
+					<printWhenExpression><![CDATA[$P{IsSOTrx} == "N"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="EndDate">
+					<subreportParameterExpression><![CDATA[$P{EndDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="StartDate">
+					<subreportParameterExpression><![CDATA[$P{StartDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="C_BPartner_ID">
+					<subreportParameterExpression><![CDATA[$P{C_BPartner_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportJobSpecExpedition_Subreport2.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.unicore.base"
+      label="UniCore Features"
+      version="1.0.0.qualifier"
+      provider-name="UntaSoft">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <requires>
+      <import plugin="org.adempiere.base" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.adempiere.ui" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.adempiere.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.adempiere.base.process" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.collections"/>
+   </requires>
+
+   <plugin
+         id="com.unicore.base"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="com.unicore.order"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="com.unicore.mm"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="com.unicore.hrm"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="com.unicore.ppic"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="com.unicore.finance"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="com.unicore.integration"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="com.unicore.ui"
+         download-size="0"
+         install-size="0"
+         version="3.0.0.qualifier"
+         unpack="false"/>
+</feature>

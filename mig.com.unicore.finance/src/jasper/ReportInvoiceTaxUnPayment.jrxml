@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTaxNumber" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2a42f414-25ae-4cdf-8f50-55a4d95a3a3e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[Select
+v.documentno as vatdocno,
+v.datereport as daterpt,
+org.name as org,
+bpt.name as bpartner,
+i.documentno as invoice,
+vline.taxinvoiceno as taxnoinv,
+vline.revisiontaxamt as revisitaxamt,
+vline.revisionbeforetaxamt as revisiamt,
+vline.taxname as taxname
+
+from UNS_VAT V
+inner join UNS_VATLine vline ON v.UNS_VAT_ID=vline.UNS_VAT_ID
+inner join AD_Org org ON org.AD_Org_ID=v.AD_Org_ID
+inner join C_Invoice i ON i.C_Invoice_ID=vline.C_Invoice_ID
+inner join C_BPartner bpt ON bpt.C_Bpartner_ID=vline.C_BPartner_ID
+LEFT JOIN UNS_VATPayment vp ON vp.UNS_VatPayment_ID=v.UNS_VatPayment_ID
+
+
+where v.datereport between $P{DateFrom} and $P{DateTo} AND v.UNS_VATPayment_ID is null]]>
+	</queryString>
+	<field name="vatdocno" class="java.lang.String"/>
+	<field name="daterpt" class="java.sql.Timestamp"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="bpartner" class="java.lang.String"/>
+	<field name="invoice" class="java.lang.String"/>
+	<field name="taxnoinv" class="java.lang.String"/>
+	<field name="revisitaxamt" class="java.math.BigDecimal"/>
+	<field name="revisiamt" class="java.math.BigDecimal"/>
+	<field name="taxname" class="java.lang.String"/>
+	<variable name="Number" class="java.lang.Integer" incrementType="Column" calculation="Count">
+		<variableExpression><![CDATA[$V{Number} == null ? 1 : $V{Number}+1]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="73" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="21" width="554" height="20" uuid="99ae1226-6928-4b95-b2c4-138df2571fcb"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="23" y="53" width="52" height="20" uuid="0a89b897-6aa7-4076-9aaf-f1ec79b6ae5b"/>
+				<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Vat No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="75" y="53" width="78" height="20" uuid="cf40ebb8-328c-42bb-9046-8152dfcbae7b"/>
+				<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[Date Reporting]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="227" y="53" width="58" height="20" uuid="3edcdbea-1d34-4f2a-b1e0-f702add0e340"/>
+				<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Invoice No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="285" y="53" width="100" height="20" uuid="a6032515-c392-476f-a7bd-54986bf5c790"/>
+				<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[Business Partner]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="385" y="53" width="85" height="20" uuid="24c9a21a-67a2-4206-ad54-b6038a8ac2c6"/>
+				<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Ammount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="470" y="53" width="85" height="20" uuid="62e95d9c-5f08-4fa8-b9ab-d4ebd87cf8a5"/>
+				<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Tax Ammount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="153" y="53" width="74" height="20" uuid="25ca1e0b-a893-4d33-a1b9-0f791622ce62"/>
+				<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Tax Invoice No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="53" width="23" height="20" uuid="65fb3c4d-b52f-4b87-914b-c4587b352a18"/>
+				<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[No]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="23" y="0" width="52" height="20" uuid="1f99fff9-118f-4c54-8052-df32f96045bb"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{vatdocno}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yy">
+				<reportElement x="75" y="0" width="78" height="20" uuid="88c1b9fa-85bd-400d-80cd-f6d87e726e0f"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{daterpt}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="227" y="0" width="58" height="20" uuid="25839be3-eb97-4154-bc8d-48387ec27228"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{invoice}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="285" y="0" width="100" height="20" uuid="fdd18f5b-fa6a-4b11-bba7-e1a9d0205300"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{bpartner}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="385" y="0" width="85" height="20" uuid="c704e5fd-bc66-4be5-bf79-71e98a455e7e"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{revisiamt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="470" y="0" width="85" height="20" uuid="fbb324b6-fde7-4ace-967e-c3f4c68513f6"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{revisitaxamt}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="153" y="0" width="74" height="20" uuid="ff1f2ccd-3817-49c3-8c31-64e90fb86dc9"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{taxnoinv}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="23" height="20" uuid="a93b68f0-0741-4034-b7ba-83cf393abd9f"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{Number}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

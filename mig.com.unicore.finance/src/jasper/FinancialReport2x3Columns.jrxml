@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FinancialReport3Columns" language="groovy" pageWidth="595" pageHeight="650" columnWidth="585" leftMargin="5" rightMargin="5" topMargin="20" bottomMargin="20" uuid="fda4ee76-fe28-4e78-91ac-1b9f5fd24736">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["F:\\work\\dev\\iDempiere\\com.uns.feature.finance\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Record_ID" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT c.Name AS Perusahaan, pr.*
+FROM PA_Report pr
+INNER JOIN AD_Client c ON pr.AD_Client_ID=c.AD_Client_ID
+WHERE pr.PA_Report_ID=$P{Record_ID}]]>
+	</queryString>
+	<field name="perusahaan" class="java.lang.String"/>
+	<field name="pa_report_id" class="java.math.BigDecimal"/>
+	<field name="ad_client_id" class="java.math.BigDecimal"/>
+	<field name="ad_org_id" class="java.math.BigDecimal"/>
+	<field name="isactive" class="java.lang.String"/>
+	<field name="created" class="java.sql.Timestamp"/>
+	<field name="createdby" class="java.math.BigDecimal"/>
+	<field name="updated" class="java.sql.Timestamp"/>
+	<field name="updatedby" class="java.math.BigDecimal"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="pa_reportlineset_id" class="java.math.BigDecimal"/>
+	<field name="pa_reportcolumnset_id" class="java.math.BigDecimal"/>
+	<field name="c_acctschema_id" class="java.math.BigDecimal"/>
+	<field name="c_calendar_id" class="java.math.BigDecimal"/>
+	<field name="processing" class="java.lang.String"/>
+	<field name="ad_printformat_id" class="java.math.BigDecimal"/>
+	<field name="listsources" class="java.lang.String"/>
+	<field name="listtrx" class="java.lang.String"/>
+	<field name="jasperprocess_id" class="java.math.BigDecimal"/>
+	<field name="jasperprocessing" class="java.lang.String"/>
+	<field name="pa_reportcube_id" class="java.math.BigDecimal"/>
+	<field name="pa_report_uu" class="java.lang.String"/>
+	<field name="listsourcesxtrx" class="java.lang.String"/>
+	<field name="c_period_id" class="java.math.BigDecimal"/>
+	<field name="org_id" class="java.math.BigDecimal"/>
+	<field name="c_bpartner_id" class="java.math.BigDecimal"/>
+	<field name="m_product_id" class="java.math.BigDecimal"/>
+	<field name="c_project_id" class="java.math.BigDecimal"/>
+	<field name="c_salesregion_id" class="java.math.BigDecimal"/>
+	<field name="pa_hierarchy_id" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="72" splitType="Stretch">
+			<textField>
+				<reportElement uuid="e83bf8e3-b137-4adf-a065-0f115ab0e91b" x="18" y="20" width="348" height="20"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="da4aad97-4bf8-4f48-a96c-d35f09b81ac7" x="18" y="0" width="348" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Financial Report " + $F{perusahaan}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="c5ef5e6d-2ac6-4c7e-9232-b577635fa541" x="17" y="60" width="550" height="1"/>
+			</line>
+			<image>
+				<reportElement uuid="7a253142-93d3-4f5a-9320-174f511704a0" x="483" y="0" width="84" height="58"/>
+				<imageExpression><![CDATA["images/logo_sambugroup.PNG"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<detail>
+		<band height="102" splitType="Stretch">
+			<subreport>
+				<reportElement uuid="e788557a-28b1-45af-8f5c-8b08b57ad454" x="0" y="2" width="200" height="100"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PA_Report_ID">
+					<subreportParameterExpression><![CDATA[$F{pa_report_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FinancialReport2x3Columns_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

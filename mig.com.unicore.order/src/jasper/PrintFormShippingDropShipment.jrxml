@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintFormShippingDropShipment" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8e4c44e0-946f-46cc-9238-ac6b7ada1e6b">
+	<property name="ireport.zoom" value="1.3995221406292007"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select mi.documentno as noshipcus,mi.movementdate as tglshipcus,jo.documentno as nojob,jo.datedoc as tgljob,jr.documentno nojobrec,jr.datedoc as tgljobrec,
+ shf.documentno as noshipping,shf.datedoc as tglshipping,shf.driver as supir,ci.dateinvoiced as tglinvoice,ci.documentno as noinvoice,cb.name as nmcust
+ from M_InOut mi
+ left join UNS_ExpeditionDetail exp on mi.m_inout_id=exp.m_inout_id
+ left join UNS_Expedition jo on exp.uns_expedition_id=jo.uns_expedition_id
+ left join UNS_Expedition jr on jr.jobso_id=exp.uns_expedition_id
+ left join UNS_ShippingFreight sff on sff.uns_expedition_id=jr.uns_expedition_id
+ left join uns_shipping shf on sff.uns_shipping_id=shf.uns_shipping_id
+ inner join ad_org org on mi.ad_org_id=org.ad_org_id
+ inner join c_invoice ci on mi.c_invoice_id=ci.c_invoice_id
+ inner join c_bpartner cb on ci.c_bpartner_id=cb.c_bpartner_id
+ where mi.isdropship='Y'
+ and mi.docstatus in('CO','CL') and mi.movementdate between $P{StartDate} and $P{EndDate}
+and
+(Case When $P{C_SalesRegion_ID} is not null then org.ad_org_id in(select ad_org_id from ad_org where c_salesregion_id=$P{C_SalesRegion_ID}) else 1=1 end)
+order by ci.dateinvoiced]]>
+	</queryString>
+	<field name="noshipcus" class="java.lang.String"/>
+	<field name="tglshipcus" class="java.sql.Timestamp"/>
+	<field name="nojob" class="java.lang.String"/>
+	<field name="tgljob" class="java.sql.Timestamp"/>
+	<field name="nojobrec" class="java.lang.String"/>
+	<field name="tgljobrec" class="java.sql.Timestamp"/>
+	<field name="noshipping" class="java.lang.String"/>
+	<field name="tglshipping" class="java.sql.Timestamp"/>
+	<field name="supir" class="java.lang.String"/>
+	<field name="tglinvoice" class="java.sql.Timestamp"/>
+	<field name="noinvoice" class="java.lang.String"/>
+	<field name="nmcust" class="java.lang.String"/>
+	<variable name="no" class="java.lang.Integer" resetType="None" incrementType="Group" incrementGroup="shipping" calculation="Count">
+		<variableExpression><![CDATA[$V{no} == null ? 1 : $V{no}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<group name="shipping">
+		<groupExpression><![CDATA[$F{noshipcus}]]></groupExpression>
+		<groupHeader>
+			<band height="13">
+				<textField>
+					<reportElement uuid="dcc0e4e2-9936-4118-b43c-0144f269a966" x="74" y="0" width="65" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{supir}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="2e36f0e2-67aa-40c4-a05d-16940142af0c" x="0" y="0" width="21" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{no}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="04930951-3e1b-4849-9d18-bae70b077ae5" x="21" y="0" width="54" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{noshipping}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement uuid="ccfe5866-34ed-4818-b659-146ea0d285e6" x="207" y="0" width="55" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tglshipcus}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="59ac7b85-48d9-4f54-a32b-dcf6a9335634" x="265" y="0" width="40" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nojob}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="178ec0c9-7f37-4249-82ba-cfebb04dffc8" x="360" y="0" width="39" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{noinvoice}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="02e33b0e-3e07-4b28-80d7-c7d105b031fd" x="140" y="0" width="67" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{noshipcus}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="526f196b-932d-4d8b-975f-c684ae7469d7" x="453" y="0" width="102" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmcust}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="7013d789-babd-4526-b903-51e11e1c7a4b" x="310" y="0" width="45" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nojobrec}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement uuid="3c11680e-2fee-4676-b328-b86f5e33fddf" x="401" y="0" width="48" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tglinvoice}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="13">
+				<rectangle>
+					<reportElement uuid="6c157481-2576-4b96-a6a9-12213e898d11" x="23" y="0" width="16" height="10"/>
+				</rectangle>
+				<staticText>
+					<reportElement uuid="1b1b15c4-48af-4c78-9e97-05c582d969f2" x="41" y="0" width="100" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Document Kembali]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="31" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="8b8f7945-4b14-4f70-b75a-9638c7faddd8" x="0" y="0" width="555" height="16"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Report Data Drop Shipment]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="dda7053b-24d8-4506-8273-c5f6143fe706" x="0" y="16" width="555" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode : "+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+" s/d "+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="11" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="4cfbbffd-7bdb-40d9-9963-c6fb6543f234" x="0" y="0" width="21" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="16768999-679a-40f0-ac59-f4a52cbfcf3e" x="21" y="0" width="54" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Shipping]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d1d06f03-5459-4c43-baef-7665ce198f5b" x="75" y="0" width="64" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Supir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f1634a07-5859-431d-b4cf-46c2780cb019" x="140" y="0" width="68" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Ship Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="83c8f2a3-a3b4-480d-b777-b80889d0abb2" x="211" y="0" width="50" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl.Shipment]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="5a7ad07a-1ae7-401f-a572-a4a433f95d8d" x="0" y="9" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="f1634a07-5859-431d-b4cf-46c2780cb019" x="265" y="0" width="40" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Job.Order]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f1634a07-5859-431d-b4cf-46c2780cb019" x="310" y="0" width="45" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Job.Receipt]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f1634a07-5859-431d-b4cf-46c2780cb019" x="360" y="0" width="39" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f1634a07-5859-431d-b4cf-46c2780cb019" x="453" y="0" width="78" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f1634a07-5859-431d-b4cf-46c2780cb019" x="401" y="0" width="48" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl. Invoiced]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="4" splitType="Stretch"/>
+	</detail>
+	<pageFooter>
+		<band height="4"/>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EFakturImportFormat" language="groovy" pageWidth="11160" pageHeight="360" orientation="Landscape" columnWidth="11120" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1ee47789-9c06-4613-937b-21ff6b82d59a">
+	<property name="ireport.zoom" value="0.4656909922943676"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_VAT_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\project\\UntaCore@FLG\\com.unicore.finance\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT IsSOTrx AS Penjualan, IsCreditMemo AS Retur FROM UNS_VAT WHERE UNS_VAT_ID = $P{UNS_VAT_ID}]]>
+	</queryString>
+	<field name="penjualan" class="java.lang.String"/>
+	<field name="retur" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="58">
+			<subreport>
+				<reportElement uuid="1cf13e6f-ca8d-42f6-8ff2-a7664e7b67d1" x="0" y="0" width="11120" height="58">
+					<printWhenExpression><![CDATA[$F{penjualan} == "Y" & $F{retur} == "N"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="UNS_VAT_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_VAT_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "EFakturImportFormat_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement uuid="1cf13e6f-ca8d-42f6-8ff2-a7664e7b67d1" x="0" y="0" width="11120" height="58">
+					<printWhenExpression><![CDATA[$F{penjualan} == "N" & $F{retur} == "N"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="UNS_VAT_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_VAT_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "EFakturImportFormat_Subreport2.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement uuid="1cf13e6f-ca8d-42f6-8ff2-a7664e7b67d1" x="0" y="0" width="11120" height="58">
+					<printWhenExpression><![CDATA[$F{penjualan} == "Y" & $F{retur} == "Y"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="UNS_VAT_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_VAT_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "EFakturImportFormat_Subreport3.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement uuid="1cf13e6f-ca8d-42f6-8ff2-a7664e7b67d1" x="0" y="0" width="11120" height="58">
+					<printWhenExpression><![CDATA[$F{penjualan} == "N" & $F{retur} == "Y"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="UNS_VAT_ID">
+					<subreportParameterExpression><![CDATA[$P{UNS_VAT_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "EFakturImportFormat_Subreport4.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+</jasperReport>

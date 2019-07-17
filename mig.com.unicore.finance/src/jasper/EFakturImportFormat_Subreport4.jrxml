@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Retur Pembelian" language="groovy" pageWidth="11160" pageHeight="360" orientation="Landscape" columnWidth="11120" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1ee47789-9c06-4613-937b-21ff6b82d59a">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_VAT_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT CASE WHEN vl.IsReplacement = 'Y' THEN 1 ELSE 0 END AS Pengganti, vl.TaxInvoiceNo AS TaxInvoiceNo, DATE_PART('MONTH', vl.DateInvoiced) AS MASA_PAJAK, DATE_PART('YEAR', vl.DateInvoiced) AS TAHUN_PAJAK, DATE(vl.DateInvoiced) AS TANGGAL_FAKTUR, REPLACE(REPLACE(vl.TaxSerialNo, '.', ''), '-', '') AS NPWPClient, vl.TaxName AS NameClient, vl.RevisionAmt AS DPP, vl.RevisionTaxAmt AS PPN
+
+FROM UNS_VAT VAT
+
+INNER JOIN UNS_VATLine vl ON vl.UNS_VAT_ID = vat.UNS_VAT_ID
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID = vl.C_BPartner_ID
+
+WHERE VAT.UNS_VAT_ID = $P{UNS_VAT_ID}
+
+ORDER BY vl.DateInvoiced ASC]]>
+	</queryString>
+	<field name="pengganti" class="java.lang.Integer"/>
+	<field name="taxinvoiceno" class="java.lang.String"/>
+	<field name="masa_pajak" class="java.lang.Double"/>
+	<field name="tahun_pajak" class="java.lang.Double"/>
+	<field name="tanggal_faktur" class="java.sql.Date"/>
+	<field name="npwpclient" class="java.lang.String"/>
+	<field name="nameclient" class="java.lang.String"/>
+	<field name="dpp" class="java.math.BigDecimal"/>
+	<field name="ppn" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="20">
+			<staticText>
+				<reportElement uuid="b56d20de-e100-44c6-be8e-7702690ff3a4" x="2773" y="0" width="500" height="20"/>
+				<textElement/>
+				<text><![CDATA[NOMOR_FAKTUR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d913bddb-027d-43ae-9778-56d2ec6d27aa" x="1454" y="0" width="1319" height="20"/>
+				<textElement/>
+				<text><![CDATA[FG_PENGGANTI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a9a4290e-43db-4bf5-99cf-d5f232f17a0f" x="4770" y="0" width="500" height="20"/>
+				<textElement/>
+				<text><![CDATA[NPWP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9b360b2a-f4be-4374-b2ad-c6c65a2d68f4" x="3771" y="0" width="500" height="20"/>
+				<textElement/>
+				<text><![CDATA[TAHUN_PAJAK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="03f7db5b-3154-4641-a874-deab64cfb3bf" x="4270" y="0" width="500" height="20"/>
+				<textElement/>
+				<text><![CDATA[TANGGAL_FAKTUR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9db1b186-b0bf-47f5-a817-cf2e6ae3e16d" x="3272" y="0" width="500" height="20"/>
+				<textElement/>
+				<text><![CDATA[MASA_PAJAK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="094a4120-7b7d-4aec-98f3-eac4aa8d3837" x="5270" y="0" width="500" height="20"/>
+				<textElement/>
+				<text><![CDATA[NAMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="eb9f3e74-67b1-4c4b-9913-ac47252682d3" x="6870" y="0" width="500" height="20"/>
+				<textElement/>
+				<text><![CDATA[JUMLAH_PPN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="049caa36-a312-4341-accd-a6ba342608b7" x="7870" y="0" width="600" height="20"/>
+				<textElement/>
+				<text><![CDATA[IS_CREDITABLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="96c287c3-e174-46d8-b205-08b5667b221a" x="6370" y="0" width="500" height="20"/>
+				<textElement/>
+				<text><![CDATA[JUMLAH_DPP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6253d58c-e6b6-4f93-af74-18b003e56f05" x="5770" y="0" width="600" height="20"/>
+				<textElement/>
+				<text><![CDATA[ALAMAT_LENGKAP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f8eb7ce1-f38e-486f-8b8f-d4f6b3379c55" x="7370" y="0" width="500" height="20"/>
+				<textElement/>
+				<text><![CDATA[JUMLAH_PPNBM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d913bddb-027d-43ae-9778-56d2ec6d27aa" x="46" y="0" width="1408" height="20"/>
+				<textElement/>
+				<text><![CDATA[KD_JENIS_TRANSAKSI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d913bddb-027d-43ae-9778-56d2ec6d27aa" x="0" y="0" width="46" height="20"/>
+				<textElement/>
+				<text><![CDATA[FM]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20">
+			<staticText>
+				<reportElement uuid="a3e9204e-ff7d-43c7-8777-7d05d15779e3" x="0" y="0" width="46" height="20"/>
+				<textElement/>
+				<text><![CDATA[FM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a3e9204e-ff7d-43c7-8777-7d05d15779e3" x="46" y="0" width="1408" height="20"/>
+				<textElement/>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="baad2f89-a647-4ebe-a0af-82bed1209166" x="1454" y="0" width="1319" height="20"/>
+				<textElement markup="none"/>
+				<textFieldExpression><![CDATA[$F{pengganti}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement uuid="9014508c-528a-43ad-9719-d25861fbdb20" x="3272" y="0" width="500" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{masa_pajak}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement uuid="adb86dd7-f703-43b9-b529-5fae132d788f" x="3771" y="0" width="500" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{tahun_pajak}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="3e75f5ed-c16f-49dd-ba7a-c4c02d4db0cb" x="4270" y="0" width="500" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{tanggal_faktur}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="584c91f4-966f-4c97-a845-12fcdcfd943c" x="4770" y="0" width="500" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{npwpclient}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="f3aa11d7-0e68-4607-9f6a-398081729462" x="5770" y="0" width="600" height="20"/>
+				<textElement markup="none"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="9014508c-528a-43ad-9719-d25861fbdb20" x="2773" y="0" width="500" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{taxinvoiceno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="323b8a69-e353-4c72-a5e0-c57eda0f11ac" x="5270" y="0" width="500" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{nameclient}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement uuid="ebb947cc-b0c8-4310-b439-89b0e95084b5" x="6370" y="0" width="500" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{dpp}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement uuid="07e52852-8cac-4f82-9f21-f691c21e9e68" x="6870" y="0" width="500" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{ppn}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="a3e9204e-ff7d-43c7-8777-7d05d15779e3" x="7370" y="0" width="500" height="20"/>
+				<textElement/>
+				<text><![CDATA[0]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a3e9204e-ff7d-43c7-8777-7d05d15779e3" x="7870" y="0" width="600" height="20"/>
+				<textElement/>
+				<text><![CDATA[1]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintCrewIncentive" language="groovy" pageWidth="610" pageHeight="394" columnWidth="580" leftMargin="10" rightMargin="20" topMargin="10" bottomMargin="5" uuid="ebf845b9-295c-4dd9-9fde-20a38d6c40ca">
+	<property name="ireport.zoom" value="1.3310000000000006"/>
+	<property name="ireport.x" value="39"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UNS_ShippingCrewIncentive_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_User_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT org.Name AS Org, i.DateFrom AS DateFrom, i.DateTo AS DateTo, emp.Name AS Driver, sh.DocumentNo AS ShippingNo, COALESCE(co.Name,'') AS ShippingOrigin, COALESCE(cd.Name,'') AS ShippingDestination, ar.Name AS Armada, sh.DateDoc AS ShippingDate, il.Amount AS Amount, il.HelperAmount AS HelperAmount, i.AmountBonuses AS AmountBonuses, i.GrandTotal AS GrandTotal,  getterbilangrupiah(i.GrandTotal) AS Terbilang, usr.Name AS Adm, COALESCE(rs.DocumentNo, '') AS Settlement
+FROM UNS_ShippingCrewIncentive i
+
+INNER JOIN AD_Org org ON org.AD_Org_ID = i.AD_Org_ID
+INNER JOIN UNS_ShippingCrewInctv_Line il ON il.UNS_ShippingCrewIncentive_ID = i.UNS_ShippingCrewIncentive_ID
+INNER JOIN UNS_Shipping sh ON sh.UNS_Shipping_ID = il.UNS_Shipping_ID
+INNER JOIN UNS_Employee emp ON emp.UNS_Employee_ID = sh.UNS_Employee_ID
+INNER JOIN UNS_Armada ar ON ar.UNS_Armada_ID = sh.UNS_Armada_ID
+LEFT JOIN C_City co ON co.C_City_ID = sh.Origin_ID
+LEFT JOIN C_City cd ON cd.C_City_ID = sh.Destination_ID
+INNER JOIN AD_User usr ON usr.AD_User_ID = $P{AD_User_ID}
+LEFT JOIN UNS_Charge_RS rs ON rs.UNS_Charge_RS_ID = i.UNS_Charge_RS_ID
+
+WHERE (CASE WHEN $P{UNS_ShippingCrewIncentive_ID} > 0 THEN i.UNS_ShippingCrewIncentive_ID = $P{UNS_ShippingCrewIncentive_ID} ELSE i.DateFrom = $P{DateFrom} AND i.DateTo = $P{DateTo} END)
+
+ORDER BY emp.Name ASC, org.Name, ShippingDate ASC]]>
+	</queryString>
+	<field name="org" class="java.lang.String"/>
+	<field name="datefrom" class="java.sql.Timestamp"/>
+	<field name="dateto" class="java.sql.Timestamp"/>
+	<field name="driver" class="java.lang.String"/>
+	<field name="shippingno" class="java.lang.String"/>
+	<field name="shippingorigin" class="java.lang.String"/>
+	<field name="shippingdestination" class="java.lang.String"/>
+	<field name="armada" class="java.lang.String"/>
+	<field name="shippingdate" class="java.sql.Timestamp"/>
+	<field name="amount" class="java.math.BigDecimal"/>
+	<field name="helperamount" class="java.math.BigDecimal"/>
+	<field name="amountbonuses" class="java.math.BigDecimal"/>
+	<field name="grandtotal" class="java.math.BigDecimal"/>
+	<field name="terbilang" class="java.lang.String"/>
+	<field name="adm" class="java.lang.String"/>
+	<field name="settlement" class="java.lang.String"/>
+	<variable name="amount" class="java.math.BigDecimal" resetType="Group" resetGroup="Organization" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+	</variable>
+	<variable name="number" class="java.lang.Integer" resetType="Group" resetGroup="Organization">
+		<variableExpression><![CDATA[$V{number} == null ? 1 : $V{number} + 1]]></variableExpression>
+	</variable>
+	<variable name="helperamount" class="java.math.BigDecimal" resetType="Group" resetGroup="Organization" calculation="Sum">
+		<variableExpression><![CDATA[$F{helperamount}]]></variableExpression>
+	</variable>
+	<variable name="total" class="java.math.BigDecimal" resetType="Group" resetGroup="Organization">
+		<variableExpression><![CDATA[$V{amount}.add($V{helperamount}).add($F{amountbonuses})]]></variableExpression>
+	</variable>
+	<group name="Driver" isStartNewPage="true" footerPosition="ForceAtBottom">
+		<groupExpression><![CDATA[$F{driver}]]></groupExpression>
+	</group>
+	<group name="Organization" isStartNewPage="true" footerPosition="ForceAtBottom">
+		<groupExpression><![CDATA[$F{org}]]></groupExpression>
+		<groupHeader>
+			<band height="68">
+				<textField>
+					<reportElement uuid="7dba500e-6295-4ef2-965c-61bcf3c84331" x="6" y="33" width="551" height="15"/>
+					<box leftPadding="5"/>
+					<textElement verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{driver} + " - " + $F{org}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="a3ca0f65-9b2c-4288-8ed1-404f876dcdcb" x="209" y="48" width="196" height="20"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Origin - Destination]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="e3117d1c-b63f-426f-a168-ca2a1951d6e8" x="405" y="48" width="74" height="20"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Driver]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="47de916b-e206-4279-a42d-a052921fdc77" x="87" y="48" width="59" height="20"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Document]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="3145863a-9a84-4837-a453-024c392d7c0f" x="33" y="48" width="54" height="20"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="a3ca0f65-9b2c-4288-8ed1-404f876dcdcb" x="146" y="48" width="63" height="20"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Vehicle]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="3145863a-9a84-4837-a453-024c392d7c0f" x="7" y="48" width="26" height="20"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[No.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="e3117d1c-b63f-426f-a168-ca2a1951d6e8" x="479" y="48" width="75" height="20"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Helper]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="b530676a-e444-4b1d-b0fe-34337cecf0f8" x="6" y="19" width="551" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new SimpleDateFormat("dd-MM-yyyy").format$P{DateFrom} + " - " + new SimpleDateFormat("dd-MM-yyyy").format($P{DateTo})]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="94529e0f-4d23-4501-b4a1-b51f1648d0f9" x="6" y="0" width="551" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Times New Roman" size="10" isBold="true" isUnderline="true"/>
+					</textElement>
+					<text><![CDATA[Payroll]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="124">
+				<staticText>
+					<reportElement uuid="03235d3b-bb90-4d4f-a9ab-2174354ea0fe" x="7" y="0" width="551" height="15"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Note : Bonus akan diberikan apabila supir kooperatif dan memenuhi peraturan yang berlaku di perusahaan]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="ca7ebb9b-302f-4d09-8cc5-5666fbdec25e" x="7" y="15" width="179" height="15"/>
+					<textElement verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Driver= Rp. " + new DecimalFormat("#,###").format($V{amount}) + ",-"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="3312ee8e-3b40-4481-a56c-0ad19647d8f8" x="187" y="15" width="190" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Bonus = Rp. " + new DecimalFormat("#,###").format($F{amountbonuses}) + ",-"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="20fdc2ef-71fe-4abf-a490-0650a3552bbf" x="9" y="29" width="547" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total = Rp. " + new DecimalFormat("#,###").format($V{total}) + ",-"]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="8cb351a0-7ddf-40bc-a6a5-fb7c45ed42c9" x="7" y="60" width="140" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Admin,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="b352ff7f-27e6-4c5e-ae04-cf5eaaea4b6c" x="287" y="61" width="140" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Driver,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="57dc170f-4c82-48cd-bb23-9ef718ed5f72" x="427" y="61" width="140" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Cashier,]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="73982712-f654-4b19-b315-a076442e2436" x="7" y="100" width="140" height="15"/>
+					<box leftPadding="5" rightPadding="0"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{adm}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="73982712-f654-4b19-b315-a076442e2436" x="287" y="100" width="141" height="15"/>
+					<box leftPadding="5" rightPadding="0"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{driver}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="c8286d13-028c-40c1-95ee-78bc50966529" x="428" y="100" width="140" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" markup="none">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[(....................................................)]]></text>
+				</staticText>
+				<line>
+					<reportElement uuid="cd0f3794-27c6-4094-99db-099806697aba" x="7" y="60" width="551" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement uuid="14134111-c935-44ac-b6fd-fef8561520b2" x="7" y="0" width="551" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement uuid="cd0f3794-27c6-4094-99db-099806697aba" x="9" y="114" width="140" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<textField>
+					<reportElement uuid="ca7ebb9b-302f-4d09-8cc5-5666fbdec25e" x="377" y="15" width="179" height="15"/>
+					<textElement verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Helper = Rp. " + new DecimalFormat("#,###").format($V{helperamount}) + ",-"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="73982712-f654-4b19-b315-a076442e2436" x="427" y="76" width="140" height="15"/>
+					<box leftPadding="5" rightPadding="0"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{settlement} == "" ? "" : "Settlement : " + $F{settlement}]]></textFieldExpression>
+				</textField>
+				<subreport>
+					<reportElement uuid="58cd9fb2-0140-4f71-8d5c-b47560abe075" x="6" y="44" width="562" height="16"/>
+					<subreportParameter name="total">
+						<subreportParameterExpression><![CDATA[$V{total}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PrintCrewIncentive_Subreport1.jasper"]]></subreportExpression>
+				</subreport>
+				<staticText>
+					<reportElement uuid="b352ff7f-27e6-4c5e-ae04-cf5eaaea4b6c" x="146" y="60" width="141" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Verified,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="c8286d13-028c-40c1-95ee-78bc50966529" x="146" y="100" width="141" height="15"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom" markup="none">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[(..................................................)]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="dd-MM-yyyy">
+				<reportElement uuid="7a3f536b-7452-470e-bb2b-4780337fbb86" x="33" y="0" width="54" height="15"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{shippingdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="73982712-f654-4b19-b315-a076442e2436" x="87" y="0" width="59" height="15"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{shippingno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="73982712-f654-4b19-b315-a076442e2436" x="146" y="0" width="63" height="15"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{armada}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="73982712-f654-4b19-b315-a076442e2436" x="209" y="0" width="196" height="15"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{shippingorigin} + " - " + $F{shippingdestination}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="73982712-f654-4b19-b315-a076442e2436" x="405" y="0" width="74" height="15"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["RP. " + new DecimalFormat("#,###").format($F{amount}) + ",-"]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement uuid="7a3f536b-7452-470e-bb2b-4780337fbb86" x="7" y="0" width="26" height="15"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{number}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="73982712-f654-4b19-b315-a076442e2436" x="479" y="0" width="75" height="15"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["RP. " + new DecimalFormat("#,###").format($F{helperamount}) + ",-"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

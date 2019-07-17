@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FormUmumDaftarPenyusutanFiskal_Subreport1" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="917267d0-8d1f-4f3c-b6aa-41dd7ca7dd72">
+	<property name="ireport.zoom" value="4.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="A_Asset_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EndDate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT COALESCE (DW.A_Accumulated_Depr,0) AS accumDepr,
+COALESCE (DW.A_Accumulated_Depr_F,0) AS accumDeprF,
+COALESCE (SUM(Exp.Expense),0) AS komersial,
+COALESCE(SUM(Exp.Expense_F),0) AS fiskal
+
+FROM A_Depreciation_Exp Exp
+INNER JOIN A_Asset A ON A.A_Asset_ID=Exp.A_Asset_ID
+INNER JOIN A_Depreciation_Workfile DW ON DW.A_Asset_ID=A.A_Asset_ID
+
+WHERE A.A_Asset_ID=$P{A_Asset_ID} AND EXTRACT (YEAR FROM $P{EndDate} ::Timestamp) = EXTRACT (YEAR FROM Exp.DateAcct) AND Exp.DateAcct <= $P{EndDate} ::Timestamp  AND Exp.Processed='Y' AND A.AD_Org_ID=$P{AD_Org_ID}
+
+GROUP BY DW.A_Accumulated_Depr, DW.A_Accumulated_Depr_F]]>
+	</queryString>
+	<field name="accumdepr" class="java.math.BigDecimal"/>
+	<field name="accumdeprf" class="java.math.BigDecimal"/>
+	<field name="komersial" class="java.math.BigDecimal"/>
+	<field name="fiskal" class="java.math.BigDecimal"/>
+	<variable name="komersial" class="java.math.BigDecimal" resetType="None">
+		<variableExpression><![CDATA[$F{accumdepr}== 0  ?$F{accumdepr}: ($F{accumdepr}-$F{komersial})]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="fiskal" class="java.math.BigDecimal" resetType="None">
+		<variableExpression><![CDATA[$F{accumdeprf}==0 ? $F{accumdeprf} : $F{accumdeprf}-$F{fiskal}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement x="0" y="0" width="95" height="15" uuid="a715ab88-4565-41d6-bc70-74b477d5f909"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{komersial}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="95" y="0" width="95" height="15" uuid="e5fd26ef-17b6-484f-a39c-1122a9f94a7a"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{fiskal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

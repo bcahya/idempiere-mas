@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: UniCore Swing
+Bundle-SymbolicName: com.unicore.ui.swing;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: UniSoft
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.adempiere.ui.swing;bundle-version="3.0.0",
+ org.adempiere.ui;bundle-version="3.0.0",
+ org.adempiere.base;bundle-version="3.0.0",
+ com.unicore.base;bundle-version="1.0.0",
+ com.unicore.order;bundle-version="1.0.0",
+ com.unicore.ui;bundle-version="3.0.0",
+ com.unicore.finance;bundle-version="1.0.0"
+Bundle-Activator: org.adempiere.base.BaseActivator
+Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/VMsgBoxFactory.xml, OSGI-INF/VCreateFromInvoice.xml
+Bundle-ClassPath: lib/iReport.jar,.
+Export-Package: com.unicore.grid,
+ com.unicore.ui.factory,
+ com.unicore.ui.grid

@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintDocumentAudit" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7403d2f7-efb9-4898-9d60-04d3f822a759">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\project\\UntaCore@FLG\\com.unicore.base\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UNS_Audit_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TypeReport" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT a.DocumentNo AS Audit, a.DateAcct AS DateAudit, a.Description AS DescAudit, TRIM(UPPER(CONCAT(bp.Name, ' - ', bp.Value))) AS Partner, ap.InvoiceCountLimit AS InvoiceCountLimit, ap.Tmp_SO_CreditLimit AS CreditLimit, SUM(ad.GrandTotal) AS GrandTotal, SUM(ad.OpenAmt) AS OpenAmt, COUNT(ad.C_Invoice_ID) AS TotalInvoice, pt.Name AS PaymentTerm, CASE WHEN a.Processed = 'N' THEN 'Not Completed Yet' ELSE 'Completed' END AS Status, ap.UNS_AuditPartner_ID AS AuditPartner FROM UNS_Audit a
+
+INNER JOIN UNS_AuditPartner ap ON ap.UNS_Audit_ID = a.UNS_Audit_ID
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID = ap.C_BPartner_ID
+INNER JOIN UNS_AuditDocument ad ON ad.UNS_AuditPartner_ID = ap.UNS_AuditPartner_ID
+INNER JOIN C_PaymentTerm pt ON pt.C_PaymentTerm_ID = ap.C_PaymentTerm_ID
+
+WHERE a.UNS_Audit_ID = $P{UNS_Audit_ID}
+
+GROUP BY a.UNS_Audit_ID, ap.UNS_AuditPartner_ID, bp.C_BPartner_ID, pt.C_PaymentTerm_ID
+
+ORDER BY TRIM(bp.Name) ASC]]>
+	</queryString>
+	<field name="audit" class="java.lang.String"/>
+	<field name="dateaudit" class="java.sql.Timestamp"/>
+	<field name="descaudit" class="java.lang.String"/>
+	<field name="partner" class="java.lang.String"/>
+	<field name="invoicecountlimit" class="java.math.BigDecimal"/>
+	<field name="creditlimit" class="java.math.BigDecimal"/>
+	<field name="grandtotal" class="java.math.BigDecimal"/>
+	<field name="openamt" class="java.math.BigDecimal"/>
+	<field name="totalinvoice" class="java.lang.Long"/>
+	<field name="paymentterm" class="java.lang.String"/>
+	<field name="status" class="java.lang.String"/>
+	<field name="auditpartner" class="java.lang.Integer"/>
+	<variable name="no" class="java.lang.Integer" incrementType="Group" incrementGroup="Partner" calculation="Count">
+		<variableExpression><![CDATA[$V{no} == null ? 1 : 1 + $V{no}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="total_invoices" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalinvoice}]]></variableExpression>
+	</variable>
+	<variable name="total_grandtotal" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{grandtotal}]]></variableExpression>
+	</variable>
+	<variable name="total_balance" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{openamt}]]></variableExpression>
+	</variable>
+	<group name="Partner" keepTogether="true">
+		<groupExpression><![CDATA[$F{partner}]]></groupExpression>
+		<groupHeader>
+			<band height="43">
+				<rectangle>
+					<reportElement uuid="fad0a61c-e043-4ca7-8143-d3d3d40444cb" x="0" y="0" width="555" height="43"/>
+					<graphicElement>
+						<pen lineWidth="0.25"/>
+					</graphicElement>
+				</rectangle>
+				<textField>
+					<reportElement uuid="2a6b512a-bf3b-4a5a-9918-8783e43ef939" x="0" y="0" width="555" height="15"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{partner}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="270f9adf-b543-4e47-8725-86ca43d81934" x="92" y="14" width="94" height="15"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[": " + $F{totalinvoice}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="2ba343d2-a10a-41a2-9343-328a0f87235f" x="276" y="14" width="94" height="15"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[": " + new DecimalFormat("#,##0.00").format($F{grandtotal})]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="f098901d-a58b-4ee5-a566-824aee46e928" x="462" y="14" width="93" height="15"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[": " + new DecimalFormat("#,##0.00").format($F{openamt})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="6bd7ecc9-917c-4ad4-acdf-51edd9bd5d2e" x="92" y="28" width="93" height="15"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[": " + $F{invoicecountlimit}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="3907a451-a6d9-4f51-accd-f7e9b2667b69" x="462" y="28" width="93" height="15"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[": " + new DecimalFormat("#,##0.00").format($F{creditlimit})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="d348ad28-e170-4782-8a0e-033fe3213d39" x="276" y="28" width="94" height="15"/>
+					<textElement/>
+					<textFieldExpression><![CDATA[": " + $F{paymentterm}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="9c7c1a7c-42c8-452e-99c3-bcccdfc8d082" x="0" y="14" width="92" height="15"/>
+					<textElement/>
+					<text><![CDATA[Invoices]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="e0c2d32e-017b-4b26-8428-d448b829cb0a" x="0" y="28" width="92" height="15"/>
+					<textElement/>
+					<text><![CDATA[Invoices Limit]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="87f5c73e-9770-4ba1-84e5-3c86edd59eb6" x="184" y="14" width="92" height="15"/>
+					<textElement/>
+					<text><![CDATA[Total]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="3cfc75bb-803f-40e6-a45b-a78e83d88db9" x="184" y="28" width="92" height="15"/>
+					<textElement/>
+					<text><![CDATA[Payment Term]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="5104e921-280f-402c-88a7-6e9e399c9531" x="370" y="14" width="92" height="15"/>
+					<textElement/>
+					<text><![CDATA[Balance]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="125ceee4-6d60-417d-8e66-16f5e229958e" x="370" y="28" width="92" height="15"/>
+					<textElement/>
+					<text><![CDATA[Credit Limit]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="2a6b512a-bf3b-4a5a-9918-8783e43ef939" x="0" y="0" width="30" height="15"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{no} + 1 + "."]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="10"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="68" splitType="Stretch">
+			<textField>
+				<reportElement uuid="e14dc41a-15c0-45d2-aa4c-7eb136dccea9" x="0" y="0" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Audit Result (" + $F{status} + ")"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="97eb0aa7-b33c-40ab-aeb6-80876dd01163" x="455" y="0" width="100" height="20"/>
+				<textElement>
+					<font size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCore ERP]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="188b50e1-ecd6-4d37-82af-ff18c5a01c54" x="0" y="20" width="555" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA["No : " + $F{audit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="188b50e1-ecd6-4d37-82af-ff18c5a01c54" x="0" y="35" width="555" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA["Date : " + new SimpleDateFormat("dd-MM-yyyy").format($F{dateaudit})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="188b50e1-ecd6-4d37-82af-ff18c5a01c54" x="0" y="50" width="555" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA["Description : " + $F{descaudit}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="fece888f-e50a-4db8-973b-ec4d89e4811f" x="0" y="65" width="555" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Double"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<detail>
+		<band>
+			<subreport>
+				<reportElement uuid="530b2901-b9cc-48fe-9b45-3a0d8ba43ea2" x="0" y="0" width="555" height="0">
+					<printWhenExpression><![CDATA[$P{TypeReport} == "DT"]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="UNS_AuditPartner_ID">
+					<subreportParameterExpression><![CDATA[$F{auditpartner}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PrintDocumentAudit_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<summary>
+		<band height="20">
+			<rectangle>
+				<reportElement uuid="350905b5-c3ff-45f1-9a84-930e7248370f" x="0" y="0" width="555" height="20"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement uuid="6bd7ecc9-917c-4ad4-acdf-51edd9bd5d2e" x="78" y="0" width="107" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $V{total_invoices}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="3907a451-a6d9-4f51-accd-f7e9b2667b69" x="445" y="0" width="110" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + new DecimalFormat("#,##0.00").format($V{total_balance})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="3cfc75bb-803f-40e6-a45b-a78e83d88db9" x="184" y="0" width="80" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e0c2d32e-017b-4b26-8428-d448b829cb0a" x="0" y="0" width="78" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Invoices]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="125ceee4-6d60-417d-8e66-16f5e229958e" x="370" y="0" width="75" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Balance]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="d348ad28-e170-4782-8a0e-033fe3213d39" x="264" y="0" width="106" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + new DecimalFormat("#,##0.00").format($V{total_grandtotal})]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

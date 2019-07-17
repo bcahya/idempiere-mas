@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SuratPengantarKeberangkatan" language="groovy" pageWidth="611" pageHeight="395" columnWidth="586" leftMargin="5" rightMargin="20" topMargin="5" bottomMargin="20" uuid="078ff5a9-d63b-4b95-8554-46ceb0f956bd">
+	<property name="ireport.zoom" value="1.366026910730142"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="UNS_Shipping_ID" class="java.lang.Integer"/>
+	<parameter name="UNS_Expedition_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select orgn.name,
+concat(lc.address1,' - ',lc.city,' - ',lc.postal) as alamat ,
+shp.documentno,
+coalesce(emp.name,'') as supir,
+coalesce(bp.name,'') as client,
+expd.itemdescription as item,
+arm.value as platno,
+shp.tonase as tonase
+from uns_shipping shp
+ LEFT JOIN  AD_OrgInfo org on shp.ad_org_id = org.ad_org_id
+LEFT JOIN uns_employee emp on shp.uns_employee_id = emp.uns_employee_id
+LEFT JOIN uns_armada arm on shp.uns_armada_id = arm.uns_armada_id
+LEFT JOIN  UNS_ShippingFreight spf on shp.uns_shipping_id = spf.uns_shipping_id LEFT JOIN  UNS_Expedition exp on spf. UNS_Expedition_id = exp.UNS_Expedition_id LEFT JOIN  UNS_Expeditiondetail expd on exp. UNS_Expedition_id = expd.UNS_Expedition_id
+LEFT JOIN c_location lc on org.c_location_id = lc.c_location_id
+LEFT JOIN c_bpartner bp on exp.c_bpartner_id = bp.c_bpartner_id
+left join ad_org orgn on org.ad_org_id=orgn.ad_org_id
+ where shp.docstatus in ('IP','CO','CL') and shp.uns_shipping_id = $P{UNS_Shipping_ID} or exp.UNS_Expedition_ID = $P{UNS_Expedition_ID} and spf.freighttype = 'EXP']]>
+	</queryString>
+	<field name="name" class="java.lang.String"/>
+	<field name="alamat" class="java.lang.String"/>
+	<field name="documentno" class="java.lang.String"/>
+	<field name="supir" class="java.lang.String"/>
+	<field name="client" class="java.lang.String"/>
+	<field name="item" class="java.lang.String"/>
+	<field name="platno" class="java.lang.String"/>
+	<field name="tonase" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="54">
+			<staticText>
+				<reportElement x="10" y="21" width="555" height="16" uuid="952791c8-8551-44a5-a96a-ad3d98f8e749"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Logistic Management, Distribution, Transportation]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="10" y="37" width="555" height="17" uuid="2efafda8-baef-425d-99ca-53c847ba916b"/>
+				<textFieldExpression><![CDATA[$F{alamat}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="0" width="335" height="20" uuid="bbf29d40-7ee8-4fe1-afaa-49522781a1be"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="294" splitType="Stretch">
+			<staticText>
+				<reportElement x="17" y="0" width="151" height="14" uuid="08155723-3f7f-4eb5-a0ec-2bdb7cd7b3ed"/>
+				<text><![CDATA[Hal : Delivery Order]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="17" y="14" width="28" height="14" uuid="bb7d3659-7ebe-42ce-ae71-6aaae6106d08"/>
+				<text><![CDATA[No :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="17" y="45" width="100" height="14" uuid="5764794c-1988-4009-b31a-f27744ce5bd4"/>
+				<text><![CDATA[Kepada Yth:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="17" y="104" width="100" height="14" uuid="7fe334d0-ab9c-4eeb-b968-cd55cc6b4447"/>
+				<text><![CDATA[Dengan hormat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="58" y="118" width="447" height="14" uuid="ec535cd5-d80e-40bd-8e02-5dc4acf008ab"/>
+				<text><![CDATA[Bersama ini, mohon diberikan muatan kepada dirver kami]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="150" width="447" height="14" uuid="b05b6242-2453-4a35-ab32-3ad55104590f"/>
+				<text><![CDATA[Sdr...................................................................................No.Pol.................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="185" width="447" height="14" uuid="c1d311be-b2b0-4b01-a059-e973a05cb242"/>
+				<text><![CDATA[....................................,..................................................................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="200" width="512" height="14" uuid="768c89c4-ab4a-4cfa-ac6c-45c2398ca964"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Demikian, hal ini kami sampaikan atas perhatian dan kerjasamanya yang baik kami ucapkan terima kasih]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="401" y="239" width="127" height="14" uuid="a551e38a-912c-4eb9-826e-25d22fa1d6e6"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Hormat Kami]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="395" y="280" width="150" height="14" uuid="d1479966-9686-4e6b-baaa-221e168282c1"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[(...........................................)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="45" y="14" width="123" height="14" uuid="c5bb5e33-0492-4f81-b0a8-efc750b5f006"/>
+				<textFieldExpression><![CDATA[$F{documentno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="45" y="59" width="460" height="45" uuid="2485e587-290b-422a-8a30-cb60d7c3f997"/>
+				<textFieldExpression><![CDATA[$F{client}+"\n"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="58" y="148" width="208" height="14" uuid="eb279112-b4b0-4a7a-8492-9372509dab79"/>
+				<textFieldExpression><![CDATA[$F{supir}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="345" y="149" width="135" height="14" uuid="8e801773-f64e-4ba9-b239-1104c734f864"/>
+				<textFieldExpression><![CDATA[$F{platno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="33" y="184" width="253" height="14" uuid="8cfc1e2f-edb2-454a-ad5f-7207e09b30cf"/>
+				<textFieldExpression><![CDATA["Item : "+$F{item}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="330" y="184" width="106" height="14" uuid="c9a41951-0228-433f-9dce-a4b46f0452ad"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{tonase}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="436" y="184" width="44" height="14" uuid="bb7d3659-7ebe-42ce-ae71-6aaae6106d08"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Ton]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="184" width="44" height="14" uuid="bb7d3659-7ebe-42ce-ae71-6aaae6106d08"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Satuan]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="7" splitType="Stretch"/>
+	</detail>
+</jasperReport>

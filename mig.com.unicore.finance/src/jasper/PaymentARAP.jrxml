@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PaymentARAP" language="groovy" pageWidth="612" pageHeight="396" columnWidth="602" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" uuid="8f77b20c-f94d-4722-b972-bf3f1a514369">
+	<property name="ireport.zoom" value="1.771561000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_Payment_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() as tglskrg,u.name as user,case when doc.docbasetype='APP' then 'BUKTI AP PAYMENT' else 'BUKTI AR PAYMENT' end as payment,
+cp.documentno as nodoc,cp.description as ket,cp.datetrx as tgltrx,
+coalesce(ca.paytooverunderamount,cp.payAmt) as tpayment,
+cb.name as nmbank,getterbilangrupiah(cp.payamt) as tebilang,data2.ket as noinvoice,data2.tinvoice as nilaiinvoice,cba.accountno as norek,cba.a_name as aname,b.name as nmbank,
+case when cp.tendertype='A' THEN 'Direct Deposit'
+	when cp.tendertype='C' Then 'Credit Card'
+	when cp.tendertype='D' Then 'Direct Debit'
+	when cp.tendertype='K' Then 'Check'
+	when cp.tendertype='T' Then 'Account' else 'Cash' end as tendetype
+from
+(SELECT cp.c_payment_id,Array_To_String(Array_Agg(ci.documentno), ';') as ket,sum(ci.grandtotal) as tinvoice
+from C_Payment cp
+left join C_PaymentAllocate ca on cp.c_payment_id=ca.c_payment_id
+left join c_invoice ci on ca.c_invoice_id=ci.c_invoice_id
+where cp.docstatus not in('VO') and cp.C_Payment_ID=$P{C_Payment_ID}
+group by cp.c_payment_id) data2
+inner join C_Payment cp on data2.c_payment_id=cp.c_payment_id
+left join C_PaymentAllocate ca on cp.c_payment_id=ca.c_payment_id
+left join c_bankaccount cb on cb.c_bankaccount_id=cp.c_bankaccount_id
+left join c_doctype doc on doc.c_doctype_id=cp.c_doctype_id
+left join ad_user u on u.ad_user_id=$P{AD_User_ID}
+left join c_bpartner cbp on cp.c_bpartner_id=cbp.c_bpartner_id
+left join C_BP_BankAccount cba on cbp.c_bpartner_id=cba.c_bpartner_id
+left join c_invoice ci on ca.c_invoice_id=ci.c_invoice_id
+left join c_bank b on cba.c_bank_id=b.c_bank_id
+where cp.docstatus not in('VO') AND cp.C_Payment_ID=$P{C_Payment_ID}]]>
+	</queryString>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="user" class="java.lang.String"/>
+	<field name="payment" class="java.lang.String"/>
+	<field name="nodoc" class="java.lang.String"/>
+	<field name="ket" class="java.lang.String"/>
+	<field name="tgltrx" class="java.sql.Timestamp"/>
+	<field name="tpayment" class="java.math.BigDecimal"/>
+	<field name="nmbank" class="java.lang.String"/>
+	<field name="tebilang" class="java.lang.String"/>
+	<field name="noinvoice" class="java.lang.String"/>
+	<field name="nilaiinvoice" class="java.math.BigDecimal"/>
+	<field name="norek" class="java.lang.String"/>
+	<field name="aname" class="java.lang.String"/>
+	<field name="tendetype" class="java.lang.String"/>
+	<variable name="no" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[new Integer('1')]]></variableExpression>
+	</variable>
+	<variable name="Jml" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{tpayment}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="81" splitType="Stretch">
+			<textField>
+				<reportElement uuid="1ca3257d-d794-4ea9-b3e9-d542878115b6" x="0" y="0" width="572" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{payment}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="51779f06-ed4c-4edf-8b83-1cc17a01ec4d" x="0" y="20" width="572" height="14"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{nmbank}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="571e453a-ccf6-45d7-8e94-66c0cb42b4e2" x="0" y="67" width="28" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8e01b2f3-c4f2-4140-a797-fceb2049a6f6" x="28" y="67" width="248" height="11"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[K E T E R A N G A N]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="187451d0-0d42-4090-bb07-ca55abacb962" x="0" y="34" width="56" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Bukti]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="54568033-f48d-4e58-9e64-bd7acbdfdc2a" x="0" y="45" width="56" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="acefe4e0-b805-4a2c-aee9-6d346fe22b95" x="56" y="45" width="100" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + new SimpleDateFormat("dd-MMM-yyyy").format($F{tgltrx})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="6e0f70a0-824b-4d8b-9f27-a093733b8a9c" x="56" y="34" width="100" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": "+$F{nodoc}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="0fbddc66-def7-4122-aba9-536b511cbd8e" x="324" y="67" width="229" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[JUMLAH Rp.]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="ed64f1b7-7e88-46fe-bc65-9a5a3fcc3633" x="0" y="79" width="572" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="837b0611-a94a-4cae-a97d-103ff00715e9" x="0" y="67" width="572" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement uuid="6abbb4d2-ab32-465b-a87a-77c66b8e2190" x="0" y="0" width="28" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d382a4a2-0a6c-414d-b426-d6e8d12d9cd1" x="56" y="0" width="310" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ket}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="f04a59db-b7cf-4b2e-b629-0fabe8b5e09d" x="453" y="0" width="100" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tpayment}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="138">
+			<rectangle>
+				<reportElement uuid="221af1e6-3360-4ec3-ba10-3c93a34559b6" x="245" y="27" width="79" height="22"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement uuid="3d655a26-96b1-4f59-8e57-d740559d9f17" x="0" y="4" width="453" height="11"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["##"+$F{tebilang}+"##"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="1d331fba-08a8-4fff-a36c-1890f875ff2c" x="453" y="4" width="100" height="15"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{Jml}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement uuid="3aa568e1-37c4-4908-8d4c-a33ed887f79b" x="412" y="27" width="88" height="20"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement uuid="42b2cf2f-0608-42bb-9873-5fe445fbe0d5" x="500" y="27" width="87" height="20"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="93e43e11-0204-44a4-ba54-8a86ff614409" x="500" y="27" width="87" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[PENERIMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e7f19278-e6ce-4262-b9f5-1e5a0b39c422" x="412" y="27" width="88" height="19" forecolor="#333333"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[KASIR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f2323e0b-ad42-40e6-8620-3cd663aa5cc9" x="-1" y="112" width="52" height="20"/>
+				<textElement/>
+				<text><![CDATA[User Print]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement uuid="25b8375e-e187-41b7-a94c-91e5dd094d30" x="324" y="27" width="88" height="20"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement uuid="16435c3d-62f7-43e4-ab26-9350ea5adc7f" x="245" y="47" width="79" height="52" forecolor="#333333"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#666666"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="4d7d7321-51fc-4abb-920c-256a76218180" x="324" y="27" width="88" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[ACCOUNTING]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="ad4a35a0-4ac5-41c7-894d-4133521a52d6" x="500" y="112" width="71" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[": " +new SimpleDateFormat("dd/MM/yyyy").format($F{tglskrg})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="1e80e778-a42d-4148-9500-1603970fc551" x="245" y="26" width="79" height="23"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[Mengetahui]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f96d6db0-33e5-45ff-9d91-482449f04276" x="1" y="15" width="94" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Catatan :]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="4e5a467f-d1a8-447d-bbaa-b50e7e127203" x="51" y="112" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[": " +$F{user}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="11a8bd4c-f668-44da-aa9f-5165f19c0989" x="429" y="112" width="71" height="20"/>
+				<textElement/>
+				<text><![CDATA[Tanggal Print]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement uuid="69996699-fe81-458c-93c2-02b55e0e0e0e" x="324" y="47" width="88" height="52" forecolor="#333333"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement uuid="a56ee051-430c-497a-a29b-70da26e1e17b" x="412" y="47" width="88" height="52" forecolor="#333333"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement uuid="cf0bca95-be91-47c0-ad13-641e4a99f5f1" x="500" y="46" width="87" height="52" forecolor="#333333"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#999999"/>
+				</graphicElement>
+			</rectangle>
+			<line>
+				<reportElement uuid="e4c8a405-695f-4b66-a691-b814c0c4b9a0" x="0" y="2" width="571" height="1"/>
+			</line>
+			<textField>
+				<reportElement uuid="e6764474-33c3-4ea0-b61e-c134a6b6ea43" x="4" y="27" width="224" height="22" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{noinvoice}!='' ? 'Invoice No : '+$F{noinvoice}+' #Rp. '+new DecimalFormat("#,###,##0.00").format($F{nilaiinvoice})
+: '']]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="21a8060d-f535-4a74-936e-96d3ec8b2e85" x="4" y="52" width="224" height="30" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{norek}!='' ? 'Transfer to :'+$F{aname}+' Norek#'+$F{aname}+'#'+$F{norek}+'#' : ' ']]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c80b0c80-d1e7-436a-812b-bf624eabd901" x="4" y="82" width="224" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Tender Type : '+$F{tendetype}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+</jasperReport>

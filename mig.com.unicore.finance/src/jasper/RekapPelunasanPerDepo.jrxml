@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RekapPelunasanPerDepo" language="groovy" pageWidth="595" pageHeight="842" columnWidth="553" leftMargin="21" rightMargin="21" topMargin="21" bottomMargin="21" uuid="1e9b0f88-a93e-4580-9c98-051b5391e6e6">
+	<property name="ireport.zoom" value="1.6105100000000017"/>
+	<property name="ireport.x" value="168"/>
+	<property name="ireport.y" value="4"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateFrom" class="java.util.Date"/>
+	<parameter name="DateTo" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[SELECT Master.* FROM (SELECT UPPER(sr.Name) AS Region, COALESCE(usr.RealName, usr.Name) AS Sales, bgr.DateDoc AS DateDoc, bg.DocumentNo AS DocNo, ry.Name AS Rayon, bgr.PaidAmt AS Cash, bgr.PaidAmtGiro AS Cheque, 0 AS Transfer FROM UNS_BillingGroup_Result bgr
+
+INNER JOIN UNS_BillingGroup bg ON bg.UNS_BillingGroup_ID = bgr.UNS_BillingGroup_ID
+INNER JOIN UNS_Rayon ry ON ry.UNS_Rayon_ID = bg.UNS_Rayon_ID
+INNER JOIN AD_User usr ON usr.AD_User_ID = bg.SalesRep_ID
+INNER JOIN AD_Org org ON org.AD_Org_ID = bgr.AD_Org_ID
+INNER JOIN C_SalesRegion sr ON sr.C_SalesRegion_ID = org.C_SalesRegion_ID
+
+WHERE sr.C_SalesRegion_ID=$P{C_SalesRegion_ID} AND bgr.DateDoc BETWEEN $P{DateFrom} AND $P{DateTo} AND bgr.DocStatus IN ('CO', 'CL')
+
+UNION
+
+SELECT UPPER(sr.Name) AS Region, COALESCE(usr.RealName, usr.Name, 'UNDEFINED SALES') AS Sales, cp.DateTrx AS DateDoc, cp.DocumentNo AS DocNo, '' AS Rayon, (CASE WHEN cp.TenderType = 'X' THEN cp.PayAmt ELSE 0 END) AS Cash, (CASE WHEN cp.TenderType = 'K' THEN cp.PayAmt ELSE 0 END) AS Cheque, (CASE WHEN cp.TenderType IN ('D', 'A') THEN cp.PayAmt ELSE 0 END) AS Transfer FROM C_Payment cp
+
+LEFT JOIN AD_User usr ON usr.AD_User_ID = cp.SalesRep_ID
+INNER JOIN AD_Org org ON org.AD_Org_ID = cp.AD_Org_ID
+INNER JOIN C_SalesRegion sr ON sr.C_SalesRegion_ID = org.C_SalesRegion_ID
+
+WHERE cp.UNS_PR_Allocation_ID IS NULL AND sr.C_SalesRegion_ID=$P{C_SalesRegion_ID} AND cp.DateTrx BETWEEN $P{DateFrom} AND $P{DateTo} AND cp.DocStatus IN ('CO', 'CL')) AS Master
+
+ORDER BY Master.Sales, Master.DateDoc, Master.DocNo]]>
+	</queryString>
+	<field name="region" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="datedoc" class="java.sql.Timestamp"/>
+	<field name="docno" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="cash" class="java.math.BigDecimal"/>
+	<field name="cheque" class="java.math.BigDecimal"/>
+	<field name="transfer" class="java.math.BigDecimal"/>
+	<variable name="t_tunai" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{cash}]]></variableExpression>
+	</variable>
+	<variable name="t_giro" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{cheque}]]></variableExpression>
+	</variable>
+	<variable name="t_tunai_sales" class="java.math.BigDecimal" resetType="Group" resetGroup="Sales" calculation="Sum">
+		<variableExpression><![CDATA[$F{cash}]]></variableExpression>
+	</variable>
+	<variable name="t_giro_sales" class="java.math.BigDecimal" resetType="Group" resetGroup="Sales" incrementType="Group" incrementGroup="Sales" calculation="Sum">
+		<variableExpression><![CDATA[$F{cheque}]]></variableExpression>
+	</variable>
+	<variable name="t_tf_sales" class="java.math.BigDecimal" resetType="Group" resetGroup="Sales" incrementType="Group" incrementGroup="Sales" calculation="Sum">
+		<variableExpression><![CDATA[$F{transfer}]]></variableExpression>
+	</variable>
+	<group name="Sales">
+		<groupExpression><![CDATA[$F{sales}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement uuid="ff78ed2a-ed7d-4c02-9e86-26ad02090465" x="0" y="0" width="553" height="17"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{sales}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Sales" pattern="#,##0.00">
+					<reportElement uuid="94f38358-2ade-4cd1-a8a7-5c4b173a60b7" x="280" y="1" width="88" height="15"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{t_tunai_sales}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Sales" pattern="#,##0.00">
+					<reportElement uuid="94f38358-2ade-4cd1-a8a7-5c4b173a60b7" x="370" y="1" width="84" height="15"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{t_giro_sales}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Sales" pattern="#,##0.00">
+					<reportElement uuid="94f38358-2ade-4cd1-a8a7-5c4b173a60b7" x="454" y="1" width="84" height="15"/>
+					<box leftPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{t_tf_sales}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="5">
+				<line>
+					<reportElement uuid="c371a72c-313d-4f95-bd06-deb0882ce275" x="0" y="0" width="555" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.5"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement uuid="57d68e3b-e710-412c-a570-e49f2c0e23ed" x="0" y="0" width="553" height="40"/>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["REKAP PELUNASAN " + $F{region} +
+"\nPER TANGGAL " + new SimpleDateFormat("dd/MM/yyyy").format($P{DateFrom}) +
+" s/d " + new SimpleDateFormat("dd/MM/yyyy").format($P{DateTo})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="c371a72c-313d-4f95-bd06-deb0882ce275" x="0" y="39" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="22">
+			<staticText>
+				<reportElement uuid="c84cc7ca-404d-4f94-ac6c-754dbbca327d" x="0" y="7" width="111" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="35ffec9b-2ea9-4b8e-920a-f9a1e45bbbca" x="111" y="7" width="84" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<text><![CDATA[Dokumen]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="04f21cf8-fbd4-45c5-b8d8-77d1e457f501" x="195" y="7" width="85" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<text><![CDATA[Rayon]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bbeb89bd-e709-4f38-ad06-6c76ec7ba5ea" x="280" y="7" width="88" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<text><![CDATA[Tunai]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="93c487d3-3a3a-430c-8fb4-e294f0881858" x="370" y="7" width="84" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<text><![CDATA[Giro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="93c487d3-3a3a-430c-8fb4-e294f0881858" x="454" y="7" width="84" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<text><![CDATA[Transfer]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="2a67218b-4788-486b-961a-8ad7778acb03" x="0" y="0" width="111" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{datedoc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e3e12768-6927-412e-8738-8eebc2197511" x="111" y="0" width="84" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{docno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a907b73f-e4d6-4abb-be9d-80b565ed19d4" x="195" y="0" width="85" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="94f38358-2ade-4cd1-a8a7-5c4b173a60b7" x="280" y="0" width="88" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{cash}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="68180cde-011e-4fe5-bd82-7f3209110f7d" x="370" y="0" width="84" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{cheque}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="68180cde-011e-4fe5-bd82-7f3209110f7d" x="454" y="0" width="84" height="15"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{transfer}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="84">
+			<staticText>
+				<reportElement uuid="d538c2b4-cef1-4433-a83f-7ab05af24043" x="0" y="0" width="185" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Yang Membuat, ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="eeaa5887-2691-4069-a9ef-0a69ce313dcd" x="185" y="0" width="185" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Yang Memeriksa, ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="17f5d472-ab51-4dc1-a7dc-9df0a37c4979" x="368" y="0" width="185" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Yang Menerima, ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bfbfa8d9-0f68-4938-b316-ee1db79efc81" x="185" y="64" width="185" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[(.............................................................)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4e16b016-f196-42f8-8ae1-3368defd03d5" x="368" y="64" width="185" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[(.............................................................)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="69bed6e5-8aac-4ec1-bfb7-9e09d363db82" x="0" y="64" width="185" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[(.............................................................)]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement uuid="5b8748c9-17a9-48de-aaee-03f9ed9b8c7f" x="333" y="0" width="111" height="20"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{t_tunai}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="2f8b5932-2bbd-4764-a688-faf8688c3978" x="444" y="0" width="109" height="20"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{t_giro}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

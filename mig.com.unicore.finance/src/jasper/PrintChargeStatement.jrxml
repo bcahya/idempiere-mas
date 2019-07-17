@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintBankCashLine" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="34f5ba20-279a-483a-abcf-77457045aa83">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<parameter name="C_Charge_ID" class="java.lang.Integer"/>
+	<parameter name="C_BankAccount_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select org.name as nmorg,cg.name as nmcharge, sum(amountap) as amountap, sum(amountar) as amountar,
+sr.name,cb.name as nmbank
+from chargestatement_v cv
+inner join c_charge cg on cg.c_charge_id=cv.charge
+inner join ad_org org on org.ad_org_id=cv.aorg
+left join c_salesregion sr on sr.c_salesregion_id=$P{C_SalesRegion_ID}
+left join ad_user u on u.ad_user_id =$P{AD_User_ID}
+inner join c_bankaccount cb on cb.c_bankaccount_id=cv.c_bankaccount_id
+where cv.dacc between $P{StartDate} and $P{EndDate}
+and (case when $P{C_Charge_ID}!=0 or $P{C_Charge_ID} is not null then cg.C_Charge_ID=$P{C_Charge_ID} else 1=1 end)
+and cv.aorg in(select ad_org_id from ad_org where c_salesregion_id=$P{C_SalesRegion_ID})
+and (case when $P{C_BankAccount_ID}!=0 or $P{C_BankAccount_ID} is not null then cb.C_BankAccount_ID=$P{C_BankAccount_ID} else 1=1 end)
+group by cg.c_charge_id,org.name,sr.c_salesregion_id,cv.C_BankAccount_ID,cb.name
+order by org.name]]>
+	</queryString>
+	<field name="nmorg" class="java.lang.String"/>
+	<field name="nmcharge" class="java.lang.String"/>
+	<field name="amountap" class="java.math.BigDecimal"/>
+	<field name="amountar" class="java.math.BigDecimal"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="nmbank" class="java.lang.String"/>
+	<variable name="no" class="java.lang.Integer" resetType="Group" resetGroup="orgname" calculation="Count">
+		<variableExpression><![CDATA[$V{orgname_COUNT}+1]]></variableExpression>
+	</variable>
+	<group name="orgname">
+		<groupExpression><![CDATA[$F{nmorg}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField>
+					<reportElement x="14" y="0" width="184" height="13" uuid="cfe10bdd-74d0-4d49-b2d0-967a64234f7c"/>
+					<textFieldExpression><![CDATA[$F{nmorg}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="nmbank">
+		<groupExpression><![CDATA[$F{nmbank}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement x="51" y="0" width="238" height="14" uuid="0b3c1c85-79ea-4916-8be1-336b5236c7ba"/>
+					<textFieldExpression><![CDATA["Bank / Kas -> "+$F{nmbank}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="4"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="20" uuid="4fc104b9-c0ad-41a1-a7f8-174857e105fb"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Report Charge Statement]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="20" width="572" height="14" uuid="397890a5-1411-4fcc-81da-5baf5fa51385"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Dari Tanggal : "+new SimpleDateFormat("dd-MM-yyyy").format($P{StartDate})+" s/d "+new SimpleDateFormat("dd-MM-yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="34" width="71" height="14" uuid="ba7bd2b1-71a5-4329-bc78-154126617a5f"/>
+				<text><![CDATA[Sales Region ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="48" width="71" height="14" uuid="17a6299a-c78e-4f29-98bd-8528647dc00c"/>
+				<text><![CDATA[Charge           ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="71" y="34" width="288" height="14" uuid="0a85e79f-9129-4c77-827d-046e6f559706"/>
+				<textFieldExpression><![CDATA[": "+$P{C_SalesRegion_ID}==0 || $P{C_SalesRegion_ID}== null ?  "All" :$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="71" y="48" width="343" height="14" uuid="bf56333d-cc41-428d-9450-390d8ce3d114"/>
+				<textFieldExpression><![CDATA[": "+$P{C_Charge_ID}==0 || $P{C_Charge_ID}== null ?  "All" :$F{nmcharge}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="33" height="13" uuid="fb379906-6a7f-4148-a975-265976ee1141"/>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="0" width="280" height="13" uuid="324d936b-16f4-4b08-85c1-dc1ff11c4d61"/>
+				<text><![CDATA[Nama Charge]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="313" y="0" width="86" height="13" uuid="4581d342-b786-4055-883c-fddda30ae2ba"/>
+				<text><![CDATA[Account Receipt]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="468" y="0" width="86" height="13" uuid="63f8e762-f8dc-4148-a99b-8f6542a07d05"/>
+				<text><![CDATA[Account Payment]]></text>
+			</staticText>
+			<line>
+				<reportElement x="2" y="16" width="570" height="1" uuid="33046da7-b9fe-47c0-8f4f-d174e6dcc425"/>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="454" y="0" width="100" height="17" uuid="6e421cb9-620f-462e-bcad-17430d6a4032"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{amountap}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="299" y="0" width="115" height="17" uuid="85872077-25e5-4604-bdfb-29a031459e6b"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{amountar}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="33" y="0" width="266" height="17" uuid="9193849d-f6ec-4478-a441-817cda41c7dc"/>
+				<textFieldExpression><![CDATA[$F{nmcharge}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="27" height="17" uuid="a254d0cb-0a3c-48cf-ab68-5230d852858f"/>
+				<textFieldExpression><![CDATA[$V{no}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

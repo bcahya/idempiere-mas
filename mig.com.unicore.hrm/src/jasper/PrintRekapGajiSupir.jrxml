@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintRekapGajiSupir" language="groovy" pageWidth="612" pageHeight="396" orientation="Landscape" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c329b958-f9b5-44bc-8964-ffc279bb7a0d">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="86"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UNS_Employee_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+sp.DocumentNo AS docnosp,
+sp.datedoc as datesp,
+sps.datedoc as datesps,
+sps.DocumentNo as docnosps,
+ar.name as vehicleno,
+drv.name as driver,
+sp.helper1 as helper1,
+sp.helper2 as helper2,
+sp.helper3 as helper3,
+hlp1.name as helperid1,
+hlp2.name as helperid2,
+hlp3.name as helperid3,
+city.name as sporigin,
+cit.name as spsorigin,
+cty.name as spdestination,
+citty.name as spsdestination
+
+FROM uns_shipping sps
+
+INNER JOIN UNS_Shipping sp ON sp.UNS_Shipping_Reff_ID=sps.UNS_Shipping_ID
+INNER JOIN UNS_Armada ar ON ar.UNS_Armada_ID=sp.UNS_Armada_ID
+INNER JOIN UNS_Employee drv ON drv.UNS_Employee_ID=sp.UNS_Employee_ID
+LEFT JOIN C_City city ON city.C_City_ID=sp.Origin_ID
+LEFT JOIN C_City cit ON city.C_City_ID=sps.Origin_ID
+LEFT JOIN C_City cty ON cty.C_City_ID=sp.Destination_ID
+LEFT JOIN C_City citty ON citty.C_City_ID=sps.Destination_ID
+LEFT JOIN UNS_Employee hlp1 ON hlp1.UNS_Employee_ID=sp.helper1_id
+LEFT JOIN UNS_Employee hlp2 ON hlp2.UNS_Employee_ID=sp.helper2_id
+LEFT JOIN UNS_Employee hlp3 ON hlp3.UNS_Employee_ID=sp.helper3_id
+
+WHERE sps.docstatus in ('CO','CL') AND sp.docstatus in ('CO','CL') AND (CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN sp.DateDoc >= $P{DateFrom}::timestamp AND sp.DateDoc <= $P{DateTo}::timestamp WHEN $P{DateTo}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN sp.DateDoc >= $P{DateFrom}::timestamp AND sp.datedoc <= now() ::timestamp  WHEN $P{DateTo}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN sp.DateDoc <= $P{DateTo}::timestamp ELSE 1=1 END) AND $P{UNS_Employee_ID}=drv.UNS_Employee_ID AND (CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN sps.DateDoc >= $P{DateFrom}::timestamp AND sps.DateDoc <= $P{DateTo}::timestamp WHEN $P{DateTo}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN sps.DateDoc >= $P{DateFrom}::timestamp AND sps.datedoc <= now() ::timestamp  WHEN $P{DateTo}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN sps.DateDoc <= $P{DateTo}::timestamp ELSE 1=1 END)
+
+order by sp.datedoc, sps.datedoc]]>
+	</queryString>
+	<field name="docnosp" class="java.lang.String"/>
+	<field name="datesp" class="java.sql.Timestamp"/>
+	<field name="datesps" class="java.sql.Timestamp"/>
+	<field name="docnosps" class="java.lang.String"/>
+	<field name="vehicleno" class="java.lang.String"/>
+	<field name="driver" class="java.lang.String"/>
+	<field name="helper1" class="java.lang.String"/>
+	<field name="helper2" class="java.lang.String"/>
+	<field name="helper3" class="java.lang.String"/>
+	<field name="helperid1" class="java.lang.String"/>
+	<field name="helperid2" class="java.lang.String"/>
+	<field name="helperid3" class="java.lang.String"/>
+	<field name="sporigin" class="java.lang.String"/>
+	<field name="spsorigin" class="java.lang.String"/>
+	<field name="spdestination" class="java.lang.String"/>
+	<field name="spsdestination" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="56" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="10" width="572" height="26" uuid="94529e0f-4d23-4501-b4a1-b51f1648d0f9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Rekap Gaji]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="162" y="36" width="60" height="20" uuid="2fe10976-f2fa-4560-97d9-d66250ecfeed"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[PERIODE  :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="222" y="36" width="225" height="20" uuid="b530676a-e444-4b1d-b0fe-34337cecf0f8"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DateFrom} == null && $P{DateTo} == null ? "All Times":
+$P{DateFrom} != null && $P{DateTo} == null ? new SimpleDateFormat("dd-MM-yyyy").format$P{DateFrom} +"- Today":
+$P{DateFrom} != null && $P{DateTo} != null ? new SimpleDateFormat("dd-MM-yyyy").format$P{DateFrom}+ " - " +new SimpleDateFormat("dd-MMMMM-yyyy").format$P{DateTo}:
+$P{DateFrom} == null && $P{DateTo} != null ? "Until " +new SimpleDateFormat("dd-MM-yyyy").format$P{DateTo}: ""]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="459" y="0" width="113" height="20" uuid="3e6760b2-e70d-4761-93ff-8b206d27345c"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCore ERP]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="54">
+			<staticText>
+				<reportElement x="0" y="12" width="72" height="20" uuid="a8795ee7-88ac-4d11-8e82-1c0ab3f96afc"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Driver       :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="74" y="12" width="157" height="20" uuid="43387be3-5f93-4637-8496-9c7dcb9ea199"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{driver}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="32" width="72" height="20" uuid="1773e38c-b61d-4718-b10c-d66c15dcb31b"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No Polisi  :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="74" y="31" width="100" height="20" uuid="096ca4d3-d6e1-4576-b2ea-6ec915b28af7"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vehicleno}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="116" height="20" uuid="3145863a-9a84-4837-a453-024c392d7c0f"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[TANGGAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="116" y="0" width="81" height="20" uuid="47de916b-e206-4279-a42d-a052921fdc77"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[DOCUMENT NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="196" y="0" width="134" height="20" uuid="a3ca0f65-9b2c-4288-8ed1-404f876dcdcb"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[TUJUAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="459" y="0" width="113" height="20" uuid="2db67f42-5843-44d3-9e54-febdb3147e80"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[KENEK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="0" width="129" height="20" uuid="e3117d1c-b63f-426f-a168-ca2a1951d6e8"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[BIAYA]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="40" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="33" y="20" width="83" height="20" uuid="950be24b-7c36-47f8-8c63-89bae93e2e1d"/>
+				<box>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{datesp}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="116" y="20" width="81" height="20" uuid="c33fea99-a7de-411f-9aea-5552b8218ade"/>
+				<box>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{docnosp}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="33" height="20" uuid="070a61fa-e4ba-44d2-9423-26995e89e649"/>
+				<box leftPadding="5" rightPadding="5">
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Pergi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="33" height="20" uuid="c135fb81-ed7b-463d-8514-d86b588f27ac"/>
+				<box leftPadding="5" rightPadding="5">
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Pulang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="459" y="0" width="113" height="20" uuid="166a5273-2e9d-478d-9aba-b23f66ce6d89"/>
+				<box>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="459" y="20" width="113" height="20" uuid="d5f4001d-f4a9-4022-99d6-76a5814df017"/>
+				<box>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="33" y="0" width="83" height="20" uuid="0115e982-a3aa-4c15-8f16-201846fe8dbe"/>
+				<box>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{datesps}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="116" y="0" width="81" height="20" uuid="142a6832-2d2c-408d-ba59-7911973d835f"/>
+				<box>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{docnosps}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="196" y="0" width="134" height="20" uuid="1993f46e-1543-46aa-bb91-ef82c522621c"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sporigin} == null && $F{spdestination} ==null ? ''
+: $F{sporigin}+ " - " +$F{spdestination}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="196" y="20" width="134" height="20" uuid="54c2e7b7-b695-410d-8c49-8325f8f9e32d"/>
+				<box leftPadding="3" rightPadding="3">
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{spsorigin} == null && $F{spsdestination} ==null ? ''
+: $F{spsorigin}+ " - " +$F{spsdestination}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="330" y="20" width="129" height="20" uuid="edeb51a4-7d3d-4711-b0e7-083fe522210f"/>
+				<box>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="0" width="129" height="20" uuid="a4b2c702-482f-4db6-be67-269243d4cdf1"/>
+				<box>
+					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="50">
+			<textField>
+				<reportElement x="459" y="30" width="80" height="20" uuid="9192081e-6f6e-46f9-858d-9d38df905b89"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="539" y="30" width="40" height="20" uuid="b46b077b-908c-40eb-8750-f35983ffe7be"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="330" height="20" uuid="c87fa5b7-4637-40a3-98bb-44d42f42005a"/>
+				<box rightPadding="7">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Total "+ $F{driver}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="330" y="0" width="129" height="20" uuid="d526ffa3-eece-4ff0-bb69-d64aef11306f"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="459" y="0" width="113" height="20" uuid="f632e0ec-271a-4107-a9d1-934bcffebf0d"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="572" height="20" uuid="03235d3b-bb90-4d4f-a9ab-2174354ea0fe"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Catatan : Bonus akan diberikan apabila supir kooperatif dan memenuhi peraturan yang berlaku di perusahaan]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

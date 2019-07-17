@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportGiro" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="812" leftMargin="10" rightMargin="20" topMargin="10" bottomMargin="5" uuid="d687dc0a-9598-460c-92d4-c26fe54724be">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["E:\\work\\UntaCore@FLG\\com.unicore.finance\\src\\jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateFrom" class="java.util.Date"/>
+	<parameter name="DateTo" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="Status" class="java.lang.String"/>
+	<parameter name="GiroType" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT 1]]>
+	</queryString>
+	<field name="?column?" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="200">
+			<subreport runToBottom="true">
+				<reportElement x="0" y="0" width="802" height="200" uuid="fb4e5124-fba0-4cec-af27-cdb13152c8bf">
+					<printWhenExpression><![CDATA[$P{GiroType} == null || $P{GiroType} =='']]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="DateFrom">
+					<subreportParameterExpression><![CDATA[$P{DateFrom}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DateTo">
+					<subreportParameterExpression><![CDATA[$P{DateTo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_User_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_User_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Status">
+					<subreportParameterExpression><![CDATA[$P{Status}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="GiroType">
+					<subreportParameterExpression><![CDATA[$P{GiroType}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportGiro_Subreport3.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport runToBottom="true">
+				<reportElement x="0" y="0" width="802" height="200" uuid="04310a44-1ed1-4ab8-8b78-829022040fd7">
+					<printWhenExpression><![CDATA[$P{GiroType}=='GM']]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="GiroType">
+					<subreportParameterExpression><![CDATA[$P{GiroType}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Status">
+					<subreportParameterExpression><![CDATA[$P{Status}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DateTo">
+					<subreportParameterExpression><![CDATA[$P{DateTo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DateFrom">
+					<subreportParameterExpression><![CDATA[$P{DateFrom}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_User_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_User_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportGiro_Subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport runToBottom="true">
+				<reportElement x="0" y="0" width="802" height="200" uuid="f0a6c21c-dd92-4099-a091-85d616e48d42">
+					<printWhenExpression><![CDATA[$P{GiroType}=='GK']]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="DateFrom">
+					<subreportParameterExpression><![CDATA[$P{DateFrom}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="DateTo">
+					<subreportParameterExpression><![CDATA[$P{DateTo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AD_User_ID">
+					<subreportParameterExpression><![CDATA[$P{AD_User_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Status">
+					<subreportParameterExpression><![CDATA[$P{Status}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="GiroType">
+					<subreportParameterExpression><![CDATA[$P{GiroType}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReportGiro_Subreport2.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

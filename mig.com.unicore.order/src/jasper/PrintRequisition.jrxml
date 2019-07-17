@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintRequisition" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2e7f7b4c-f683-4731-a64e-4eaee059b957">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="83"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select org.name as org,cb.name as nmvendor,mr.documentno as noreq,mr.daterequired as tgl,mp.name as nmbrg,mr.priorityrule,
+uomconversiontostr(mp.m_product_id,ml.qty) as sqty
+from M_Requisition as mr
+left join M_RequisitionLine ml on ml.m_requisition_id=mr.m_requisition_id
+left join m_product mp on mp.m_product_id=ml.m_product_id
+left join ad_org org on org.ad_org_id=mr.ad_org_id
+left join c_bpartner_product cp on cp.m_product_id=mp.m_product_id
+left join c_bpartner cb on cb.c_bpartner_id=cp.c_bpartner_id
+where mr.daterequired between  $P{StartDate} and $P{EndDate}
+and mr.docstatus in('CO','CL')
+order by org.name,mr.documentno,cb.name]]>
+	</queryString>
+	<field name="org" class="java.lang.String"/>
+	<field name="nmvendor" class="java.lang.String"/>
+	<field name="noreq" class="java.lang.String"/>
+	<field name="tgl" class="java.sql.Timestamp"/>
+	<field name="nmbrg" class="java.lang.String"/>
+	<field name="priorityrule" class="java.lang.String"/>
+	<field name="sqty" class="java.lang.String"/>
+	<group name="org">
+		<groupExpression><![CDATA[$F{org}]]></groupExpression>
+		<groupHeader>
+			<band height="13">
+				<textField>
+					<reportElement x="0" y="0" width="141" height="11" uuid="35655bf0-25f8-4b20-b44d-6ba51fb8ab3e"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="noreq">
+		<groupExpression><![CDATA[$F{noreq}]]></groupExpression>
+		<groupHeader>
+			<band height="14">
+				<textField>
+					<reportElement x="44" y="0" width="59" height="11" uuid="538a37a9-d7bc-4055-893d-e78b37648d83"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{noreq}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="103" y="0" width="65" height="11" uuid="0468ea57-dbaa-4ade-84e2-ea42f7586490"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tgl}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="8">
+				<line>
+					<reportElement x="0" y="3" width="572" height="1" uuid="ca4951b9-8004-471d-867e-bb9bf78bea8a"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="vendor">
+		<groupExpression><![CDATA[$F{nmvendor}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement x="103" y="0" width="220" height="11" uuid="1a2365bd-92e6-4103-b208-46324383a58b"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmvendor}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="52" splitType="Stretch">
+			<staticText>
+				<reportElement x="472" y="0" width="100" height="12" uuid="5f1fc7d6-8acb-4a14-9b3c-1e2483cf8b2a"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="20" width="572" height="11" uuid="464574be-143e-4963-9ac4-87612a3ad0fe"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode :  "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+" s/d "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="20" uuid="4e1dba03-7abb-40df-8b5c-44ee424a5d29"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Requisition Order]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="37" width="52" height="11" uuid="52a34f70-2cea-4bc1-b92d-6a24f39ebd59"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Organitation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="55" y="37" width="52" height="11" uuid="b8d92714-64c0-4212-a02c-7e03bf27708f"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No.Req]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="107" y="37" width="52" height="11" uuid="dfb04b8a-09ae-48b2-b475-b4b07263d1b9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl.Req]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="159" y="37" width="172" height="11" uuid="5fcd3f26-8a5b-4959-9ccb-abed1ddee1df"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="331" y="37" width="103" height="11" uuid="e07e765c-18b9-4dd3-b5cd-2a7b708eca93"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty Requisition]]></text>
+			</staticText>
+			<line>
+				<reportElement x="3" y="49" width="569" height="1" uuid="69501b7f-d340-47d0-ac81-17bbacbc53d1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="452" y="20" width="80" height="20" uuid="a0dbdc05-d7f5-4219-98d9-79611f41a23d"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="532" y="20" width="40" height="20" uuid="0272785f-64fe-4c1c-b92b-50dd1373f8da"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement x="141" y="0" width="190" height="11" uuid="841993a1-bb93-43c7-b798-665111643648"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmbrg}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="331" y="0" width="103" height="11" uuid="dd7121cf-06b8-4870-b30a-aad792ba7da8"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sqty}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="8" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="569" height="1" uuid="92651f11-fae3-4318-8510-2486ff8ed237"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="78">
+			<staticText>
+				<reportElement x="427" y="64" width="108" height="14" uuid="1b1c1a55-2f0d-4f0b-9437-739fee4ebab7"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[(                                             )]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="427" y="0" width="108" height="14" uuid="2bab6179-6b5b-4f3a-8be6-596b8956bdd2"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Dibuat Oleh,]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+</jasperReport>

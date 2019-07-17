@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RiwayatPembelianBarang" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="570c42fd-d966-4f55-816c-15e6ad158d00">
+	<property name="ireport.zoom" value="0.75"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AD_Org_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="M_Product_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+od.DateOrdered AS tglPO,
+od.DocumentNo AS noPO,
+org.Name AS orgPO,
+bp.Name AS vendorPO,
+pd.Name AS barangPO,
+cg.Name AS cgPO,
+ol.qtyordered as qtyPO,
+uom.uomsymbol as uomPO,
+req.DocumentNo AS DocNoReq,
+io.DocumentNo AS DocNoMM,
+io.MovementDate AS TglMM,
+pdmm.Name AS barangMM,
+uommm.UomSymbol AS UomMM,
+iol.QtyEntered AS QtyMM,
+wh.Name AS GudangMM
+
+FROM C_Order od
+
+INNER JOIN C_OrderLine ol on ol.C_Order_ID=od.C_Order_ID
+INNER JOIN AD_Org org on org.AD_Org_ID=od.AD_Org_ID
+INNER JOIN C_BPartner bp on bp.C_BPartner_ID=od.C_BPartner_ID
+LEFT OUTER JOIN M_Product pd on pd.M_Product_ID=ol.M_Product_ID
+LEFT OUTER JOIN C_Charge cg on cg.C_Charge_ID=ol.C_Charge_ID
+INNER JOIN C_UOM uom on uom.C_Uom_ID=ol.C_Uom_ID
+LEFT Outer JOIn M_RequisitionLine reql on reql.C_OrderLine_ID=ol.C_OrderLine_ID
+LEFT OUTER JOIN M_Requisition req on  req.M_Requisition_ID=reql.M_Requisition_ID
+LEFT OUTER JOIN M_InOutLine iol on iol.C_OrderLine_ID=ol.C_OrderLine_ID
+LEFT OUTER JOIN M_InOut io on io.M_InOut_ID=iol.M_InOut_ID
+INNER JOIN M_Product pdmm on pdmm.M_Product_ID=iol.M_Product_ID
+INNER JOIN C_Uom uommm on uommm.C_Uom_ID=iol.C_Uom_ID
+INNER JOIN M_Warehouse wh on wh.M_Warehouse_ID=io.M_Warehouse_ID
+
+WHERE od.IsSOTrx='N' AND (CASE WHEN $P{C_BPartner_ID} IS NOT NULL THEN bp.C_BPartner_ID = $P{C_BPartner_ID} ELSE 1=1 END)
+AND (CASE WHEN $P{DateFrom}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NOT NULL THEN od.dateordered >= $P{DateFrom}::timestamp AND od.dateordered <= $P{DateTo}::timestamp WHEN $P{DateTo}::timestamp IS NOT NULL AND $P{DateTo}::timestamp IS NULL THEN od.dateordered >= $P{DateFrom}::timestamp WHEN $P{DateTo}::timestamp IS NULL AND $P{DateTo}::timestamp IS NOT NULL THEN od.dateordered <= $P{DateTo}::timestamp ELSE 1=1 END)
+
+ORDER BY od.DateOrdered, od.DocumentNo]]>
+	</queryString>
+	<field name="tglpo" class="java.sql.Timestamp"/>
+	<field name="nopo" class="java.lang.String"/>
+	<field name="orgpo" class="java.lang.String"/>
+	<field name="vendorpo" class="java.lang.String"/>
+	<field name="barangpo" class="java.lang.String"/>
+	<field name="cgpo" class="java.lang.String"/>
+	<field name="qtypo" class="java.math.BigDecimal"/>
+	<field name="uompo" class="java.lang.String"/>
+	<field name="docnoreq" class="java.lang.String"/>
+	<field name="docnomm" class="java.lang.String"/>
+	<field name="tglmm" class="java.sql.Timestamp"/>
+	<field name="barangmm" class="java.lang.String"/>
+	<field name="uommm" class="java.lang.String"/>
+	<field name="qtymm" class="java.math.BigDecimal"/>
+	<field name="gudangmm" class="java.lang.String"/>
+	<group name="POGroup">
+		<groupExpression><![CDATA[$F{nopo}]]></groupExpression>
+		<groupHeader>
+			<band height="77">
+				<staticText>
+					<reportElement x="129" y="57" width="154" height="20" uuid="70366c16-12c7-4682-9976-6faa64c17c10"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Nama Barang]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="283" y="57" width="42" height="20" uuid="650ebef2-d852-4569-a8e9-4c383ae04891"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Jumlah]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="325" y="57" width="82" height="20" uuid="8889d77a-80aa-4c42-9990-5f18a5b80b5c"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Tanggal Terima]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="407" y="57" width="88" height="20" uuid="b0a307e9-1c3f-46ab-845f-918bb2996dcb"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[No, Penerimaan]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="653" y="57" width="209" height="20" uuid="1f573934-3220-4131-b75b-0b8c93a40451"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Nama Barang]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="862" y="57" width="50" height="20" uuid="0741e710-65e9-413f-8f6e-daa52fdebc79"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Jumlah]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="24" width="81" height="15" uuid="38c6cc6c-3d64-4309-ab49-4744f5ac8c72"/>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Tanggal PO]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="48" y="57" width="81" height="20" uuid="446dfff3-faac-4d20-8bc7-145114625316"/>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Dashed"/>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+						<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[No. PO]]></text>
+				</staticText>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="97" y="24" width="130" height="15" uuid="cdf51bc1-6628-43f3-8ae2-8b91142891ac"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{tglpo}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="38" width="81" height="15" uuid="3b3bdbd6-654e-403b-9564-b738af8275fb"/>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Toko]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="81" y="24" width="16" height="15" uuid="977a77f4-64a2-40ff-a95f-2f1227d0e6ad"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="495" y="57" width="158" height="20" uuid="2d46e967-0b17-4d71-a750-196424bc7607"/>
+					<box>
+						<topPen lineWidth="0.5" lineStyle="Dashed"/>
+						<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Gudang]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true">
+					<reportElement x="97" y="38" width="186" height="15" isPrintWhenDetailOverflows="true" uuid="8df11e38-6dce-464e-b604-8261046eb711"/>
+					<textFieldExpression><![CDATA[$F{vendorpo}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="81" y="38" width="16" height="15" uuid="cffe0928-3133-4cdf-ac88-85d6bbeb7d2d"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="36" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="968" height="36" uuid="56107178-d9d3-4482-ad6a-2cfbc5cf0997"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RIWAYAT PEMBELIAN BARANG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="868" y="0" width="100" height="20" uuid="aea77f87-1213-4921-803e-64b079b95024"/>
+				<textElement textAlignment="Right">
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreERP]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="129" y="0" width="154" height="15" uuid="e96ac36c-f0c7-4a87-acdf-73819b92a1ba"/>
+				<textFieldExpression><![CDATA[$F{barangpo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="283" y="0" width="21" height="15" uuid="a680d980-dc07-4907-b561-67cbba6e1598"/>
+				<textFieldExpression><![CDATA[$F{qtypo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="304" y="0" width="21" height="15" uuid="35f38030-08f8-4c2a-aadf-3abbdd59885f"/>
+				<textFieldExpression><![CDATA[$F{uompo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="325" y="0" width="82" height="15" uuid="1a350318-8b49-4411-9339-c98bd7065da7"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{tglmm}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="407" y="0" width="88" height="15" uuid="38d6e7c1-bee8-49e0-85fd-127f518fe849"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{docnomm}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="653" y="0" width="209" height="15" uuid="505e5aa5-eb3f-4268-94fa-d70616072dc1"/>
+				<textFieldExpression><![CDATA[$F{barangmm}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="862" y="0" width="22" height="15" uuid="b500fb42-eb5e-4b8f-8b38-61b6b4153feb"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{qtymm}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="884" y="0" width="28" height="15" uuid="9354fd0f-3aff-47cc-a723-a6619c3793a9"/>
+				<textFieldExpression><![CDATA[$F{uommm}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="495" y="0" width="158" height="15" uuid="06875b2d-7351-43a4-9615-1143fc36b857"/>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{gudangmm}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="48" y="1" width="81" height="15" uuid="fe5e2ee1-a37a-4b3b-b055-5d8e505759f8"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nopo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

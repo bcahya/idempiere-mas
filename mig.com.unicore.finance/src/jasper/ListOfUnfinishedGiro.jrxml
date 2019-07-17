@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ListOfUnfinishedGiro" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ac644ce5-96d5-491e-ad3e-8fa5e1e21531">
+	<property name="ireport.zoom" value="1.210000000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="isAlreadyOverDue" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ByDate" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT bg.Name AS Giro, bp.Name AS Partner, b.Name AS Bank, us.Name AS Sales, bg.ReceiptDate AS Receipt, bg.DueDate AS DueDate, bg.LimitAmt AS Total, bg.UNS_CustomerBG_ID AS ID FROM UNS_CustomerBG bg
+
+LEFT JOIN UNS_CustomerBG_Action bga ON bga.UNS_CustomerBG_ID = bg.UNS_CustomerBG_ID
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID = bg.C_BPartner_ID
+INNER JOIN C_Bank b ON b.C_Bank_ID = bg.C_Bank_ID
+INNER JOIN AD_User us ON us.AD_User_ID = COALESCE(bg.SalesRep_ID, bg.CreatedBy)
+INNER JOIN AD_Org org ON org.AD_Org_ID = bg.AD_Org_ID AND org.C_SalesRegion_ID = $P{C_SalesRegion_ID}
+
+WHERE bg.DocStatus NOT IN ('VO', 'RE') AND (CASE WHEN $P{isAlreadyOverDue} = 'Y' THEN bg.DueDate <= now() ELSE 1=1 END) AND (CASE WHEN $P{ByDate} = 'RD' THEN bg.ReceiptDate BETWEEN $P{DateFrom} AND $P{DateTo} WHEN $P{ByDate} = 'DD' THEN bg.DueDate BETWEEN $P{DateFrom} AND $P{DateTo} WHEN $P{ByDate} = bga.Action AND bga.UNS_CustomerBG_Action_ID IS NOT NULL THEN bga.DateDoc BETWEEN $P{DateFrom} AND $P{DateTo} END)
+
+ORDER BY DueDate ASC]]>
+	</queryString>
+	<field name="giro" class="java.lang.String"/>
+	<field name="partner" class="java.lang.String"/>
+	<field name="bank" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="receipt" class="java.sql.Timestamp"/>
+	<field name="duedate" class="java.sql.Timestamp"/>
+	<field name="total" class="java.math.BigDecimal"/>
+	<field name="id" class="java.lang.Integer"/>
+	<variable name="number" class="java.lang.Integer">
+		<variableExpression><![CDATA[$V{number} == null ? 1 : $V{number} + 1]]></variableExpression>
+	</variable>
+	<variable name="sum_amount" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{total}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="4097e2f1-cee6-46fd-ba3b-b2bc48c39fe2" x="0" y="0" width="555" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[List Of Unfinished Giro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="48c444d7-1561-451b-85b0-24d916534c4a" x="474" y="0" width="78" height="20"/>
+				<textElement>
+					<font size="8" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCore ERP]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="a19b4e4b-a01d-4b16-bd65-78c98eb98f69" x="0" y="20" width="555" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd-MM-yyyy").format($P{DateFrom}) + " - " +new SimpleDateFormat("dd-MM-yyyy").format($P{DateTo})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="9cf63b81-92bf-474f-b8b2-b88bd1c40df9" x="25" y="40" width="56" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Giro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9e73f3aa-8712-457d-8a9f-49ea7c857d63" x="80" y="40" width="132" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Customer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="802bc875-5005-433c-8ae7-d8feed86b2c2" x="211" y="40" width="79" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Bank]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="661405af-6cb7-4710-91e7-6da2618d36ab" x="289" y="40" width="79" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Sales / Admin]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="18c6daa6-0d3f-46c1-8218-9c7e7b2c5156" x="367" y="40" width="60" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Receipt]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="86340d81-24bb-4399-aac9-65b667f99cb7" x="426" y="40" width="60" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Due Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6ea6b463-ff4e-4a4f-b633-c30a094f72f8" x="485" y="40" width="70" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9cf63b81-92bf-474f-b8b2-b88bd1c40df9" x="0" y="40" width="26" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="2ee2ec0a-db37-4a04-93e9-057b70d7998a" x="0" y="59" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="9f1cf2ca-68f6-4a7c-bebc-b5d3da693ab5" x="25" y="0" width="56" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{giro}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="981fe9b8-22e5-4d13-8bbc-1ee6b402e504" x="80" y="0" width="132" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{partner}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8bba0520-25a4-4453-aa1d-3618008e0c00" x="211" y="0" width="79" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{bank}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a19b4e4b-a01d-4b16-bd65-78c98eb98f69" x="289" y="0" width="79" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sales}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="0e807b84-69b0-4233-a0d4-42bc05c76b30" x="367" y="0" width="60" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{receipt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="04b170e5-c1c1-4b9a-a7ad-45bff4118c0d" x="426" y="0" width="60" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{duedate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="9f1cf2ca-68f6-4a7c-bebc-b5d3da693ab5" x="0" y="0" width="26" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{number}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="2ee2ec0a-db37-4a04-93e9-057b70d7998a" x="0" y="19" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</line>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="9c5d29e0-cd43-44ff-aff5-cb3134f64c4d" x="485" y="0" width="70" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement uuid="ccca88d5-e9d6-46a7-a31b-b94d86748b24" x="485" y="0" width="70" height="20"/>
+				<box leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sum_amount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportPenjualanPerBusinessPartnerPerArea" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e49cd171-c022-4cbf-8fa2-41fa1d3660fd">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="C_BPartner_Location_ID" class="java.lang.Integer"/>
+	<parameter name="UNS_Rayon_ID" class="java.lang.Integer"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<parameter name="UNS_Pasar_ID" class="java.lang.Integer"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select now() as tglskrg,us.name as nmctk,cbl.bpartnername as nmcust,cbs.name as nmsupp,ry.name as rayon,ps.name as nmpasar,mp.name as namebrg,
+uomconversiontostr(mp.m_product_id,sum(cl.qtyentered)) as qty,sum(cl.discountamt) as discount,sum(cl.linenetamt) as tfak,
+data.tfak as ttfak
+from(
+select cbl.C_BPartner_Location_ID,sum(cl.linenetamt) as tfak
+from c_invoice ci
+left join c_invoiceline cl on cl.c_invoice_id=ci.c_invoice_id
+left join c_bpartner_location cbl on cbl.c_bpartner_location_id=ci.c_bpartner_location_id
+LEFT JOIN uns_rayon ry on ry.uns_rayon_id=cbl.uns_rayon_id
+left join uns_pasar ps on ps.uns_pasar_id=cbl.uns_pasar_id
+left join m_product mp on mp.m_product_id=cl.m_product_id
+left join C_BPartner_Product cbp on cbp.m_product_id=mp.m_product_id
+where ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+and (ci.c_doctype_id IN ( SELECT c_doctype.c_doctype_id FROM c_doctype WHERE c_doctype.docbasetype = 'ARI')) and ci.docstatus in('CO','CL')
+and ci.ad_org_id in(select ad_org_id from ad_org where  CASE WHEN $P{C_SalesRegion_ID} IS NOT NULL THEN c_salesregion_id=$P{C_SalesRegion_ID} ELSE 1=1 END)
+and (case when $P{UNS_Rayon_ID}!=0 or $P{UNS_Rayon_ID} is not null then
+ry.uns_rayon_id=$P{UNS_Rayon_ID} else 1=1 end)
+and (case when $P{C_BPartner_Location_ID}!=0 or $P{C_BPartner_Location_ID} is not null then cbl.C_BPartner_Location_ID=$P{C_BPartner_Location_ID} else 1=1 end)
+and (case when $P{C_BPartner_ID}!=0 or $P{C_BPartner_ID} is not null then
+cbp.C_BPartner_ID=$P{C_BPartner_ID} else 1=1 end)
+
+group by cbl.C_BPartner_Location_ID
+order by tfak desc) as data
+
+left join c_bpartner_location cbl on cbl.c_bpartner_location_id=data.c_bpartner_location_id
+left join c_invoice ci on ci.c_bpartner_location_id=cbl.c_bpartner_location_id
+left join c_invoiceline cl on cl.c_invoice_id=ci.c_invoice_id
+LEFT JOIN m_product mp on mp.m_product_id=cl.m_product_id
+LEFT JOIN uns_rayon ry on ry.uns_rayon_id=cbl.uns_rayon_id
+left join ad_user ad on ad.ad_user_id=ci.salesrep_id
+left join uns_pasar ps on ps.uns_pasar_id=cbl.uns_pasar_id
+left join ad_user us on us.ad_user_id=$P{AD_User_ID}
+left join C_BPartner_Product cbp on cbp.m_product_id=mp.m_product_id
+left join C_BPartner cbs on cbs.C_BPartner_ID=cbp.C_BPartner_ID
+where ci.dateinvoiced between $P{StartDate} and $P{EndDate}
+and (ci.c_doctype_id IN ( SELECT c_doctype.c_doctype_id FROM c_doctype WHERE c_doctype.docbasetype = 'ARI')) and ci.docstatus in('CO','CL')
+and ci.ad_org_id in(select ad_org_id from ad_org where  CASE WHEN $P{C_SalesRegion_ID} IS NOT NULL THEN c_salesregion_id=$P{C_SalesRegion_ID} ELSE 1=1 END)
+and (case when $P{UNS_Rayon_ID}!=0 or $P{UNS_Rayon_ID} is not null then
+ry.uns_rayon_id=$P{UNS_Rayon_ID} else 1=1 end)
+and (case when $P{C_BPartner_ID}!=0 or $P{C_BPartner_ID} is not null then
+cbp.C_BPartner_ID=$P{C_BPartner_ID} else 1=1 end)
+group by cbl.bpartnername,ry.name,us.name,ps.name,mp.name,mp.m_product_id,data.tfak,cbs.name
+order by ttfak desc]]>
+	</queryString>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="nmctk" class="java.lang.String"/>
+	<field name="nmcust" class="java.lang.String"/>
+	<field name="nmsupp" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="nmpasar" class="java.lang.String"/>
+	<field name="namebrg" class="java.lang.String"/>
+	<field name="qty" class="java.lang.String"/>
+	<field name="discount" class="java.math.BigDecimal"/>
+	<field name="tfak" class="java.math.BigDecimal"/>
+	<field name="ttfak" class="java.math.BigDecimal"/>
+	<variable name="Rayon" class="java.lang.String"/>
+	<variable name="tfak_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tfak}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="69">
+			<staticText>
+				<reportElement x="680" y="3" width="74" height="12" uuid="12a85ba5-e053-4a40-9830-49865fc27042"/>
+				<textElement textAlignment="Right">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="27" width="151" height="13" uuid="9bdf394c-db00-4e15-a17e-0a030b412aef"/>
+				<box leftPadding="20"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Rayon]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="754" height="17" uuid="3fb1fe3f-a659-46f5-850d-4a464a709748"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Laporan Pareto Per Pasar]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="151" y="40" width="277" height="13" uuid="2f770d86-3e90-45ca-afca-1ce28ab80690"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{UNS_Pasar_ID}==0 || $P{UNS_Pasar_ID}== null ?  ": All" : ": "+$F{nmpasar}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="15" width="754" height="12" uuid="dbdd0bad-1558-487a-b540-6b2c06f6187b"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode :  "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+" s/d "+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="151" y="27" width="277" height="13" uuid="bf831d77-99d1-424c-b8ec-cfd1100299fc"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{UNS_Rayon_ID}==0 || $P{UNS_Rayon_ID}== null ?  ": All" : ": "+$F{rayon}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="40" width="151" height="13" uuid="ef29686a-111c-42ed-a98f-a1b99e783337"/>
+				<box leftPadding="20"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Pasar]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="151" y="53" width="277" height="13" uuid="0207a9a7-4777-4277-90b2-cd571500ca32"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{C_BPartner_Location_ID}==0 || $P{C_BPartner_Location_ID}==null ?  ": All" : ": "+$F{nmcust}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="53" width="151" height="13" uuid="9ec2da00-be39-4827-8662-225bcc7809ae"/>
+				<box leftPadding="20"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Business Partner]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="27" width="119" height="13" uuid="843fd938-63c7-4000-99ea-7940d154e822"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Prinsiple ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="547" y="27" width="205" height="13" uuid="85b2a560-fce3-4b31-b211-4937fa527b98"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{C_BPartner_ID}==0 || $P{C_BPartner_ID}==null ?  ": All" : ": "+$F{nmsupp}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="27">
+			<staticText>
+				<reportElement x="151" y="13" width="184" height="14" uuid="2ebc9bd2-0386-4d55-9887-448b1ae6603b"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="13" width="151" height="14" uuid="3715cd2a-1c6e-46da-b868-a13473bb515e"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[Business Partner]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="335" y="13" width="93" height="14" uuid="a3edecd9-e581-4577-af6c-809ea887ac4f"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[Rayon / Area]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="13" width="119" height="14" uuid="bf092e79-4dba-4186-8403-2c3be3c63f96"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[Nama Pasar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="547" y="13" width="97" height="14" uuid="481d5731-211e-4ed6-8098-6767f1b99c56"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[Qty Dalam Satuan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="644" y="13" width="108" height="14" uuid="8b598033-703e-43ac-a285-545bdb1fb2e9"/>
+				<box leftPadding="3" rightPadding="3">
+					<topPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Jumlah]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13">
+			<textField>
+				<reportElement x="0" y="0" width="151" height="13" uuid="24b7bce2-c15d-4eb7-b382-4e43dd5bd651"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmcust}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="335" y="0" width="93" height="13" uuid="9a724c1e-490f-4dd0-bc5b-67cf0de5199c"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="428" y="0" width="119" height="13" uuid="1d39e646-bdba-49e0-b8cf-cbd2a569ee16"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmpasar}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="151" y="0" width="184" height="13" uuid="41e3d6e6-9698-47bb-8d3b-d0145fa230cb"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namebrg}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="547" y="0" width="97" height="13" uuid="423913cf-7c7f-4d74-b3c1-8a91f4c83373"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="644" y="0" width="108" height="13" uuid="2b94a7a3-5dcd-4961-b5c6-ea9b9f1d972c"/>
+				<box leftPadding="3" rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tfak}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="16">
+			<textField pattern="#,##0.00">
+				<reportElement x="547" y="0" width="205" height="16" uuid="2693354a-3f27-4c6f-9576-7c9d2f2b6868"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{tfak_1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="547" height="16" uuid="0228938d-bc21-4ed5-917e-353d69c8cb70"/>
+				<box>
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.5" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Grand Total     :]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

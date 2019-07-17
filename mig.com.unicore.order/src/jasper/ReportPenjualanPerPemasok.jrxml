@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportPenjualanPerPemasok" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" uuid="75e2fe3f-a3e3-4116-a4c4-42ee0c01d879">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select cb.name as nm_supp,mp.name as namabarang,sum(cl.qtyentered) as qty,sum(cl.linenetamt) as tfak,
+uom.name as Satuan1,now() as tglskrg,u.name as nama
+from m_product mp
+left join c_invoiceline cl on  mp.m_product_id=cl.m_product_id
+left join c_invoice ci on ci.c_invoice_id=cl.c_invoice_id
+left join c_uom uom on uom.c_uom_id=mp.uomconversionl1_id
+left join c_bpartner_product mpp on mpp.m_product_id=mp.m_product_id
+left join c_bpartner cb on cb.c_bpartner_id=mpp.c_bpartner_id
+left join ad_user u on u.ad_user_id = $P{AD_User_ID}
+where cb.isvendor='Y' and
+ci.dateinvoiced>=$P{StartDate} and ci.dateinvoiced<=$P{EndDate}
+group by cb.name,mp.name,uom.name,u.name
+order by cb.name,sum(cl.linenetamt) asc]]>
+	</queryString>
+	<field name="nm_supp" class="java.lang.String"/>
+	<field name="namabarang" class="java.lang.String"/>
+	<field name="qty" class="java.math.BigDecimal"/>
+	<field name="tfak" class="java.math.BigDecimal"/>
+	<field name="satuan1" class="java.lang.String"/>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="nama" class="java.lang.String"/>
+	<variable name="NoUrut" class="java.lang.Integer" incrementType="Group" incrementGroup="Pemasok" calculation="Count">
+		<variableExpression><![CDATA[new Integer("1")]]></variableExpression>
+		<initialValueExpression><![CDATA[new Integer("0")]]></initialValueExpression>
+	</variable>
+	<variable name="TtlSupp" class="java.math.BigDecimal" resetType="Group" resetGroup="Pemasok" calculation="Sum">
+		<variableExpression><![CDATA[$F{tfak}]]></variableExpression>
+	</variable>
+	<group name="Pemasok">
+		<groupExpression><![CDATA[$F{nm_supp}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement x="35" y="1" width="176" height="11" uuid="7d35af53-d561-4748-a070-79cea30a6cfa"/>
+					<textElement>
+						<font size="8" isUnderline="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nm_supp}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="2" y="0" width="22" height="12" uuid="d4fdf62b-3fd9-48be-a645-88ecf9e1a130"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{NoUrut}.intValue()+1
+]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="13">
+				<textField pattern="#,##0.00">
+					<reportElement x="595" y="1" width="100" height="11" uuid="5775ea07-fa84-47a7-980d-97d53550c0a6"/>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TtlSupp}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="161" y="5" width="191" height="1" uuid="d04d348e-53ff-41b6-bd1d-2bbafd178c24"/>
+				</line>
+				<textField>
+					<reportElement x="352" y="0" width="228" height="12" uuid="c1ed163d-f670-4546-bc63-8fa964391336"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA['Sub Total : '+$F{nm_supp}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="63" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="2" width="244" height="14" uuid="0cf49909-8e63-48cc-bb26-c67d0f983ecf"/>
+				<text><![CDATA[Print Penjualan Per Pemasok]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="16" width="244" height="20" uuid="f0df0563-3d15-4574-80e2-9689340240be"/>
+				<textFieldExpression><![CDATA['Periode :  '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' s/d '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="652" y="2" width="100" height="14" uuid="af6bf9dd-3592-4b94-9a45-ed5341aef9c4"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[IdempiereUntaSoft]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="47" width="24" height="11" uuid="c0fe4047-5570-4491-8e46-b9de36a085b1"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="35" y="47" width="176" height="11" uuid="eadf6cee-37d0-4ca4-9d30-01ce13143d4c"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Pemasok]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="216" y="47" width="108" height="11" uuid="9c24f87f-2818-42ec-8ab8-9144a0d1f144"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Barang ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="463" y="47" width="52" height="11" uuid="05710e7c-7152-4c18-bacb-a1bee6c9c751"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Qty]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="520" y="47" width="60" height="11" uuid="f75ef3be-356d-4a80-8593-e38e4a7763d8"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Satuan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="595" y="47" width="100" height="11" uuid="c1e324a7-5daa-4342-9e32-9502c81047d0"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total Netto]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="627" y="17" width="80" height="11" uuid="f48084c9-1c94-4c86-9a30-b70573e12f0a"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="707" y="17" width="40" height="11" uuid="11965cde-2ad5-4762-a6ab-70e1f925b08b"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="221" y="0" width="242" height="11" uuid="106b5548-87f8-4660-b753-3ad589244b9c"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{namabarang}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="463" y="0" width="52" height="12" uuid="1601a1e2-fcf9-4156-a746-6f84bd8b63c8"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="520" y="0" width="60" height="12" uuid="de11279a-4867-4c40-af27-ba63ca584b5e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{satuan1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="595" y="0" width="100" height="12" uuid="d458c389-7203-4f66-a69f-215ffa503c49"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tfak}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="18" splitType="Stretch">
+			<textField>
+				<reportElement x="434" y="3" width="100" height="11" uuid="9d24b240-a427-4c7e-a625-9cc0bcbbbcb2"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Print Date '+
+new SimpleDateFormat('dd/MM/yyyy').format($F{tglskrg})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="554" y="3" width="100" height="11" uuid="d65ad7d3-8dda-4252-b744-e539fa3994fb"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA['Print By : '+$F{nama}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="2" y="7" width="432" height="1" uuid="82250b8f-8501-4221-a34d-50a28378c12a"/>
+			</line>
+		</band>
+	</pageFooter>
+</jasperReport>

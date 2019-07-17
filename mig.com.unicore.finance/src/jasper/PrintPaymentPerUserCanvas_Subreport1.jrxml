@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintPaymentPerUserCanvas_Subreport1" language="groovy" pageWidth="610" pageHeight="394" columnWidth="580" leftMargin="10" rightMargin="20" topMargin="10" bottomMargin="5" uuid="148a206f-30aa-474b-acab-96bbcca053b1">
+	<property name="ireport.zoom" value="2.415765000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT data.name as nmbank,sum(data.payamt) as bayar FROM (
+SELECT bc.name,
+ pa.paytooverunderamount as payamt
+FROM
+ c_paymentallocate pa
+INNER JOIN  c_invoice i ON i.c_invoice_id = pa.c_invoice_id and i.c_invoice_id in(select c_invoice_id from  UNS_Cvs_Rpt)
+INNER JOIN  c_paymentterm pt on pt.c_paymentterm_id = i.c_paymentterm_id
+INNER JOIN  c_payment p ON p.c_payment_id = pa.c_payment_id
+INNER JOIN  c_bpartner bp ON bp.c_bpartner_id = p.c_bpartner_id
+LEFT JOIN c_bpartner_location cl on cl.c_bpartner_location_id =i.c_bpartner_location_id
+left join c_charge ch on ch.c_charge_id=p.c_charge_id
+left join c_bankaccount bc on bc.c_bankaccount_id=p.c_bankaccount_id
+left join ad_user sal on sal.ad_user_id=i.salesrep_id
+left join ad_user u on u.ad_user_id = $P{AD_User_ID}
+WHERE p.datetrX=$P{StartDate}
+and p.tendertype='X'
+and p.docstatus in('CO','CL')
+and p.uns_pr_allocation_id is null
+and p.c_order_id is null
+and p.c_doctype_id in(select c_doctype_id from c_doctype  where docbasetype='ARR')
+and p.ad_org_id in(select ad_org_id from ad_org where c_salesregion_id=$P{C_SalesRegion_ID})
+) data
+group by data.name]]>
+	</queryString>
+	<field name="nmbank" class="java.lang.String"/>
+	<field name="bayar" class="java.math.BigDecimal"/>
+	<group name="group bank">
+		<groupExpression><![CDATA[$F{nmbank}]]></groupExpression>
+		<groupFooter>
+			<band height="12">
+				<textField>
+					<reportElement uuid="b74bc938-7edd-4131-a026-f89ace4031f4" x="0" y="0" width="108" height="12"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nmbank}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="72c5458c-e132-4e3e-b0aa-06f8cb76d5b6" x="108" y="0" width="56" height="12"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{bayar}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+</jasperReport>

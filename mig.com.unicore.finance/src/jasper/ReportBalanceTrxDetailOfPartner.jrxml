@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportBalanceTrxDetailOfPartner" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cb0d8f10-d6e0-4595-a404-ff749ba42b39">
+	<property name="ireport.zoom" value="1.3310000000000015"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="C_BPartner_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT bp.Name AS Partner, Master.* FROM (SELECT iv.DocumentNo AS DocNo, iv.DateInvoiced AS DateTrx, (CASE WHEN dt.DocBaseType IN ('ARI', 'APC') THEN iv.GrandTotal ELSE 0 END) AS Debt, (CASE WHEN dt.DocBaseType IN ('API', 'ARC') THEN iv.GrandTotal ELSE 0 END) AS Credit, (CASE WHEN dt.DocBaseType = 'API' THEN 'AP Invoice' WHEN dt.DocBaseType = 'ARC' THEN 'Credit Memo' ELSE '' END) AS CreditType, COALESCE(us.RealName, us.Name) AS Sales FROM C_Invoice iv
+INNER JOIN C_DocType dt ON dt.C_DocType_ID = iv.C_DocType_ID
+INNER JOIN AD_User us ON us.AD_User_ID = iv.SalesRep_ID
+WHERE iv.C_Invoice_ID IN
+(SELECT inv.C_Invoice_ID FROM C_Invoice inv
+WHERE inv.DocStatus IN ('CO', 'CL') AND inv.C_BPartner_ID = $P{C_BPartner_ID} AND (EXISTS (SELECT 1 FROM UNS_AuditDocument ad WHERE ad.C_Invoice_ID = inv.C_Invoice_ID AND EXISTS (SELECT 1 FROM UNS_AuditPartner ap WHERE ap.UNS_AuditPartner_ID = ad.UNS_AuditPartner_ID AND ap.UNS_Audit_ID = getLastAudit(inv.C_BPartner_ID, inv.AD_Org_ID))) OR inv.DateInvoiced > (SELECT a.DateAcct FROM UNS_Audit a WHERE a.UNS_Audit_ID = getLastAudit(inv.C_BPartner_ID, inv.AD_Org_ID))))
+
+UNION ALL
+
+SELECT p.DocumentNo AS DocNo, p.DateTrx AS DateTrx, (CASE WHEN p.IsReceipt = 'N' THEN abs(pa.Amount - pa.DiscountAmt - pa.WriteOffAmt) ELSE 0 END) AS Debt, (CASE WHEN p.IsReceipt = 'Y' THEN abs(pa.Amount - pa.DiscountAmt - pa.WriteOffAmt) ELSE 0 END) AS Credit, (CASE WHEN p.TenderType = 'X' THEN 'CASH' WHEN p.TenderType = 'K' THEN 'GIRO (' || p.CheckNo || ')'  ELSE 'TRANSFER' END) AS CreditType, COALESCE(us.RealName, us.Name, '') AS Sales FROM C_Payment p
+INNER JOIN C_PaymentAllocate pa ON pa.C_Payment_ID = p.C_Payment_ID
+LEFT JOIN AD_User us ON us.AD_User_ID = p.SalesRep_ID
+WHERE p.DocStatus IN ('CO', 'CL') AND pa.C_Invoice_ID IN (SELECT inv.C_Invoice_ID FROM C_Invoice inv WHERE inv.DocStatus IN ('CO', 'CL') AND inv.C_BPartner_ID = $P{C_BPartner_ID} AND (EXISTS (SELECT 1 FROM UNS_AuditDocument ad WHERE ad.C_Invoice_ID = inv.C_Invoice_ID AND EXISTS (SELECT 1 FROM UNS_AuditPartner ap WHERE ap.UNS_AuditPartner_ID = ad.UNS_AuditPartner_ID AND ap.UNS_Audit_ID = getLastAudit(inv.C_BPartner_ID, inv.AD_Org_ID))) OR inv.DateInvoiced > (SELECT a.DateAcct FROM UNS_Audit a WHERE a.UNS_Audit_ID = getLastAudit(inv.C_BPartner_ID, inv.AD_Org_ID))))) AS Master
+
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID = $P{C_BPartner_ID}
+
+ORDER BY Master.DateTrx ASC]]>
+	</queryString>
+	<field name="partner" class="java.lang.String"/>
+	<field name="docno" class="java.lang.String"/>
+	<field name="datetrx" class="java.sql.Timestamp"/>
+	<field name="debt" class="java.math.BigDecimal"/>
+	<field name="credit" class="java.math.BigDecimal"/>
+	<field name="credittype" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<variable name="sum_debit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{debt}]]></variableExpression>
+	</variable>
+	<variable name="sum_credit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{credit}]]></variableExpression>
+	</variable>
+	<variable name="balance" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{balance} == null ? $F{debt}.subtract($F{credit}) : ($V{balance}.add($F{debt})).subtract($F{credit})]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="45" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="0fa623e9-28a5-45ab-8746-8ff291984f9e" x="0" y="0" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Balance Transaction Report - Detail Of Partner]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7545bf3a-23af-4d70-9e4d-934125551f85" x="471" y="0" width="84" height="10"/>
+				<textElement>
+					<font size="7" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaERP System]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="c2deab8c-d6c0-48d0-a142-e76ae14de1c2" x="0" y="21" width="555" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{partner}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="6875cb62-be33-474d-b424-4a92af646ce6" x="0" y="0" width="70" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Document No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cf663f53-c5ff-4271-ac50-9dfa949d7c32" x="70" y="0" width="68" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="328e6775-8d51-44b2-8967-25d346e4848f" x="138" y="0" width="88" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Debit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1e4383c4-451c-4dd9-84c2-74be18de1a11" x="226" y="0" width="87" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Credit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0490b194-6524-42ab-bb0d-02d5a3e2c137" x="401" y="0" width="66" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Credit Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0490b194-6524-42ab-bb0d-02d5a3e2c137" x="467" y="0" width="88" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sales]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1e4383c4-451c-4dd9-84c2-74be18de1a11" x="313" y="0" width="88" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Balance]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="5fa412b1-39b8-42d8-a120-b856cd2dec25" x="0" y="0" width="70" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{docno}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="68204814-d000-404b-825d-554bbacf4536" x="70" y="0" width="68" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{datetrx}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="34e1d1f2-980c-4107-81c0-edf848266ed9" x="138" y="0" width="88" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{debt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="140ecf42-80b9-43d3-b6dd-a6abf1097bf9" x="226" y="0" width="87" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{credit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="58598536-5173-4ba1-96f2-71585528e792" x="401" y="0" width="66" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{credittype}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="51b7aa1c-ea4c-41a8-a834-285c73e59723" x="467" y="0" width="88" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{sales}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="140ecf42-80b9-43d3-b6dd-a6abf1097bf9" x="313" y="0" width="88" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{balance}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement uuid="140ecf42-80b9-43d3-b6dd-a6abf1097bf9" x="226" y="0" width="87" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sum_credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="34e1d1f2-980c-4107-81c0-edf848266ed9" x="138" y="0" width="88" height="20"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sum_debit}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

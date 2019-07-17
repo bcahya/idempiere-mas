@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportGajiProduksi" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dfa97198-2ffd-41d5-b209-ae7bd65c4921">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="12"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="AD_Org_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select data.orgname,data.worker,data.jabatan,sum(data.stdl) as stdl,sum(data.stdm) as stdm,sum(data.stds) as stds,sum(data.stdss) stdss,
+sum(gaji) as trupiah
+from
+(--PACKER manual
+SELECT org.name as orgname,pr.productiondate as tglproduksi,em.name as worker,job.name as jabatan,pt.name as
+nmtarget,pt.targetmin as trgmin,pt.targetmax as trgmax,pt.payableamt as trupah,pr.productionqty as
+qtyproduksi,wkr.productionqty as qtywrk,
+pt.payableamt*case when pr.productionqty<=pt.targetmax and pr.productionqty>=pt.targetmin then 1 else 0 end as gaji,
+case when pr.productionqty>=pt.targetmin and pr.productionqty<=pt.targetmax then 1 else 0 end as std,
+case when wkr.productionqty>300 then 1 else 0 end as stdl,
+case when wkr.productionqty>=201 and wkr.productionqty<=300 then 1 else 0 end as stdm,
+case when wkr.productionqty>=126 and wkr.productionqty<=200 then 1 else 0 end as stds,
+case when wkr.productionqty<=125 then 1 else 0 end as stdss
+FROM UNS_Production pr
+left join m_product mp on mp.m_product_id=pr.m_product_id
+left join UNS_Production_Worker wk on wk.uns_production_id=pr.uns_production_id
+left join UNS_Production_WorkerResult wkr on wkr.uns_production_worker_id=wk.uns_production_worker_id
+left join uns_employee em on em.uns_employee_id=wk.labor_id
+left join UNS_ProductionPayConfig pc on pc.uns_productionpayconfig_id=pr.uns_productionpayconfig_id
+left join UNS_PayRollLine py on py.uns_productionpayconfig_id=pc.uns_productionpayconfig_id and  py.uns_job_role_id=wk.uns_job_role_id
+left join uns_payrollpremitarget pt on pt.uns_payrollline_id=py.uns_payrollline_id
+left join uns_job_role job on job.uns_job_role_id=wk.uns_job_role_id
+left join ad_org org on org.ad_org_id=pr.ad_org_id
+WHERE pr.isworkerbase='Y' and  mp.M_Product_ID in(1002880) and pr.productiondate between $P{StartDate} and $P{EndDate} and org.AD_Org_ID=$P{AD_Org_ID}
+and pr.DocStatus in('CO','CL')
+union all
+---packer mesin
+SELECT org.name as orgname,pr.productiondate as tglproduksi,em.name as worker,job.name as jabatan,pt.name as
+nmtarget,pt.targetmin as trgmin,pt.targetmax as trgmax,pt.payableamt as trupah,pr.productionqty as
+qtyproduksi,0 as qtywrk,pt.payableamt*case when pr.productionqty>=pt.targetmin and pr.productionqty<=pt.targetmax then 1 else 0 end as gaji,
+case when pr.productionqty>=pt.targetmin and pr.productionqty<=pt.targetmax then 1 else 0 end as std,
+case when pr.productionqty>=1200 then 1 else 0 end as stdl,
+case when pr.productionqty>=600 and pr.productionqty<=1199 then 1 else 0 end as stdm,
+case when pr.productionqty>=401 and pr.productionqty<=599 then 1 else 0 end as stds,
+case when pr.productionqty<=400 then 1 else 0 end as stdss
+FROM UNS_Production pr
+left join m_product mp on mp.m_product_id=pr.m_product_id
+left join UNS_Production_Worker wk on wk.uns_production_id=pr.uns_production_id
+left join uns_employee em on em.uns_employee_id=wk.labor_id
+left join UNS_ProductionPayConfig pc on pc.uns_productionpayconfig_id=pr.uns_productionpayconfig_id
+left join UNS_PayRollLine py on py.uns_productionpayconfig_id=pc.uns_productionpayconfig_id and py.uns_job_role_id=wk.uns_job_role_id
+left join uns_payrollpremitarget pt on pt.uns_payrollline_id=py.uns_payrollline_id
+left join uns_job_role job on job.uns_job_role_id=wk.uns_job_role_id
+left join ad_org org on org.ad_org_id=pr.ad_org_id
+WHERE pr.isworkerbase='Y' and mp.M_Product_ID in(1002831,1002833,1003064,1003476,1003066) and pr.productiondate between $P{StartDate} and $P{EndDate} and org.AD_Org_ID=$P{AD_Org_ID}
+and pr.DocStatus in('CO','CL')
+---produksi mesin
+union all
+SELECT org.name as orgname,pr.productiondate as tglproduksi,em.name as worker,job.name as jabatan,pt.name as nmtarget,pt.targetmin as trgmin,pt.targetmax as trgmax,pt.payableamt as trupah,pr.productionqty as qtyproduksi,0 as qtywrk,pt.payableamt*case when pr.productionqty>=pt.targetmin and pr.productionqty<=pt.targetmax then 1 else 0 end as gaji,
+case when pr.productionqty>=pt.targetmin and pr.productionqty<=pt.targetmax then 1 else 0 end as std,
+case when pr.productionqty>=3000 then 1 else 0 end as stdl,
+case when pr.productionqty>=2800 and pr.productionqty<=2999 then 1 else 0 end as stdm,
+case when pr.productionqty>=2200 and pr.productionqty<=2799 then 1 else 0 end as stds,
+case when pr.productionqty<=2199 then 1 else 0 end as stdss
+FROM UNS_Production pr
+inner join m_product mp on mp.m_product_id=pr.m_product_id
+inner join UNS_Production_Worker wk on wk.uns_production_id=pr.uns_production_id
+inner join uns_employee em on em.uns_employee_id=wk.labor_id
+inner join UNS_ProductionPayConfig pc on pc.uns_productionpayconfig_id=pr.uns_productionpayconfig_id
+inner join UNS_PayRollLine py on wk.uns_job_role_id=py.uns_job_role_id and py.uns_productionpayconfig_id=pc.uns_productionpayconfig_id
+inner join uns_payrollpremitarget pt on pt.uns_payrollline_id=py.uns_payrollline_id
+inner join uns_job_role job on job.uns_job_role_id=wk.uns_job_role_id
+left join ad_org org on org.ad_org_id=pr.ad_org_id
+WHERE pr.isworkerbase='Y' and mp.M_Product_ID NOT IN(1002880,1002831,1002833,1003064,1003476,1003066) and pr.productiondate between $P{StartDate} and $P{EndDate} and org.AD_Org_ID=$P{AD_Org_ID}
+and pr.DocStatus in('CO','CL')) as data
+where data.std!=0
+group by data.orgname,data.worker,data.jabatan
+order by data.jabatan,data.worker]]>
+	</queryString>
+	<field name="orgname" class="java.lang.String"/>
+	<field name="worker" class="java.lang.String"/>
+	<field name="jabatan" class="java.lang.String"/>
+	<field name="stdl" class="java.lang.Long"/>
+	<field name="stdm" class="java.lang.Long"/>
+	<field name="stds" class="java.lang.Long"/>
+	<field name="stdss" class="java.lang.Long"/>
+	<field name="trupiah" class="java.math.BigDecimal"/>
+	<variable name="tterima" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{trupiah}]]></variableExpression>
+	</variable>
+	<variable name="nourut" class="java.lang.Integer" resetType="Group" resetGroup="Jabatan" calculation="Count">
+		<variableExpression><![CDATA[new Integer('1')]]></variableExpression>
+	</variable>
+	<group name="Jabatan">
+		<groupExpression><![CDATA[$F{jabatan}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField>
+					<reportElement x="165" y="1" width="244" height="13" uuid="903107fd-636a-4cd4-9b2d-a11674092fb3"/>
+					<textFieldExpression><![CDATA[$F{jabatan}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="135" y="13" width="211" height="1" uuid="7a08689e-4884-412c-b30e-c68b026cfc0a"/>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="4">
+				<line>
+					<reportElement x="2" y="0" width="413" height="1" uuid="1fede4a0-eafb-4838-b4e9-e8680e8e415f"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="101" splitType="Stretch">
+			<rectangle>
+				<reportElement x="2" y="72" width="800" height="29" uuid="3dac744a-755c-440c-8044-91ab469f2cb3"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="802" height="24" uuid="26abb794-5026-4658-a297-45ac79c74cad"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Laporan Gaji Produksi]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="24" width="802" height="20" uuid="db901f3f-631b-4a08-85fb-2e425a7951d1"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{orgname}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="702" y="0" width="100" height="20" uuid="fbb0906f-5eaa-46c0-ab81-34ea5bbd656c"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[UntaCoreERP]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="2" y="44" width="304" height="20" uuid="3e02268b-f8cc-4588-bc5d-981cadd83d29"/>
+				<textFieldExpression><![CDATA["Periode Tanggal : "+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+' s/d '+
+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="8" y="81" width="30" height="20" uuid="01b420e5-4f9b-455b-a487-173d56033247"/>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="81" width="119" height="20" uuid="66ed7634-6985-495d-95fd-ffb0e959c48a"/>
+				<text><![CDATA[Jabatan ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="46" y="81" width="164" height="20" uuid="fd0f1649-1b59-4a21-8fe8-d0b12a3dd14f"/>
+				<text><![CDATA[Nama Karyawan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="72" width="62" height="29" uuid="44d6cce4-6de5-46a9-a1dc-cc390cc8150d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None"/>
+				<text><![CDATA[Grade 1 / STD L]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="353" y="72" width="62" height="29" uuid="dada74bd-a319-4a84-b522-b26d9a84b27f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None"/>
+				<text><![CDATA[Grade 2 / STD M]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="418" y="72" width="62" height="29" uuid="0ea1d615-9b7d-49ed-8da3-822c448fc341"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None"/>
+				<text><![CDATA[Grade 3 / STD S]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="486" y="72" width="62" height="29" uuid="81182b42-4177-4ffb-b8ae-2979406dae7a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None"/>
+				<text><![CDATA[Grade 4 / STD SS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="548" y="72" width="90" height="29" uuid="28e69968-e9d3-48db-8f6b-1f6e629c22fc"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None"/>
+				<text><![CDATA[Jumlah Diterima]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="638" y="72" width="151" height="29" uuid="390147af-9cf2-4046-b9db-fa624eb55de8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None"/>
+				<text><![CDATA[Tanda Tangan]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement x="46" y="0" width="119" height="15" uuid="d6122daf-9b33-4e4e-acb9-10938d450ca8"/>
+				<textFieldExpression><![CDATA[$F{worker}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="548" y="0" width="77" height="14" uuid="9b9a5787-07f2-491c-8479-530073454ede"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{tterima}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="638" y="13" width="151" height="1" uuid="2dcd52cb-065c-47e3-bc26-cbf57dd3e85e"/>
+				<graphicElement>
+					<pen lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="8" y="2" width="30" height="13" uuid="9cab0bd1-9660-40e0-9bfc-3700eaf9a7fb"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{nourut}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="284" y="1" width="62" height="13" uuid="22aead1b-41d9-4cf7-870f-74260696163a"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{stdl}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="354" y="1" width="61" height="13" uuid="7325353a-9505-48a2-85c0-173f23793c5a"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{stdm}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="418" y="1" width="62" height="13" uuid="7b709478-d47a-4ea8-9db3-1cfbf39a7fb2"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{stds}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="486" y="1" width="62" height="13" uuid="924e4fea-7e38-4216-be57-5e3eda94ff6f"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{stdss}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="17" splitType="Stretch">
+			<textField>
+				<reportElement x="646" y="0" width="80" height="13" uuid="c1d6d6cc-de34-4152-9b56-5cf2c5aefcb4"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="726" y="0" width="40" height="13" uuid="f52fdc8c-a139-455f-9c73-0a820e97ba63"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="592" y="13" width="197" height="1" uuid="e568bf75-f83e-45d9-a362-7ba32dc68c25"/>
+			</line>
+		</band>
+	</pageFooter>
+</jasperReport>

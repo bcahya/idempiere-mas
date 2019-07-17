@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PrintFormPackingList" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8e4c44e0-946f-46cc-9238-ac6b7ada1e6b">
+	<property name="ireport.zoom" value="1.3995221406292"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="StartDate" class="java.util.Date"/>
+	<parameter name="EndDate" class="java.util.Date"/>
+	<parameter name="C_SalesRegion_ID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select coalesce(sp.documentno,'-') as noshipping,coalesce(sp.driver,'-') as supir,sr.value,u.name as sales,pl.datedoc as tglpl,pl.documentno as nopl,pl.name as keterangan,ry.name as rayon
+,count(po.c_invoice_id) as ttlfaktur
+from uns_packinglist  pl
+inner join UNS_PackingList_Order po on pl.uns_packinglist_id=po.uns_packinglist_id
+inner join ad_org org on pl.ad_org_id=org.ad_org_id
+inner join c_salesregion sr on org.c_salesregion_id=sr.c_salesregion_id
+inner join ad_user u on po.salesrep_id=u.ad_user_id
+left join UNS_ShippingFreight sh on pl.uns_packinglist_id=sh.uns_packinglist_id
+left join uns_shipping sp on sh.uns_shipping_id=sp.uns_shipping_id
+left join uns_rayon ry on po.uns_rayon_id=ry.uns_rayon_id
+where pl.docstatus in('CO','CL') and  pl.datedoc between $P{StartDate} and $P{EndDate}
+and
+(Case When $P{C_SalesRegion_ID} is not null then org.ad_org_id in(select ad_org_id from ad_org where c_salesregion_id=$P{C_SalesRegion_ID}) else 1=1 end)
+group by sp.documentno,sp.driver,sr.value,u.name,pl.datedoc,pl.documentno,pl.name,ry.name
+order by sp.documentno,sp.driver,sr.value,u.name,pl.datedoc,pl.documentno,pl.name,ry.name]]>
+	</queryString>
+	<field name="noshipping" class="java.lang.String"/>
+	<field name="supir" class="java.lang.String"/>
+	<field name="value" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="tglpl" class="java.sql.Timestamp"/>
+	<field name="nopl" class="java.lang.String"/>
+	<field name="keterangan" class="java.lang.String"/>
+	<field name="rayon" class="java.lang.String"/>
+	<field name="ttlfaktur" class="java.lang.Long"/>
+	<variable name="no" class="java.lang.Integer" resetType="None" incrementType="Group" incrementGroup="packinglist" calculation="Count">
+		<variableExpression><![CDATA[$V{no} == null ? 1 : $V{no}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<group name="packinglist">
+		<groupExpression><![CDATA[$F{nopl}]]></groupExpression>
+		<groupHeader>
+			<band height="11">
+				<textField>
+					<reportElement uuid="3481964a-782d-4d03-948b-37f3af2f97fe" x="21" y="0" width="54" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{noshipping}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="dcc0e4e2-9936-4118-b43c-0144f269a966" x="75" y="0" width="65" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{supir}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement uuid="05dc8db4-1a80-4a4e-be17-26963e2923be" x="189" y="0" width="46" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tglpl}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="2484e87b-3339-40b3-a8c4-2356d28cf941" x="140" y="0" width="49" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nopl}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="1bfbfc0c-970b-49c9-970d-a48ccbe6ba24" x="235" y="0" width="141" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="b60c30ea-173b-4b25-b4a8-4ce6fc805cee" x="376" y="0" width="108" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="e8cd566f-2c16-4249-9c00-41b6e3a2b5d5" x="484" y="0" width="71" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ttlfaktur}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="2e36f0e2-67aa-40c4-a05d-16940142af0c" x="0" y="0" width="21" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{no}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="13">
+				<rectangle>
+					<reportElement uuid="6c157481-2576-4b96-a6a9-12213e898d11" x="21" y="1" width="16" height="10"/>
+				</rectangle>
+				<staticText>
+					<reportElement uuid="1b1b15c4-48af-4c78-9e97-05c582d969f2" x="39" y="0" width="100" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Document Kembali]]></text>
+				</staticText>
+				<line>
+					<reportElement uuid="19b0b339-0033-44e1-9d18-a384355ccaef" x="0" y="12" width="555" height="1"/>
+					<graphicElement>
+						<pen lineWidth="0.75"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="31" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="8b8f7945-4b14-4f70-b75a-9638c7faddd8" x="0" y="0" width="555" height="16"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Report Data Packing List]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="dda7053b-24d8-4506-8273-c5f6143fe706" x="0" y="16" width="555" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode : "+new SimpleDateFormat("dd/MM/yyyy").format($P{StartDate})+" s/d "+new SimpleDateFormat("dd/MM/yyyy").format($P{EndDate})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="11" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="4cfbbffd-7bdb-40d9-9963-c6fb6543f234" x="0" y="0" width="21" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="16768999-679a-40f0-ac59-f4a52cbfcf3e" x="21" y="0" width="54" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Shipping]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d1d06f03-5459-4c43-baef-7665ce198f5b" x="75" y="0" width="64" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Supir]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f1634a07-5859-431d-b4cf-46c2780cb019" x="140" y="0" width="49" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No. Packing]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="83c8f2a3-a3b4-480d-b777-b80889d0abb2" x="189" y="0" width="46" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tgl.Packing]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="da711ecf-f763-45dd-99d1-9994d09dbfb6" x="235" y="0" width="141" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="993bbd72-6adc-497f-adbe-6801a3d13112" x="376" y="0" width="108" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Rayon]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7886e0aa-3649-4170-a89f-6c695fb0b142" x="484" y="0" width="71" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Jml. Nota]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="5a7ad07a-1ae7-401f-a572-a4a433f95d8d" x="0" y="9" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement uuid="38e332cf-dd6e-4211-a935-d1c90b0b9535" x="235" y="0" width="100" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sales}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="edc632a2-ccfe-481c-a322-c03bf3df5a66" x="376" y="0" width="100" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rayon}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="4"/>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportGiro_Subreport1" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="68f48bec-51a1-4248-add7-f10880d64b52">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date"/>
+	<parameter name="DateTo" class="java.util.Date"/>
+	<parameter name="AD_User_ID" class="java.lang.Integer"/>
+	<parameter name="Status" class="java.lang.String"/>
+	<parameter name="GiroType" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select now () tglskrg, sl.name as sales, ad.name as nama,cg.created as tglgiro,(case when cg.disbursementdate is null then cg.duedate else cg.disbursementdate end) as tglcair,cg.duedate as tgljtempo,cba.name as nmbankgirom,coalesce(cb.name,'-') as nmbankpencairan,cb.accountno as norek,cg.name as nogiro,cg.limitamt as rpgiro,cp.name as nm_customer,
+rf.value as status,rf.name as kstatus,'Masukan' as keterangan
+from uns_customerbg as cg
+inner join uns_customerbg_action cga on cga.uns_customerbg_id=cg.uns_customerbg_id
+left join c_bank cba on cba.c_bank_id = cg.c_bank_id
+left join c_bpartner as cp on cp.c_bpartner_id=cg.c_bpartner_id
+left join c_bankaccount cb on cb.c_bankaccount_id=cga.c_bankaccount_id
+left join ad_user ad on ad.ad_user_id=$P{AD_User_ID}
+left join ad_user sl on sl.ad_user_id = cg.createdby
+left join ad_ref_list rf on rf.value= cga.action and rf.ad_reference_id = (select ar.ad_reference_id from ad_reference ar where ar.name='_Giro Action List')
+WHERE CASE WHEN cga.action IN ($P{Status}) THEN cga.action = $P{Status} ELSE 1=1 END and cg.created between $P{DateFrom} AND $P{DateTo}
+and $P{GiroType}='GM']]>
+	</queryString>
+	<field name="tglskrg" class="java.sql.Timestamp"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="nama" class="java.lang.String"/>
+	<field name="tglgiro" class="java.sql.Timestamp"/>
+	<field name="tglcair" class="java.sql.Timestamp"/>
+	<field name="tgljtempo" class="java.sql.Timestamp"/>
+	<field name="nmbankgirom" class="java.lang.String"/>
+	<field name="nmbankpencairan" class="java.lang.String"/>
+	<field name="norek" class="java.lang.String"/>
+	<field name="nogiro" class="java.lang.String"/>
+	<field name="rpgiro" class="java.math.BigDecimal"/>
+	<field name="nm_customer" class="java.lang.String"/>
+	<field name="status" class="java.lang.String"/>
+	<field name="kstatus" class="java.lang.String"/>
+	<field name="keterangan" class="java.lang.String"/>
+	<variable name="jmlgiro_1" class="java.math.BigDecimal" resetType="Group" resetGroup="bank" calculation="Sum">
+		<variableExpression><![CDATA[$F{rpgiro}]]></variableExpression>
+	</variable>
+	<group name="bank">
+		<groupExpression><![CDATA[$F{status}]]></groupExpression>
+		<groupHeader>
+			<band height="50">
+				<rectangle>
+					<reportElement uuid="2d8d583f-1f3a-45f6-a7ca-57ba04f033b4" x="0" y="21" width="752" height="20"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement uuid="a1de9bfb-009f-449a-8b5e-b326c4a454c8" x="4" y="26" width="52" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Giro]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="bbc0333a-e35d-4a37-968e-62fb8c9cdcd3" x="56" y="26" width="95" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Busines Partner]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="a4cc1ed6-aedb-4989-bb2a-fb2cfd64b09d" x="313" y="26" width="92" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Bank Pencairan]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="596fcd75-aecc-4e33-9cc1-efd67a433234" x="405" y="26" width="68" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Tgl. Giro]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="0905a481-fab9-46ef-bd08-a6a8e33091c5" x="473" y="26" width="58" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Tgl. J. Tempo]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="e2944799-5ecd-4b08-a4de-5496de1df7d5" x="531" y="26" width="59" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Tgl. Cair]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="593fc060-9e79-47b0-beb5-eedb7630f693" x="590" y="26" width="62" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Jumlah]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="094314ba-8fc4-4c96-ac11-9437cdea4969" x="652" y="26" width="100" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Keterangan]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="a4cc1ed6-aedb-4989-bb2a-fb2cfd64b09d" x="151" y="26" width="66" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Sales]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="586442a2-2ae1-430a-a006-3c844c1ceaa9" x="217" y="26" width="96" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Bank Giro]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="1701f550-0dd5-4bd5-90ad-763bdbfaf5ee" x="4" y="1" width="228" height="11"/>
+					<textElement>
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Status Giro : "+$F{kstatus}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<textField pattern="#,##0.00">
+					<reportElement uuid="ecbd786c-5d54-4ea3-b87c-b2b9a387e4dc" x="590" y="8" width="62" height="11"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{jmlgiro_1}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement uuid="0b2d23ec-c551-4c24-aab2-64889f9031c0" x="0" y="5" width="752" height="1"/>
+					<graphicElement>
+						<pen lineStyle="Dashed"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement uuid="f5aca674-fbfb-49df-ad37-f1b5d4273de5" x="530" y="8" width="59" height="11"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Total]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="37" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="62dcf476-b339-4953-8e26-09151b4a4cca" x="0" y="0" width="752" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="12" isBold="false" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[REKAP GIRO MASUKAN]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="5cbe87d0-6980-45cd-937c-8ad9199eb1e6" x="0" y="20" width="752" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Periode : " + new SimpleDateFormat("dd/MM/yyyy").format($P{DateFrom}) + " s/d " + new SimpleDateFormat("dd/MM/yyyy").format($P{DateTo})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="4617483b-aa6b-4e3e-ae93-1d050f7adf3b" x="652" y="0" width="100" height="20"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[UntaCoreIdempiere]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="9ee21e96-cef2-4e1b-9b2e-a1448cc31103" x="626" y="23" width="80" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="a1e2d8cf-1086-418c-b40b-a764e6b0ceb2" x="706" y="23" width="40" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement uuid="0d6ac9d3-ad0c-4d7c-9fe5-6891f24e971a" x="4" y="0" width="52" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nogiro}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="cd1c093e-3aaa-4d43-8b47-67de3bfb727f" x="56" y="0" width="95" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nm_customer}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8000b7c5-6aeb-46a6-98ef-fc49bc3d9fb2" x="313" y="0" width="92" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmbankpencairan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="a1f8a615-9bf1-4fbf-85ff-6cb2b139b0f4" x="405" y="0" width="64" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglgiro}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="0b8b9fa0-f01c-4e6d-bc61-8e7d093e87f9" x="473" y="0" width="55" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tgljtempo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="e0cbbcee-1db5-4080-9e59-46739599a8bb" x="531" y="0" width="59" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tglcair}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="0f69a23b-7834-4904-a743-1346cbcfa7c0" x="590" y="0" width="62" height="11"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rpgiro}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="550a9cdf-6d13-4c9c-929c-e2eb3c59c93f" x="151" y="0" width="66" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sales}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a8b2bf86-77a0-4b30-9d9e-5c6d7961ec7d" x="217" y="0" width="96" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nmbankgirom}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="30">
+			<textField>
+				<reportElement uuid="e015db2e-9eb4-4b69-b9f7-89da3413f480" x="601" y="14" width="151" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Print Date : "+ new SimpleDateFormat("dd/MM/yyyy").format($F{tglskrg})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="cfa05848-ac68-4e79-93f1-0d397c32e943" x="16" y="9" width="100" height="16"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dicetak oleh : "+$F{nama}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

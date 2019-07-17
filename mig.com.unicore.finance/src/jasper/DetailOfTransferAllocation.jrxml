@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailOfTransferAllocation" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0ff84c0f-6a94-4e04-9c44-ecc22e21649d">
+	<property name="ireport.zoom" value="1.6105100000000008"/>
+	<property name="ireport.x" value="35"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DateFrom" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DateTo" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="C_BankAccount_ID" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="UseBankFrom" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT * FROM (SELECT btv.UNS_BillingTrfValidation_ID AS btvID, btv.DocumentNo AS DocNo, btv.DateAcct AS DateAcct, bafrom.Name AS AccountFrom, bato.Name AS AccountTo, btv.AmountTrf AS AmountTrf, org.Value AS Org, CONCAT(bp.Value, '-', bp.Name) AS Partner, iv.DocumentNo AS Invoice, iv.GrandTotal AS GrandTotal FROM UNS_BillingTrfValidation btv
+
+INNER JOIN UNS_BillingTrf_Detail btd ON btd.UNS_BillingTrfValidation_ID = btv.UNS_BillingTrfValidation_ID
+INNER JOIN C_BankAccount bafrom ON bafrom.C_BankAccount_ID = btv.AccountFrom_ID
+INNER JOIN C_BankAccount bato ON bato.C_BankAccount_ID = btv.AccountTo_ID
+INNER JOIN UNS_PaymentReceipt pr ON pr.UNS_PaymentReceipt_ID = btd.UNS_PaymentReceipt_ID
+INNER JOIN UNS_BillingGroup_Result bgr ON bgr.UNS_BillingGroup_Result_ID = pr.UNS_BillingGroup_Result_ID
+INNER JOIN UNS_Billing_Result br ON br.UNS_BillingGroup_Result_ID = bgr.UNS_BillingGroup_Result_ID
+INNER JOIN UNS_BillingLine_Result blr ON blr.UNS_Billing_Result_ID = br.UNS_Billing_Result_ID AND blr.AD_Org_ID = pr.AD_Org_ID
+INNER JOIN C_Invoice iv ON iv.C_Invoice_ID = blr.C_Invoice_ID
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID = iv.C_BPartner_ID
+INNER JOIN AD_Org org ON org.AD_Org_ID = iv.AD_Org_ID
+
+WHERE btv.DocStatus IN ('CO', 'CL') AND btv.DateAcct BETWEEN $P{DateFrom} AND $P{DateTo} AND (CASE WHEN $P{UseBankFrom} = 'Y' AND $P{C_BankAccount_ID} IS NOT NULL THEN bafrom.C_BankAccount_ID = $P{C_BankAccount_ID} WHEN $P{UseBankFrom} = 'N' AND $P{C_BankAccount_ID} IS NOT NULL THEN bato.C_BankAccount_ID = $P{C_BankAccount_ID} ELSE 1=1 END)
+
+UNION ALL
+
+SELECT btv.UNS_BillingTrfValidation_ID AS btvID, btv.DocumentNo AS DocNo, btv.DateAcct AS DateAcct, bafrom.Name AS AccountFrom, bato.Name AS AccountTo, btv.AmountTrf AS AmountTrf, org.Value AS Org, CONCAT(bp.Value, '-', bp.Name) AS Partner, iv.DocumentNo AS Invoice, iv.GrandTotal AS GrandTotal FROM UNS_BillingTrfValidation btv
+
+INNER JOIN UNS_BillingTrf_Detail btd ON btd.UNS_BillingTrfValidation_ID = btv.UNS_BillingTrfValidation_ID
+INNER JOIN C_BankAccount bafrom ON bafrom.C_BankAccount_ID = btv.AccountFrom_ID
+INNER JOIN C_BankAccount bato ON bato.C_BankAccount_ID = btv.AccountTo_ID
+INNER JOIN C_PaymentAllocate pa ON pa.C_Payment_ID = btd.C_Payment_ID
+INNER JOIN C_Invoice iv ON iv.C_Invoice_ID = pa.C_Invoice_ID
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID = iv.C_BPartner_ID
+INNER JOIN AD_Org org ON org.AD_Org_ID = iv.AD_Org_ID
+
+WHERE btv.DocStatus IN ('CO', 'CL') AND btv.DateAcct BETWEEN $P{DateFrom} AND $P{DateTo} AND (CASE WHEN $P{UseBankFrom} = 'Y' AND $P{C_BankAccount_ID} IS NOT NULL THEN bafrom.C_BankAccount_ID = $P{C_BankAccount_ID} WHEN $P{UseBankFrom} = 'N' AND $P{C_BankAccount_ID} IS NOT NULL THEN bato.C_BankAccount_ID = $P{C_BankAccount_ID} ELSE 1=1 END)
+
+UNION ALL
+
+SELECT btv.UNS_BillingTrfValidation_ID AS btvID, btv.DocumentNo AS DocNo, btv.DateAcct AS DateAcct, bafrom.Name AS AccountFrom, bato.Name AS AccountTo, btv.AmountTrf AS AmountTrf, org.Value AS Org, CONCAT(bp.Value, '-', bp.Name) AS Partner, iv.DocumentNo AS Invoice, iv.GrandTotal AS GrandTotal FROM UNS_BillingTrfValidation btv
+
+INNER JOIN UNS_BillingTrf_Detail btd ON btd.UNS_BillingTrfValidation_ID = btv.UNS_BillingTrfValidation_ID
+INNER JOIN C_BankAccount bafrom ON bafrom.C_BankAccount_ID = btv.AccountFrom_ID
+INNER JOIN C_BankAccount bato ON bato.C_BankAccount_ID = btv.AccountTo_ID
+INNER JOIN UNS_BillingTrfValidation btvv ON btvv.Reference_ID = btd.C_Payment_ID
+INNER JOIN UNS_BillingTrf_Detail btdd ON btdd.UNS_BillingTrfValidation_ID = btvv.UNS_BillingTrfValidation_ID
+INNER JOIN C_Payment p ON p.C_Payment_ID = btdd.C_Payment_ID
+INNER JOIN C_PaymentAllocate paa ON paa.C_Payment_ID = p.C_Payment_ID
+INNER JOIN C_Invoice iv ON iv.C_Invoice_ID = paa.C_Invoice_ID
+INNER JOIN C_BPartner bp ON bp.C_BPartner_ID = iv.C_BPartner_ID
+INNER JOIN AD_Org org ON org.AD_Org_ID = iv.AD_Org_ID
+
+WHERE btv.DocStatus IN ('CO', 'CL') AND btv.DateAcct BETWEEN $P{DateFrom} AND $P{DateTo} AND (CASE WHEN $P{UseBankFrom} = 'Y' AND $P{C_BankAccount_ID} IS NOT NULL THEN bafrom.C_BankAccount_ID = $P{C_BankAccount_ID} WHEN $P{UseBankFrom} = 'N' AND $P{C_BankAccount_ID} IS NOT NULL THEN bato.C_BankAccount_ID = $P{C_BankAccount_ID} ELSE 1=1 END)
+) AS Master
+
+ORDER BY Master.DateAcct, Master.DocNo, Master.AccountFrom, Master.AccountTo]]>
+	</queryString>
+	<field name="btvid" class="java.math.BigDecimal"/>
+	<field name="docno" class="java.lang.String"/>
+	<field name="dateacct" class="java.sql.Timestamp"/>
+	<field name="accountfrom" class="java.lang.String"/>
+	<field name="accountto" class="java.lang.String"/>
+	<field name="amounttrf" class="java.math.BigDecimal"/>
+	<field name="org" class="java.lang.String"/>
+	<field name="partner" class="java.lang.String"/>
+	<field name="invoice" class="java.lang.String"/>
+	<field name="grandtotal" class="java.math.BigDecimal"/>
+	<variable name="num" class="java.lang.Integer" resetType="Group" resetGroup="IDTransferAllocation">
+		<variableExpression><![CDATA[$V{num} == null ? 1 : $V{num} + 1]]></variableExpression>
+	</variable>
+	<group name="IDTransferAllocation">
+		<groupExpression><![CDATA[$F{btvid}]]></groupExpression>
+		<groupHeader>
+			<band height="60">
+				<textField pattern="#,##0.00">
+					<reportElement uuid="8ef26e76-a587-400f-b3b3-d4e23cef17a8" x="0" y="0" width="555" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Transfer Allocation. #NO:: " + $F{docno} + " #Date:: " + new SimpleDateFormat("dd-MM-yyyy").format($F{dateacct})
+ + " #Amount:: " + new DecimalFormat("#,##0.00").format($F{amounttrf})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="c082d208-570d-4300-ad40-19a7b9a6bbcf" x="0" y="20" width="555" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{accountfrom} + " - " + $F{accountto}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="71785f4e-b7b0-4c5b-a3f2-27244dcd97b8" x="28" y="40" width="77" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Organization]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="97444bf7-ffdb-4bec-b55c-1e119611c7ce" x="105" y="40" width="170" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Partner]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="b1aede88-aa37-45f9-8d58-85d00aa727ba" x="275" y="40" width="83" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Invoice]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="261ab06c-bff1-4285-bad4-cb481338a009" x="358" y="40" width="138" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Grand Total]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="71785f4e-b7b0-4c5b-a3f2-27244dcd97b8" x="0" y="40" width="28" height="20"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[No.]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="14"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="e157188e-f3a6-4e1f-b336-3178a71d3c47" x="0" y="0" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Detail Of Transfer Allocation]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="ebe3f3fa-8d98-4e62-b88d-d1b878efbc2d" x="28" y="0" width="77" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{org}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d14da2da-95ce-49f2-a1c0-ea9fcbef4a4e" x="105" y="0" width="170" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{partner}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="3089979d-cbaa-4ca2-89ee-f4ccd2c1ae2f" x="275" y="0" width="83" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{invoice}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="0aed6d8c-ceaf-4062-9183-cf8fd60cd91b" x="358" y="0" width="138" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{grandtotal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ebe3f3fa-8d98-4e62-b88d-d1b878efbc2d" x="0" y="0" width="28" height="20"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{num}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
